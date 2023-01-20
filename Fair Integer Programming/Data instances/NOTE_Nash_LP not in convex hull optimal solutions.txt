@@ -1,0 +1,53 @@
+For the instance 'Nash_LP_2' the NASH LP-relaxation would find the following:
+
+ Y:
+         2
+
+ M:
+         0
+         3
+         4
+         6
+         7
+         8
+         9
+
+ N:
+         1
+         5
+
+
+------------------------
+                 NASH_LP
+------------------------
+ Agent  0:       0.40
+ Agent  3:       1.00
+ Agent  4:       0.60
+ Agent  6:       0.60
+ Agent  7:       0.60
+ Agent  8:       0.60
+ Agent  9:       1.00
+------------------------
+ Minimum :       0.40
+
+ Mean :          0.69
+ Geom. mean :    0.66
+
+ Solut. used:    0
+ Time :          0.14
+------------------------
+
+The optimal solutions are: (each solution is a column)
+        1       0       0       0       0       1       1
+        0       0       0       0       0       0       0
+        1       1       1       1       1       1       1
+        0       1       1       1       0       0       0
+        1       1       0       1       1       1       0
+        0       0       0       0       0       0       0
+        1       1       1       0       1       0       1
+        0       0       1       1       1       1       1
+        0       1       1       1       1       0       0
+        1       1       1       1       0       1       1
+
+Clearly, it is not possible to satisfy x_3 = 1 and x_0 = 1 at the same time in any of the optimal solutions,
+and therefore, the LP relaxation for the Nash solution doesn't lie in the convex hull of the optimal solutions.

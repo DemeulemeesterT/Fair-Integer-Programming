@@ -3,6 +3,13 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Excel
+*.xlsx
+
+# GUROBI generated files
+*.lp
+*.log
+
 # User-specific files
 *.rsuser
 *.suo
