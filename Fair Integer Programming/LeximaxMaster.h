@@ -1,7 +1,7 @@
 #include "IPSolver.h"
 
 #pragma once
-class LeximinMaster
+class LeximaxMaster
 {
 public:
 	IPSolver* K;
@@ -34,7 +34,7 @@ public:
 	// Auxiliary functions
 	void defineModelConVar(bool print);
 
-	LeximinMaster(IPSolver* K_in, bool print);
-	~LeximinMaster();
+	LeximaxMaster(IPSolver* K_in, bool print);
+	~LeximaxMaster();
 };
 

@@ -1,6 +1,6 @@
-#include "LeximinMaster.h"
+#include "LeximaxMaster.h"
 
-lottery LeximinMaster::solve(bool print) {
+lottery LeximaxMaster::solve(bool print) {
 	//model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
@@ -20,7 +20,7 @@ lottery LeximinMaster::solve(bool print) {
 	// Create a lottery object corresponding to store the solution
 	lottery L;
 
-	// We will use two while loops to find the leximin solution.
+	// We will use two while loops to find the leximax solution.
 	// In the inner loop, we will find the weights of the solutions in order to 
 		// maximize the selection probability of the worst-off agent in M "that is remaining"
 	// In the outer loop, we decide which agents are remaining.
@@ -41,7 +41,7 @@ lottery LeximinMaster::solve(bool print) {
 		double obj_val_pricing = 1;
 		double obj_val_master;
 		while (obj_val_pricing > 0) {
-			model->write("Generated Formulations/LeximinModel.lp");
+			model->write("Generated Formulations/LeximaxModel.lp");
 			if (print) {
 				printf("ITERATION %i\n", iterations);
 			}
@@ -114,7 +114,7 @@ lottery LeximinMaster::solve(bool print) {
 			}
 		}
 		model->update();
-		model->write("Generated Formulations/LeximinMaster.lp");
+		model->write("Generated Formulations/LeximaxMaster.lp");
 
 		// Count the number of agents for which no selection probability is fixed yet
 		sum = 0;
@@ -130,7 +130,7 @@ lottery LeximinMaster::solve(bool print) {
 	return L;
 }
 
-void LeximinMaster::addColumn(solution sol, bool print) {
+void LeximaxMaster::addColumn(solution sol, bool print) {
 	GRBColumn col;
 	int counter = 0;
 	for (int i = 0; i < K->I.n; i++) {
@@ -153,10 +153,10 @@ void LeximinMaster::addColumn(solution sol, bool print) {
 	GRBVar empty;
 	w.push_back(empty);
 	w.back() = model->addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, col, name_w);
-	model->write("Generated Formulations/LeximinMaster.lp");
+	model->write("Generated Formulations/LeximaxMaster.lp");
 }
 
-void LeximinMaster::getDualValues(bool print) {
+void LeximaxMaster::getDualValues(bool print) {
 	dual_C.clear();
 	dual_C_Sum1.clear();
 
@@ -189,10 +189,10 @@ void LeximinMaster::getDualValues(bool print) {
 	}
 }
 
-void LeximinMaster::defineModelConVar(bool print) {
+void LeximaxMaster::defineModelConVar(bool print) {
 	env = new GRBEnv();
 	model = new GRBModel(*env);
-	env->set(GRB_StringParam_LogFile, "Generated Log-files/LeximinMaster.log");
+	env->set(GRB_StringParam_LogFile, "Generated Log-files/LeximaxMaster.log");
 
 	// Define 'MIN_M' variable, which we will maximize
 	MIN_M = GRBVar();
@@ -234,7 +234,7 @@ void LeximinMaster::defineModelConVar(bool print) {
 		K->block_solution(K->S[s]);
 	}
 
-	model->write("Generated Formulations/LeximinMaster.lp");
+	model->write("Generated Formulations/LeximaxMaster.lp");
 	// Define variables
 	w = std::vector<GRBVar>(K->S.size());
 	for (int i = 0; i < K->S.size(); i++) {
@@ -250,17 +250,17 @@ void LeximinMaster::defineModelConVar(bool print) {
 	dual_C_Sum1 = std::vector<double>();
 
 	if (print) {
-		model->write("Generated Formulations/LeximinMaster.lp");
+		model->write("Generated Formulations/LeximaxMaster.lp");
 	}
 }
 
-LeximinMaster::LeximinMaster(IPSolver* K_in, bool print) {
+LeximaxMaster::LeximaxMaster(IPSolver* K_in, bool print) {
 	K = new IPSolver(K_in, print);
 
 	defineModelConVar(print);
 }
 
-LeximinMaster::~LeximinMaster() {
+LeximaxMaster::~LeximaxMaster() {
 	delete[] C;
 	delete K;
 	delete model;

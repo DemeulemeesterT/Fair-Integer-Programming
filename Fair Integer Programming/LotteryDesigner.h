@@ -1,5 +1,5 @@
 #include "IPSolver.h"
-#include "LeximinMaster.h"
+#include "LeximaxMaster.h"
 #include "SimplicalDecomposition.h"
 
 #pragma once
@@ -13,8 +13,8 @@ public:
 	// Main methods
 	lottery uniform(bool print);
 	// 'uniform' selects each agent with a probability equal to the fraction of the optimal solutions in which they are selected
-	lottery leximin(bool print);
-	// 'leximin' finds a lottery that maximizes the lowest selection probability among the agents in M, and then the second-lowest...
+	lottery leximax(bool print);
+	// 'leximax' finds a lottery that maximizes the lowest selection probability among the agents in M, and then the second-lowest...
 	lottery RSD(int iterations, bool print, unsigned seed = 123456789);
 	// 'RSD' randomly orders the agents and let them discard the solutions in which they are not selected one by one in this order.
 	lottery rename_variables(int iterations, bool print, unsigned seed = 123456789);
@@ -34,7 +34,7 @@ public:
 	// It will print the results in this order
 	// Letters are
 		// U = Uniform
-		// L = Leximin
+		// L = Leximax
 		// R = RSD
 		// O = Rename Variables ("Order")
 		// P = Perturb objective

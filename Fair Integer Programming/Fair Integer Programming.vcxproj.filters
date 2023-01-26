@@ -27,7 +27,7 @@
     <ClInclude Include="KidneyExchange.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LeximinMaster.h">
+    <ClInclude Include="LeximaxMaster.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LotteryDesigner.h">
@@ -44,7 +44,7 @@
     <ClCompile Include="KidneyExchange.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LeximinMaster.cpp">
+    <ClCompile Include="LeximaxMaster.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LotteryDesigner.cpp">
