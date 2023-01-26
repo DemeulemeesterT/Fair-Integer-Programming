@@ -148,6 +148,7 @@
     <ClInclude Include="IPSolver.h" />
     <ClInclude Include="KidneyExchange.h" />
     <ClInclude Include="LeximaxMaster.h" />
+    <ClInclude Include="LeximaxMasterLegacy.h" />
     <ClInclude Include="LotteryDesigner.h" />
     <ClInclude Include="Run_configurations.h" />
     <ClInclude Include="SimplicalDecomposition.h" />
@@ -158,6 +159,7 @@
     <ClCompile Include="IPfunctions.cpp" />
     <ClCompile Include="KidneyExchange.cpp" />
     <ClCompile Include="LeximaxMaster.cpp" />
+    <ClCompile Include="LeximaxMasterLegacy.cpp" />
     <ClCompile Include="LotteryDesigner.cpp" />
     <ClCompile Include="run_Kidney_Exchange_all.cpp" />
     <ClCompile Include="SimplicalDecomposition.cpp" />

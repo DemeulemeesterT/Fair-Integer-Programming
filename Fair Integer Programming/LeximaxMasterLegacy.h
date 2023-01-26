@@ -1,7 +1,7 @@
 #include "IPSolver.h"
 
 #pragma once
-class LeximaxMaster
+class LeximaxMasterLegacy
 {
 public:
 	IPSolver* K;
@@ -26,18 +26,15 @@ public:
 	std::vector<double> dual_C;
 	std::vector<double> dual_C_Sum1;
 
-	std::vector<double> prob_agents;
-	// Contains the probabilities with which the agents in M are selected in the leximax distribution
-
-	//lottery solve(bool print);
-	//void getDualValues(bool print);
-	//void addColumn(solution sol, bool print);
+	lottery solve(bool print);
+	void getDualValues(bool print);
+	void addColumn(solution sol, bool print);
 
 
 	// Auxiliary functions
 	void defineModelConVar(bool print);
 
-	LeximaxMaster(IPSolver* K_in, bool print);
-	~LeximaxMaster();
+	LeximaxMasterLegacy(IPSolver* K_in, bool print);
+	~LeximaxMasterLegacy();
 };
 

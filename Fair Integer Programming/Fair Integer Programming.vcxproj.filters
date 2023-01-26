@@ -27,7 +27,7 @@
     <ClInclude Include="KidneyExchange.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LeximaxMaster.h">
+    <ClInclude Include="LeximaxMasterLegacy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LotteryDesigner.h">
@@ -39,12 +39,15 @@
     <ClInclude Include="SimplicalDecomposition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LeximaxMaster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KidneyExchange.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LeximaxMaster.cpp">
+    <ClCompile Include="LeximaxMasterLegacy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LotteryDesigner.cpp">
@@ -67,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="run_Kidney_Exchange_all.cpp">
       <Filter>Source Files\RunConfigurations</Filter>
+    </ClCompile>
+    <ClCompile Include="LeximaxMaster.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
