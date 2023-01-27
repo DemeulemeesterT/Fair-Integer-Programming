@@ -1,7 +1,7 @@
 #include "LeximaxMaster.h"
 
 lottery LeximaxMaster::solve(bool print) {
-	//model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
+	model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	// Add constraint to knapsack to enforce the objective value to be equal to the optimal objective value
@@ -37,6 +37,9 @@ lottery LeximaxMaster::solve(bool print) {
 	clock_t start_time = clock();
 
 	while (sum > 0) {
+		bool all_solutions_in_S = false;
+		// This boolean will become true if all optimal solutions are included in K->S.
+
 		// As long as the solution of the pricing problem has a non-negative reduced cost, continue
 		double obj_val_pricing = 1;
 		double obj_val_master;
@@ -66,6 +69,11 @@ lottery LeximaxMaster::solve(bool print) {
 			obj -= dual_C_Sum1[0];
 			K->model->setObjective(obj, GRB_MAXIMIZE);
 			obj_val_pricing = K->solve(false);
+			// If the model was not infeasible
+			if (K->model->get(GRB_IntAttr_Status) == 3) {
+				all_solutions_in_S = true;
+				obj_val_pricing = 0; // This will stop the master-pricing iterations
+			}
 
 			// Add a new column to the master if the reduced cost is non-negative
 			if (obj_val_pricing > 0) {
@@ -137,58 +145,73 @@ lottery LeximaxMaster::solve(bool print) {
 					if (epsilon_opt < 0.001) {
 						// This means that we are not yet sure whether we found the optimal value of epsilon
 						// We will continue looking until we have proof of optimality
-						
-						// Do the column generation step to decide whether the found solution is optimal
-							// or whether we have to add an additional column and solve again.
-						getDualValues(true, print);
 
-						// Change the objective of the knapsack problem, which will serve as our pricing problem
-						obj = 0.0;
+							// Do the column generation step to decide whether the found solution is optimal
+								// or whether we have to add an additional column and solve again.
+							getDualValues(true, print);
 
-						// The dual variable of the epsilon-constraint:
-						obj -= dual_C_bound_MIN_M[0] * K->X[i];
+							// Change the objective of the knapsack problem, which will serve as our pricing problem
+							obj = 0.0;
 
-						int counter_inner = 0;
-						for (int j = 0; j < K->I.n; j++) {
-							if (K->M[j] == 1) {
+							// The dual variable of the epsilon-constraint:
+							obj -= dual_C_bound_MIN_M[0] * K->X[i];
 
-								obj -= dual_C_bound[counter_inner] * K->X[j];
-								counter_inner++;
+							int counter_inner = 0;
+							for (int j = 0; j < K->I.n; j++) {
+								if (K->M[j] == 1) {
+
+									obj -= dual_C_bound[counter_inner] * K->X[j];
+									counter_inner++;
+								}
 							}
-						}
-						obj -= dual_C_Sum1[0];
-						K->model->setObjective(obj, GRB_MAXIMIZE);
-						obj_val_pricing_epsilon = K->solve(false);
+							obj -= dual_C_Sum1[0];
+							K->model->setObjective(obj, GRB_MAXIMIZE);
+							K->model->write("Generated Formulations/IPModel.lp");
+							obj_val_pricing_epsilon = K->solve(false);
 
-						// Add a new column to the master if the reduced cost is non-negative
-						if (obj_val_pricing_epsilon > 0) {
-							addColumn(K->S.back(), print);
-							K->block_solution(K->S.back());
-						}
+							// If the model was infeasible
+							if (K->model->get(GRB_IntAttr_Status) == 3) {
+								all_solutions_in_S = true;
+								// This means that all optimal solutions are included in the set K->S
+								// No more optimal solutions can be found
 
-						else {
-							// Epsilon*=0 is the optimal solution
-							// This means that we have to fix the selection probabilty of agent i
-								// to the obtained value of MIN_M
-							
-							// We can simply do this by bounding the RHS of the bounding inequality to the optimal objective value of MIN_M...
-							C_bound[counter].set(GRB_DoubleAttr_RHS, obj_val_master);
+								// Stop the master-pricing iterations for the epsilon problems
+								obj_val_pricing_epsilon = 0;
+							}
 
-							// And by setting the coefficient of MIN_M in that constraint to zero
-							model->chgCoeff(C_bound[counter], MIN_M, 0.0);
-							model->write("Generated Formulations/LeximaxModel.lp");
+							// Add a new column to the master if the reduced cost is non-negative
+							if (obj_val_pricing_epsilon > 0) {
+								addColumn(K->S.back(), print);
+								//K->block_solution(K->S.back());
+							}
 
-							M_remaining[i] = 0;
-						}
+							else {
+								// Epsilon*=0 is the optimal solution
+								// This means that we have to fix the selection probabilty of agent i
+									// to the obtained value of MIN_M
 
+								// We can simply do this by bounding the RHS of the bounding inequality to the optimal objective value of MIN_M...
+								C_bound[counter].set(GRB_DoubleAttr_RHS, obj_val_master);
+								C_bound[counter].set(GRB_CharAttr_Sense, '=');
+
+								// And by setting the coefficient of MIN_M in that constraint to zero
+								model->chgCoeff(C_bound[counter], MIN_M, 0.0);
+								model->write("Generated Formulations/LeximaxModel.lp");
+
+								M_remaining[i] = 0;
+							}
+						
 						if (print) {
 							// If the model was not infeasible
 							if (K->model->get(GRB_IntAttr_Status) != 3) {
 								printf("\t Reduced cost = %.5f\n\n", obj_val_pricing_epsilon);
 							}
 							else {
-								printf("\t Pricing problem INFEASIBLE\n\n");
-								model->computeIIS();
+								printf("\t Pricing problem INFEASIBLE or ALL optimal solutions are found\n\n");
+								//model->write("Generated Formulations/LeximaxModel.lp");
+								//K->model->computeIIS();
+								//K->model->write("Generated Formulations/LeximaxModal_IIS.ilp");
+
 							}
 						}
 					}
