@@ -1,7 +1,7 @@
 #include "LeximaxMaster.h"
 
 lottery LeximaxMaster::solve(bool print) {
-	model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
+	//model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	// Add constraint to knapsack to enforce the objective value to be equal to the optimal objective value
@@ -124,7 +124,7 @@ lottery LeximaxMaster::solve(bool print) {
 				int iterations_subroutine = 1;
 				while (obj_val_pricing_epsilon > 0) {
 					if (print) {
-						printf("\nITERATION SUBROUTINE %i.%i.%i\n\n", iterations, i, iterations_subroutine);
+						printf("\nITERATION SUBROUTINE %i.%i.%i\n\n", iterations-1, i, iterations_subroutine);
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
@@ -188,6 +188,7 @@ lottery LeximaxMaster::solve(bool print) {
 							}
 							else {
 								printf("\t Pricing problem INFEASIBLE\n\n");
+								model->computeIIS();
 							}
 						}
 					}

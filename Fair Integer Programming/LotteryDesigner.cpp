@@ -926,8 +926,8 @@ void LotteryDesigner::compare_methods(std::string s, int iterations, bool intera
 				if (letter == "U") {
 					L.push_back(uniform(false));
 				}
-				else if (letter == "X") {
-					L.push_back(leximax(false));
+				else if (letter == "L") {
+					L.push_back(leximax(true));
 				}
 				else if (letter == "R") {
 					L.push_back(RSD(iterations, false, seed));
@@ -971,6 +971,9 @@ void LotteryDesigner::compare_methods(std::string s, int iterations, bool intera
 				}
 				else if (letter == "R") {
 					display = " RSD";
+				}
+				else if (letter == "L") {
+					display = "LEXI";
 				}
 				else if (letter == "O") {
 					display = "INDEX*";
