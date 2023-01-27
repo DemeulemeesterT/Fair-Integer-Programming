@@ -45,7 +45,8 @@ public:
 	// Contains the probabilities with which the agents in M are selected in the leximax distribution
 
 	lottery solve(bool print);
-	void getDualValues(bool print);
+	void getDualValues(bool epsilon_constraint, bool print);
+		// 'epsilon_constraint' is true when we are calling the dual variables when the epsilon variable is present in the model
 	void addColumn(solution sol, bool print);
 
 

@@ -961,7 +961,7 @@ void LotteryDesigner::compare_methods(std::string s, int iterations, bool intera
 					L.push_back(leximax_legacy(false));
 				}
 				else if (letter == "X") {
-					L.push_back(leximax(false));
+					L.push_back(leximax(true));
 				}
 				else if (letter == "R") {
 					L.push_back(RSD(iterations, false, seed));

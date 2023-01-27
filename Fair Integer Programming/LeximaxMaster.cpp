@@ -43,7 +43,7 @@ lottery LeximaxMaster::solve(bool print) {
 		while (obj_val_pricing > 0) {
 			model->write("Generated Formulations/LeximaxModel.lp");
 			if (print) {
-				printf("ITERATION %i\n", iterations);
+				printf("\nITERATION %i\n\n", iterations);
 			}
 
 			GRBLinExpr obj = MIN_M;
@@ -51,7 +51,7 @@ lottery LeximaxMaster::solve(bool print) {
 
 			model->optimize();
 			obj_val_master = model->get(GRB_DoubleAttr_ObjVal);
-			getDualValues(print);
+			getDualValues(false, print);
 
 			// Change the objective of the knapsack problem, which will serve as our pricing problem
 			obj = 0.0;
@@ -121,9 +121,10 @@ lottery LeximaxMaster::solve(bool print) {
 				// We will do this by setting the coefficient of the column 'Epsilon' to minus one for that constraint
 
 				double obj_val_pricing_epsilon = 1;
+				int iterations_subroutine = 1;
 				while (obj_val_pricing_epsilon > 0) {
 					if (print) {
-						printf("ITERATION %i\n", iterations);
+						printf("\nITERATION SUBROUTINE %i.%i.%i\n\n", iterations, counter, iterations_subroutine);
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
@@ -145,12 +146,49 @@ lottery LeximaxMaster::solve(bool print) {
 						// Terminate the while-loop
 						obj_val_pricing_epsilon = 0;
 
+						M_remaining[i] = 0;
+
 					}
 					else {
 						// Do the column generation step to decide whether the found solution is optimal
 							// or whether we have to add an additional column and solve again.
+						getDualValues(true, print);
 
+						// Change the objective of the knapsack problem, which will serve as our pricing problem
+						obj = 0.0;
+
+						// The dual variable of the epsilon-constraint:
+						obj -= dual_C_bound_MIN_M[0] * K->X[i];
+
+						int counter = 0;
+						for (int j = 0; j < K->I.n; j++) {
+							if (K->M[j] == 1) {
+
+								obj -= dual_C_bound[counter] * K->X[j];
+								counter++;
+							}
+						}
+						obj -= dual_C_Sum1[0];
+						K->model->setObjective(obj, GRB_MAXIMIZE);
+						obj_val_pricing = K->solve(false);
+
+						// Add a new column to the master if the reduced cost is non-negative
+						if (obj_val_pricing > 0) {
+							addColumn(K->S.back(), print);
+							K->block_solution(K->S.back());
+						}
+
+						if (print) {
+							// If the model was not infeasible
+							if (K->model->get(GRB_IntAttr_Status) != 3) {
+								printf("\t Reduced cost = %.5f\n\n", obj_val_pricing);
+							}
+							else {
+								printf("\t Pricing problem INFEASIBLE\n\n");
+							}
+						}
 					}
+					iterations_subroutine++;
 				}
 				// Undo the modifications to the model to solve it again in the next iteration
 				model->chgCoeff(C_bound[counter], Epsilon, 0.0);
@@ -164,25 +202,6 @@ lottery LeximaxMaster::solve(bool print) {
 		model->remove(C_bound_MIN_M);
 		model->write("Generated Formulations/LeximaxModel.lp");
 
-
-		counter = -1;
-		for (int i = 0; i < K->I.n; i++) {
-			if (K->M[i] == 1) {
-				counter++;
-				// To find the index of the corresponding constraint
-			}
-			double diff = std::abs(L.p[i] - obj_val_master);
-			if (diff <= 0.000001) {
-				M_remaining[i] = 0;
-				// Remove 'MIN_M' from the corresponding constraint
-				model->chgCoeff(C_bound[counter], MIN_M, 0.0);
-
-				// Change RHS from the corresponding constraint
-				C_bound[counter].set(GRB_DoubleAttr_RHS, obj_val_master);
-			}
-		}
-		model->update();
-		model->write("Generated Formulations/LeximaxMaster.lp");
 
 		// Count the number of agents for which no selection probability is fixed yet
 		sum = 0;
@@ -225,7 +244,7 @@ void LeximaxMaster::addColumn(solution sol, bool print) {
 }
 
 
-void LeximaxMaster::getDualValues(bool print) {
+void LeximaxMaster::getDualValues(bool epsilon_constraint, bool print) {
 	dual_C_bound.clear();
 	dual_C_Sum1.clear();
 	dual_C_bound_MIN_M.clear();
@@ -248,6 +267,10 @@ void LeximaxMaster::getDualValues(bool print) {
 	}
 	dual_C_Sum1.push_back(C_Sum1.get(GRB_DoubleAttr_Pi));
 
+	if (epsilon_constraint == true) {
+		dual_C_bound_MIN_M.push_back(C_bound_MIN_M.get(GRB_DoubleAttr_Pi));
+	}
+
 	counter = 0;
 	if (print) {
 		for (int i = 0; i < K->I.n; i++) {
@@ -257,6 +280,10 @@ void LeximaxMaster::getDualValues(bool print) {
 			}
 		}
 		printf("\t\tDual_C_Sum1 = %.2f\n", dual_C_Sum1[0]);
+
+		if (epsilon_constraint == true) {
+			printf("\t\tDual_C_bound_MIN_M = %.2f\n", dual_C_bound_MIN_M[0]);
+		}
 	}
 }
 
