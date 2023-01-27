@@ -1,6 +1,5 @@
 #include "IPSolver.h"
 #include "LeximaxMaster.h"
-#include "LeximaxMasterLegacy.h"
 #include "SimplicalDecomposition.h"
 
 #pragma once
@@ -14,9 +13,6 @@ public:
 	// Main methods
 	lottery uniform(bool print);
 	// 'uniform' selects each agent with a probability equal to the fraction of the optimal solutions in which they are selected
-	lottery leximax_legacy(bool print);
-	// LEGACY FUNCTION, USE LEXIMAX() INSTEAD!
-	//'leximax_legacy' finds a lottery that maximizes the lowest selection probability among the agents in M, and then the second-lowest...
 	lottery leximax(bool print);
 	// 'leximax' finds a lottery that maximizes the lowest selection probability among the agents in M, and then the second-lowest...
 	lottery RSD(int iterations, bool print, unsigned seed = 123456789);

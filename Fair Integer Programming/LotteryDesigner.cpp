@@ -215,36 +215,6 @@ lottery LotteryDesigner::uniform(bool print) {
 	return L;
 }
 
-lottery LotteryDesigner::leximax_legacy(bool print) {
-	// LEGACY FUNCTION, USE LEXIMAX() INSTEAD
-	// THIS FUNCTION WILL INCORRECTLY DETERMINE FOR WHICH AGENTS 
-	// THE SELECTION PROBABILITY IS EQUAL TO THE MAXIMUM POSSIBLE FOR THE REMAINING AGENTS.
-
-	// We want to build a column generation framework that maximizes the selection probability
-	// of the least-selected agent in M
-		// First we solve a master problem, based on the optimal solutions we already know.
-		// Then we solve our knapack problem with an alternative objective function,
-			// and the constraint that the original objective value is equal to the optimal value
-		// Add the solution to the master problem again, etc.
-
-	// Disable output if not wanted
-	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
-
-
-	LeximaxMasterLegacy* M = new LeximaxMasterLegacy(K, print);
-	lottery L = M->solve(print);
-	delete M;
-
-	if (print) {
-		print_lottery(L);
-	}
-
-	// Reset 'K', so that we don't "cheat" by making it easier for the other methods.
-	reset_K(print);
-
-	return L;
-}
-
 lottery LotteryDesigner::leximax(bool print) {
 	// We want to build a column generation framework that maximizes the selection probability
 	// of the least-selected agent in M
@@ -927,8 +897,7 @@ void LotteryDesigner::compare_methods(std::string s, int iterations, bool intera
 				printf("\n\n ****************************************************************************");
 				printf("\n Which methods do you want to compare? Type the corresponding letters + ENTER\n");
 				printf("\t U = Uniform\n");
-				printf("\t L = Leximax (legacy)\n");
-				printf("\t X = Leximax\n");
+				printf("\t L = Leximax\n");
 				printf("\t R = Random Serial Dictatorship\n");
 				printf("\t O = Re-index the variables randomly\n");
 				printf("\t P = Perturb the objective function randomly\n");
@@ -957,11 +926,8 @@ void LotteryDesigner::compare_methods(std::string s, int iterations, bool intera
 				if (letter == "U") {
 					L.push_back(uniform(false));
 				}
-				else if (letter == "L") {
-					L.push_back(leximax_legacy(false));
-				}
 				else if (letter == "X") {
-					L.push_back(leximax(true));
+					L.push_back(leximax(false));
 				}
 				else if (letter == "R") {
 					L.push_back(RSD(iterations, false, seed));
@@ -1002,9 +968,6 @@ void LotteryDesigner::compare_methods(std::string s, int iterations, bool intera
 				letter = s[i];
 				if (letter == "U") {
 					display = "UNIF*";
-				}
-				else if (letter == "L") {
-					display = "LEXI";
 				}
 				else if (letter == "R") {
 					display = " RSD";

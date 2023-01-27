@@ -11,7 +11,7 @@ int main()
 	//RG = run_Kidney_exchange_all(true);
 
 	//KidneyExchange* KE = new KidneyExchange("50-instance-19", true);
-	KidneyExchange* KE = new KidneyExchange("20-instance-1", true);
+	KidneyExchange* KE = new KidneyExchange("30-instance-2", true);
 
 	inst I = KE->generate_instance(true, true);
 	IPSolver* K = new IPSolver(I, true);

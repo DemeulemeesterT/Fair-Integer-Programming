@@ -1,7 +1,7 @@
 #include "LeximaxMaster.h"
 
 lottery LeximaxMaster::solve(bool print) {
-	//model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
+	model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	// Add constraint to knapsack to enforce the objective value to be equal to the optimal objective value
@@ -124,7 +124,7 @@ lottery LeximaxMaster::solve(bool print) {
 				int iterations_subroutine = 1;
 				while (obj_val_pricing_epsilon > 0) {
 					if (print) {
-						printf("\nITERATION SUBROUTINE %i.%i.%i\n\n", iterations, counter, iterations_subroutine);
+						printf("\nITERATION SUBROUTINE %i.%i.%i\n\n", iterations, i, iterations_subroutine);
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
@@ -135,21 +135,9 @@ lottery LeximaxMaster::solve(bool print) {
 						// The leximax selection probability of agent i should be equal to MIN_M
 					epsilon_opt = model->get(GRB_DoubleAttr_ObjVal);
 					if (epsilon_opt < 0.001) {
-						// Fix the selection probability of agent i to MIN_M
-						// We can simply do this by bounding the RHS of the bounding inequality to the optimal objective value of MIN_M...
-						C_bound[counter].set(GRB_DoubleAttr_RHS, obj_val_master);
-
-						// And by setting the coefficient of MIN_M in that constraint to zero
-						model->chgCoeff(C_bound[counter], MIN_M, 0.0);
-						model->write("Generated Formulations/LeximaxModel.lp");
-
-						// Terminate the while-loop
-						obj_val_pricing_epsilon = 0;
-
-						M_remaining[i] = 0;
-
-					}
-					else {
+						// This means that we are not yet sure whether we found the optimal value of epsilon
+						// We will continue looking until we have proof of optimality
+						
 						// Do the column generation step to decide whether the found solution is optimal
 							// or whether we have to add an additional column and solve again.
 						getDualValues(true, print);
@@ -160,33 +148,56 @@ lottery LeximaxMaster::solve(bool print) {
 						// The dual variable of the epsilon-constraint:
 						obj -= dual_C_bound_MIN_M[0] * K->X[i];
 
-						int counter = 0;
+						int counter_inner = 0;
 						for (int j = 0; j < K->I.n; j++) {
 							if (K->M[j] == 1) {
 
-								obj -= dual_C_bound[counter] * K->X[j];
-								counter++;
+								obj -= dual_C_bound[counter_inner] * K->X[j];
+								counter_inner++;
 							}
 						}
 						obj -= dual_C_Sum1[0];
 						K->model->setObjective(obj, GRB_MAXIMIZE);
-						obj_val_pricing = K->solve(false);
+						obj_val_pricing_epsilon = K->solve(false);
 
 						// Add a new column to the master if the reduced cost is non-negative
-						if (obj_val_pricing > 0) {
+						if (obj_val_pricing_epsilon > 0) {
 							addColumn(K->S.back(), print);
 							K->block_solution(K->S.back());
+						}
+
+						else {
+							// Epsilon*=0 is the optimal solution
+							// This means that we have to fix the selection probabilty of agent i
+								// to the obtained value of MIN_M
+							
+							// We can simply do this by bounding the RHS of the bounding inequality to the optimal objective value of MIN_M...
+							C_bound[counter].set(GRB_DoubleAttr_RHS, obj_val_master);
+
+							// And by setting the coefficient of MIN_M in that constraint to zero
+							model->chgCoeff(C_bound[counter], MIN_M, 0.0);
+							model->write("Generated Formulations/LeximaxModel.lp");
+
+							M_remaining[i] = 0;
 						}
 
 						if (print) {
 							// If the model was not infeasible
 							if (K->model->get(GRB_IntAttr_Status) != 3) {
-								printf("\t Reduced cost = %.5f\n\n", obj_val_pricing);
+								printf("\t Reduced cost = %.5f\n\n", obj_val_pricing_epsilon);
 							}
 							else {
 								printf("\t Pricing problem INFEASIBLE\n\n");
 							}
 						}
+					}
+					else {
+						// Although the objective value of epsilon might not be optimal yet
+						// We know that it is at least strictly positive
+						// And that agent i is therefore selected with a strictly higher probability than MIN_M
+
+						// Terminate the while-loop
+						obj_val_pricing_epsilon = 0;
 					}
 					iterations_subroutine++;
 				}
