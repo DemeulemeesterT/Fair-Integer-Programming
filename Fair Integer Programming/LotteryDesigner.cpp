@@ -258,8 +258,7 @@ lottery LotteryDesigner::leximax(bool print) {
 
 
 	LeximaxMaster* M = new LeximaxMaster(K, print);
-	lottery L;
-	/*lottery L = M->solve(print);
+	lottery L = M->solve(print);
 	delete M;
 
 	if (print) {
@@ -268,7 +267,7 @@ lottery LotteryDesigner::leximax(bool print) {
 
 	// Reset 'K', so that we don't "cheat" by making it easier for the other methods.
 	reset_K(print);
-	*/
+	
 	return L;
 }
 
