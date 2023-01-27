@@ -15,10 +15,16 @@ public:
 	GRBVar MIN_M;
 	// This variable contains the lowest selection probability for the agents in M
 	
-	GRBConstr* C;
+	// THE FOLLOWING CONSTRAINTS contain one element for each agent in M
+		// e.g., C_bound[3] represents the C_bound constraint for the third agent in M.
+	std::vector<GRBConstr> C_bound;
 	// Constraints that determine the constraints to link w with MIN_M.
+
 	GRBConstr C_Sum1;
 	// Sum of the weights equals one
+
+	GRBConstr C_bound_MIN_M;
+	// Constraint will be used to decide which agents is assigned with obtained selection probabilities
 
 	std::vector<GRBColumn> columns;
 	// Contains the constraint coefficients by column (solution)
@@ -29,8 +35,11 @@ public:
 	// Variable associated with 'Epsilon_column'
 
 
-	std::vector<double> dual_C;
+	std::vector<double> dual_C_bound;
+
 	std::vector<double> dual_C_Sum1;
+
+	std::vector<double> dual_C_bound_MIN_M;
 
 	std::vector<double> prob_agents;
 	// Contains the probabilities with which the agents in M are selected in the leximax distribution
