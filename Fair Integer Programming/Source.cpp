@@ -36,7 +36,4 @@ int main()
 	//delete SD;
 	delete K;
 	//delete KE;
-
-	printf("\n\n\nSTILL NOT CORRECT, SHOULD OBTAIN SAME AS NASH FOR 30-instance-2 in KE, BUT DOESN'T!\n\n");
-
 }

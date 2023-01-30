@@ -123,6 +123,7 @@ double IPSolver::solve(bool print) {
 	return z;
 }
 
+
 void IPSolver::analyze(bool print) {
 	solve(false);
 	printf("\n*******************************************\n\t         PARTITION\n*******************************************\n");
