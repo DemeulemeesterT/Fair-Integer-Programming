@@ -227,9 +227,11 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 	model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
-	printf("\n\n\n For Nash, it is very important that every agent in M is at least selected in one of the optimal solutions that is used to initiate the Simplical Decomposition.\n");
-	printf(" Therefore, we will initiate the solution set with a greedy covering of the agents.\n\n");
-	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	if (print) {
+		printf("\n\n\n For Nash, it is very important that every agent in M is at least selected in one of the optimal solutions that is used to initiate the Simplical Decomposition.\n");
+		printf(" Therefore, we will initiate the solution set with a greedy covering of the agents.\n\n");
+
+	}K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	int counter;
 
@@ -269,7 +271,7 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 			counter++;
 		}
 	}
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 
 	// OBJECTIVE
 	// Set objective function
@@ -283,7 +285,7 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 	}
 	model->setObjective(obj, GRB_MAXIMIZE);
 
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 
 	// Add the columns
 	columns.resize(K->S_greedy.size());
@@ -307,7 +309,7 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 		L.S.push_back(K->S_greedy[s]);
 	}
 
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 
 	for (int i = 0; i < K->S_greedy.size(); i++) {
 		char name_w[13];
@@ -315,7 +317,7 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 		w.push_back(model->addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, columns[i], name_w));
 	}
 
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 
 	// Add constraint to knapsack to enforce the objective value to be equal to the optimal objective value
 	GRBLinExpr expr = 0.0;
@@ -340,7 +342,7 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 
 	bool finished = false;
 	while (finished == false) {
-		model->write("Generated Formulations/SDNashMaster.lp");
+		//model->write("Generated Formulations/SDNashMaster.lp");
 		if (print) {
 			printf("ITERATION %i\n", iterations);
 		}

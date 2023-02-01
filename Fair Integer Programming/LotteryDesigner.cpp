@@ -875,7 +875,10 @@ lottery LotteryDesigner::Nash_LP_relax(bool print) {
 }
 
 
-void LotteryDesigner::compare_methods(std::string s, int iterations, bool interactive_console, unsigned seed) {
+std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterations, bool interactive_console, unsigned seed) {
+	// Solve the named solution concepts and store the lotteries in a vector of lotteries
+	std::vector<lottery> L;
+	
 	// First check if the partitioning of the agents into Y, N, and M is already done
 	if (K->done_partition == false) {
 		printf("\n\t We first have to find a partitioning of the agents to know which agents are always/never/sometimes selected.\n");
@@ -916,9 +919,6 @@ void LotteryDesigner::compare_methods(std::string s, int iterations, bool intera
 				}
 			}
 
-			// Solve the named solution concepts and store the lotteries in a vector of lotteries
-			std::vector<lottery> L;
-
 			std::string letter;
 
 			for (int i = 0; i < s.size(); i++) {
@@ -951,7 +951,7 @@ void LotteryDesigner::compare_methods(std::string s, int iterations, bool intera
 				}
 				else if (letter == "C") {
 					SimplicalDecomposition* SD = new SimplicalDecomposition(K, false);
-					L.push_back(SD->Nash_CG_Flanigan(true));
+					L.push_back(SD->Nash_CG_Flanigan(false));
 					delete SD;
 				}
 			}
@@ -1119,7 +1119,7 @@ void LotteryDesigner::compare_methods(std::string s, int iterations, bool intera
 		printf("\t (More specifically, think about how to exclude a solution in 'block_solution' for integer Ys.)\n");
 	}
 
-
+	return L;
 }
 
 

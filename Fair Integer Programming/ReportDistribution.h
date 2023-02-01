@@ -15,7 +15,7 @@ public:
 	// Solutions and lottery
 	lottery L;
 
-	ReportDistribution(IPSolver* K_in, bool print);
+	ReportDistribution(std::string name_in, IPSolver* K_in, lottery L, bool print);
 	~ReportDistribution();
 };
 

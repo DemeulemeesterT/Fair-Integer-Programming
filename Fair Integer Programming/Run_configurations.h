@@ -21,7 +21,7 @@ struct reportGreedy {
 
 std::vector<reportGreedy> run_Kidney_exchange_all(bool print);
 
-std::vector<ReportDistribution> run_distribution_all_KE(std::string s, double time_limit, bool print);
+std::vector<ReportDistribution> run_distribution_all_KE(double time_limit, int iterations, bool print);
 
 void compare_time_normal_RSD(int iter, bool print);
 

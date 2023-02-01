@@ -29,7 +29,7 @@ public:
 		// Find the solution of maximum Nash welfare over the LP relaxation of the original knapsack problem.
 		// We are not sure if the resuling probabilities lie in the convex hull of the optimal solutions...
 
-	void compare_methods(std::string s, int iterations, bool interactive_console = false, unsigned seed = 123456789);
+	std::vector<lottery> compare_methods(std::string s, int iterations, bool interactive_console = false, unsigned seed = 123456789);
 	// The 'input' string contains the letters of the methods we want to see compared
 	// It will print the results in this order
 	// Letters are
@@ -38,6 +38,7 @@ public:
 		// R = RSD
 		// O = Rename Variables ("Order")
 		// P = Perturb objective
+	//Will output a vector of the found lotteries, in the demanded order
 
 // Constructors and destructors
 	LotteryDesigner(IPSolver* K_in, bool print);
