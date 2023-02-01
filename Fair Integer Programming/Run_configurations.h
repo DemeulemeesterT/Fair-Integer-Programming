@@ -2,6 +2,7 @@
 #include "KidneyExchange.h"
 #include "LotteryDesigner.h"
 #include "SimplicalDecomposition.h"
+#include "ReportDistribution.h"
 
 // Contains a couple of different runs, like this we don't have to write everything in 'source.cpp'
 
@@ -20,4 +21,9 @@ struct reportGreedy {
 
 std::vector<reportGreedy> run_Kidney_exchange_all(bool print);
 
+std::vector<ReportDistribution> run_distribution_all_KE(std::string s, double time_limit, bool print);
+
 void compare_time_normal_RSD(int iter, bool print);
+
+
+

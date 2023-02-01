@@ -39,6 +39,9 @@
     <ClInclude Include="LeximaxMaster.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ReportDistribution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KidneyExchange.cpp">
@@ -66,6 +69,12 @@
       <Filter>Source Files\RunConfigurations</Filter>
     </ClCompile>
     <ClCompile Include="LeximaxMaster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Run_distribution_all_KE.cpp">
+      <Filter>Source Files\RunConfigurations</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportDistribution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

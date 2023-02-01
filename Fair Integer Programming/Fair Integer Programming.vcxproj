@@ -149,6 +149,7 @@
     <ClInclude Include="KidneyExchange.h" />
     <ClInclude Include="LeximaxMaster.h" />
     <ClInclude Include="LotteryDesigner.h" />
+    <ClInclude Include="ReportDistribution.h" />
     <ClInclude Include="Run_configurations.h" />
     <ClInclude Include="SimplicalDecomposition.h" />
   </ItemGroup>
@@ -159,6 +160,8 @@
     <ClCompile Include="KidneyExchange.cpp" />
     <ClCompile Include="LeximaxMaster.cpp" />
     <ClCompile Include="LotteryDesigner.cpp" />
+    <ClCompile Include="ReportDistribution.cpp" />
+    <ClCompile Include="Run_distribution_all_KE.cpp" />
     <ClCompile Include="run_Kidney_Exchange_all.cpp" />
     <ClCompile Include="SimplicalDecomposition.cpp" />
     <ClCompile Include="Source.cpp" />
