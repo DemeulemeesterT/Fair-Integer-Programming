@@ -17,6 +17,9 @@ public:
 	// 'leximax' finds a lottery that maximizes the lowest selection probability among the agents in M, and then the second-lowest...
 	lottery RSD(int iterations, bool print, unsigned seed = 123456789);
 	// 'RSD' randomly orders the agents and let them discard the solutions in which they are not selected one by one in this order.
+	lottery RSD_once(bool print, unsigned seed = 123456789);
+	// Only runs RSD once.
+
 	lottery rename_variables(int iterations, bool print, unsigned seed = 123456789);
 	// Re-index the variables and solve the program again with the variables in this order.
 	lottery perturb_objective(int iterations, bool print, unsigned seed = 123456789);

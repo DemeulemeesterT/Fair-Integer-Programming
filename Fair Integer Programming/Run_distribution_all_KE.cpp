@@ -36,16 +36,23 @@ std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double t
 	if (s == "P") {
 		filename_distr = "PERTURB";
 	}
-	if (s == "Q") {
+	if (s == "T") {
 		filename_distr = "RSD-ONCE";
 	}
 
 	filename = filename_front + filename_distr + filename_back;
 
 	std::ofstream O;
+	std::ofstream Q;
 	O.open(filename);
-	O << "Name, n, |M|, time solution, time partition, time distribution, generated solutions, geometric mean, arithmetic mean, minimum selection probability" << "\n";
+	O << "Name, n, |M|, time solution, time partition, time distribution, generated solutions, used solutions, geometric mean, arithmetic mean, minimum selection probability" << "\n";
 	O.close();
+
+	// Now create a separate file that contains the distributions themselves
+	std::string filename_long = filename_front + filename_distr + "_distr" + filename_back;
+	Q.open(filename_long);
+	Q << "Name, n, |M|, distribution" << "\n";
+	Q.close();
 
 	std::vector<ReportDistribution*> R;
 
@@ -95,6 +102,15 @@ std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double t
 			O << empty->time_distribution << ",";
 			O << empty->K->solver_times << ",";
 
+			// Count number of solutions with strictly positive weight
+			int count = 0;
+			for (int t = 0; t < L_vector[0].S.size(); t++) {
+				if (L_vector[0].w[t] > 0.0001) {
+					count++;
+				}
+			}
+			O << count << ",";
+
 			// Compute some metrics
 			double Nash_product = 1.0;
 			double mean = 0.0;
@@ -108,12 +124,28 @@ std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double t
 					}
 				}
 			}
+			mean = mean / (double)K->M_size;
 			O << Nash_product << "," << mean << "," << min_selection_prob << ",";
 			O << "\n";
 
 			R.push_back(empty);
 
+			
 			O.close();
+			O.clear();
+
+			Q.open(filename_long, std::fstream::app);
+			Q << name << ", " << P[p][0] << ", ";
+			Q << K->M_size << ", ";
+			for (int t = 0; t < K->I.n; t++) {
+				Q << L_vector[0].p[t] << ",";
+			}
+			Q << "\n";
+
+			Q.close();
+			Q.clear();
+
+
 			delete empty;
 			delete L;
 			delete K;
