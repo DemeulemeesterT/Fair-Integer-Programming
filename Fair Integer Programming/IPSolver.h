@@ -119,7 +119,10 @@ public:
 // FUNCTIONS
 	double solve(bool print);
 		// Solves the IP instance to optimality
-	
+
+	solution solve_return_solution(bool print);
+		// Same as 'solve' but returns optimal solution.
+
 	void analyze(bool print);
 		// Calls 'solve', 'partition' and 'find_identical agents'
 	

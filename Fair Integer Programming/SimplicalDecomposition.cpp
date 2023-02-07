@@ -342,7 +342,7 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 
 	bool finished = false;
 	while (finished == false) {
-		//model->write("Generated Formulations/SDNashMaster.lp");
+		model->write("Generated Formulations/SDNashMaster.lp");
 		if (print) {
 			printf("ITERATION %i\n", iterations);
 		}
@@ -380,59 +380,96 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 
 
 		K->model->setObjective(obj, GRB_MAXIMIZE);
-		K->model->write("Generated Formulations/IPModel.lp");
-		obj_val_pricing = K->solve(false);
+		//K->model->write("Generated Formulations/IPModel.lp");
+		obj_val_pricing = K->solve(print);
+		solution s;
 
-		// Check for all solutions that are already included in the master problem what their objective value for this gradient would be
-		double best_value = -1e30;
-		int j = 0;
-		while (j < L.S.size()) {
-			double sol_obj = 0.0;
-			counter = 0;
-			for (int k = 0; k < K->I.n; k++) {
-				if (K->M[k] == 1) {
-					if (L.S[j].x[k] == 1) {
-						sol_obj += gradient[counter];
-					}
-					counter++;
+		// Store solution
+		if (K->model->get(GRB_IntAttr_Status) != 3) { // If pricing problem not infeasible
+
+			s.x = std::vector<bool>(K->I.n, 0);
+			for (int j = 0; j < K->I.n; j++) {
+				s.x[j] = (bool)K->X[j].get(GRB_DoubleAttr_X);
+			}
+
+			s.y = std::vector<int>(K->I.t, 0);
+			for (int j = 0; j < K->I.t; j++) {
+				s.y[j] = K->Y_var[j].get(GRB_DoubleAttr_X);
+			}
+
+			// Compute the binary number represented by the solution.
+			int bin = 0;
+			int exponent = 0;
+			int exponent_sum = 0;
+			for (int i = K->I.n - 1; i > -1; i--) {
+				if (s.x[i] == true) {
+					bin += pow(2, exponent);
+					exponent_sum += exponent;
 				}
+				exponent++;
 			}
+			s.ID = bin;
 
-			if (sol_obj > best_value) {
-				best_value = sol_obj;
-			}
-			if (best_value > obj_val_pricing) {
-				finished = true;
-				j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
-				if (print) {
-					printf("\n\n The optimal solution has been found.\n");
-				}
-			}
-
-			j++;
-		}
-
-		// Add a new column to the master if the reduced cost is non-negative
-		if (finished == false) {
-			addColumn(K->S.back(), print);
-			L.S.push_back(K->S.back());
-
-			//K->block_solution(K->S.back());
-				// This will block entire solution (including agents in Y and y-variables)
-
-			// Block the found solution
-			GRBLinExpr lin = 0;
-			int counter = 0;
-			for (int i = 0; i < K->S.back().x.size(); i++) {
-				if (K->M[i] == 1) { // If the agent is in M, that's the only case in which it matters
-					if (K->S.back().x[i] == 1) {// If the agent is selected
-						lin += K->X[i];
+			// Check for all solutions that are already included in the master problem what their objective value for this gradient would be
+			double best_value = -1e30;
+			int j = 0;
+			while (j < L.S.size()) {
+				double sol_obj = 0.0;
+				counter = 0;
+				for (int k = 0; k < K->I.n; k++) {
+					if (K->M[k] == 1) {
+						if (L.S[j].x[k] == 1) {
+							sol_obj += gradient[counter];
+							if (print) {
+								printf("\t Existing solution obj: %.4f\n", sol_obj);
+							}
+						}
 						counter++;
 					}
 				}
-			}
-			K->model->addConstr(lin <= (counter - 1));
 
+				if (sol_obj > best_value) {
+					best_value = sol_obj;
+				}
+				if (best_value > obj_val_pricing - 0.0001) {
+					finished = true;
+					j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
+					if (print) {
+						printf("\n\n The optimal solution has been found.\n");
+					}
+				}
+
+				j++;
+			}
+
+			// Add a new column to the master if the reduced cost is non-negative
+			if (finished == false) {
+				addColumn(s, print);
+				L.S.push_back(s);
+				//addColumn(K->S.back(), print);
+				//L.S.push_back(K->S.back());
+
+				//K->block_solution(K->S.back());
+					// This will block entire solution (including agents in Y and y-variables)
+
+				// Block the found solution
+				GRBLinExpr lin = 0;
+				int counter = 0;
+				for (int i = 0; i < s.x.size(); i++) {
+					if (K->M[i] == 1) { // If the agent is in M, that's the only case in which it matters
+						if (s.x[i] == 1) {// If the agent is selected
+							lin += K->X[i];
+							counter++;
+						}
+					}
+				}
+				K->model->addConstr(lin <= (counter - 1));
+				//K->model->update();
+
+			}
+		}
+		else {
+			finished = true;
 		}
 
 		if (print) {

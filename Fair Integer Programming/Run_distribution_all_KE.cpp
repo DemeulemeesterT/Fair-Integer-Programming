@@ -1,6 +1,6 @@
 #include"Run_configurations.h"
 
-std::vector<ReportDistribution> run_distribution_all_KE(double time_limit, int iterations, bool print) {
+std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double time_limit, int iterations, bool print) {
 	// Prepare to go through all instances
 	std::vector<std::vector<int>> P;
 	P.push_back({ 10,50 }); // The first number is the number of agents, the second the ID of the instance
@@ -12,12 +12,42 @@ std::vector<ReportDistribution> run_distribution_all_KE(double time_limit, int i
 	P.push_back({ 70,50 });
 
 	// Change this conditional on the name of the distribution you're looking for.
+	char filename_front[50];
+	char filename_back[50];
+	std::string filename_distr = "_";
+	std::string filename;
+	sprintf_s(filename_front, "Generated Results/ReportKE");
+	sprintf_s(filename_back, ".csv");
+	if (s == "C") {
+		filename_distr = "_NASH";
+	}
+	if (s == "R") {
+		filename_distr = "_RSD";
+	}
+	if (s == "L") {
+		filename_distr = "_LEXIMAX";
+	}
+	if (s == "U") {
+		filename_distr = "_UNIFORM";
+	}
+	if (s == "O") {
+		filename_distr = "_RE-INDEX";
+	}
+	if (s == "P") {
+		filename_distr = "PERTURB";
+	}
+	if (s == "Q") {
+		filename_distr = "RSD-ONCE";
+	}
+
+	filename = filename_front + filename_distr + filename_back;
+
 	std::ofstream O;
-	O.open("Generated Results/ReportDistributionsKE.csv");
-	O << "Name, n, |M|, time solution, time partition, time distribution" << "\n";
+	O.open(filename);
+	O << "Name, n, |M|, time solution, time partition, time distribution, generated solutions, geometric mean, arithmetic mean, minimum selection probability" << "\n";
 	O.close();
 
-	std::vector<ReportDistribution> R;
+	std::vector<ReportDistribution*> R;
 
 	char numstr1[21];
 	char numstr2[21];
@@ -44,31 +74,49 @@ std::vector<ReportDistribution> run_distribution_all_KE(double time_limit, int i
 
 
 			LotteryDesigner* L = new LotteryDesigner(K, print);
-			std::vector<lottery> L_vector = L->compare_methods("N", iterations);
+			std::vector<lottery> L_vector = L->compare_methods("C", iterations);
 				// The first element of 'L_vector' will contain the lottery we asked for
 				
 			////////////////////////////////////////////////////////////
 			// Find a way to include time limits into this!
 			////////////////////////////////////////////////////////////
 
-			ReportDistribution empty(name, K, L_vector[0], print);
-			empty.time_single_solution = time_solve;
-			empty.time_partition = time_partition;
-			empty.time_distribution = L_vector[0].t;
-			R.push_back(empty);
+			ReportDistribution* empty = new ReportDistribution(name, K, L_vector[0], print);
+			empty->time_single_solution = time_solve;
+			empty->time_partition = time_partition;
+			empty->time_distribution = L_vector[0].t;
 			
 			std::ofstream O;
-			O.open("Generated Results/ReportDistributionsKE.csv", std::fstream::app);
+			O.open(filename, std::fstream::app);
 			O << name << ", " << P[p][0] << ", ";
 			O << K->M_size << ", ";
-			O << empty.time_single_solution << ",";
-			O << empty.time_partition << ",";
-			O << empty.time_distribution << ",";
+			O << empty->time_single_solution << ",";
+			O << empty->time_partition << ",";
+			O << empty->time_distribution << ",";
+			O << empty->K->solver_times << ",";
+
+			// Compute some metrics
+			double Nash_product = 1.0;
+			double mean = 0.0;
+			double min_selection_prob = 1.0;
+			for (int t = 0; t < K->I.n; t++) {
+				if (K->M[t] == 1) {
+					Nash_product = Nash_product * L_vector[0].p[t];
+					mean += L_vector[0].p[t];
+					if (L_vector[0].p[t] < min_selection_prob) {
+						min_selection_prob = L_vector[0].p[t];
+					}
+				}
+			}
+			O << Nash_product << "," << mean << "," << min_selection_prob << ",";
 			O << "\n";
 
+			R.push_back(empty);
+
 			O.close();
-			delete K;
+			delete empty;
 			delete L;
+			delete K;
 			delete KE;
 		}
 	}

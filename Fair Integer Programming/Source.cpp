@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	run_distribution_all_KE(3600.0, 200, false);
+	run_distribution_all_KE("C", 3600.0, 200, false);
 	
 	/*
 	//compare_time_normal_RSD(50, false);
@@ -13,7 +13,7 @@ int main()
 	//RG = run_Kidney_exchange_all(true);
 
 	//KidneyExchange* KE = new KidneyExchange("50-instance-19", true);
-	KidneyExchange* KE = new KidneyExchange("70-instance-1", true);
+	KidneyExchange* KE = new KidneyExchange("10-instance-6", true);
 
 	inst I = KE->generate_instance(true, true);
 	IPSolver* K = new IPSolver(I, true);

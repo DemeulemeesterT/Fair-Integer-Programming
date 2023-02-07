@@ -1112,6 +1112,13 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 
 		else {
 			printf("\n\n\t All agents are either always or never selected in this instance.\n");
+
+			// Return an empty lottery;
+			lottery L_empty;
+			L_empty.p = std::vector<double>(K->I.n, 0);
+			L_empty.w = std::vector<double>();
+			L_empty.S = std::vector<solution>();
+			L.push_back(L_empty);
 		}
 	}
 	else {
