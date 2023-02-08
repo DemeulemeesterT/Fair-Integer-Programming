@@ -70,7 +70,9 @@ lottery LeximaxMaster::solve(bool print) {
 			}
 			obj -= dual_C_Sum1[0];
 			K->model->setObjective(obj, GRB_MAXIMIZE);
-			obj_val_pricing = K->solve(false);
+			IP_report IP_R_pricing = K->solve_return_solution(false);
+			obj_val_pricing = IP_R_pricing.opt_obj_value;
+			
 			// If the model was not infeasible
 			if (K->model->get(GRB_IntAttr_Status) == 3) {
 				all_solutions_in_S = true;
@@ -79,12 +81,20 @@ lottery LeximaxMaster::solve(bool print) {
 			else { // model was feasible
 				// Add a new column to the master if the reduced cost is non-negative
 				if (obj_val_pricing > 0) {
-					addColumn(K->S.back(), print);
+					if (IP_R_pricing.solution_already_in_S == false) {
+						addColumn(IP_R_pricing.s, print);
+					}
+					else {
+						// Don't add a new 'w' variable, but block only block the found solution
+						K->block_solution(IP_R_pricing.s);
+					}
 				}
 				else {
 					// This means that the solution to the primal problem is optimal
-					// Remove the last added solution to K->S, because we will not create a variable for this
-					//K->S.pop_back();
+					if (IP_R_pricing.solution_already_in_S == false) {
+						// Remove the last added solution to K->S, because we will not create a variable for this
+						K->S.pop_back();
+					}
 				}
 			}
 
@@ -212,7 +222,13 @@ lottery LeximaxMaster::solve(bool print) {
 							else {// model was feasible
 								// Add a new column to the master if the reduced cost is non-negative
 								if (obj_val_pricing_epsilon > 0) {
-									addColumn(IP_R.s, print);
+									if (IP_R.solution_already_in_S == false) {
+										addColumn(IP_R.s, print);
+									}
+									else {
+										// Don't add a new 'w' variable, but block only block the found solution
+										K->block_solution(IP_R.s);
+									}
 								}
 
 								else {
@@ -230,9 +246,11 @@ lottery LeximaxMaster::solve(bool print) {
 
 									M_remaining[i] = 0;
 
-									// Lastly, we remove the last added solution to K->S, because the K->solve() function will automatically store it
-									// while we will not create a variable for this solution
-									K->S.pop_back();
+									if (IP_R.solution_already_in_S == false) {
+										// Lastly, we remove the last added solution to K->S, because the K->solve() function will automatically store it
+										// while we will not create a variable for this solution
+										K->S.pop_back();
+									}
 								}
 							}
 						

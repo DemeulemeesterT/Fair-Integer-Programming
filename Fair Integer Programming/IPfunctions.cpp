@@ -127,6 +127,7 @@ IP_report IPSolver::solve_return_solution(bool print) {
 
 	IP_report IP_R;
 	solution s;
+	bool found;
 
 	solver_times++;
 
@@ -220,7 +221,7 @@ IP_report IPSolver::solve_return_solution(bool print) {
 			// This method will not work for large numbers
 			// Largest number that can be stored in a double is 1.7e308
 			// Just add the solution if the ID is too large, don't perform check
-			bool found = false;
+			found = false;
 			if (exponent_sum <= 80) {
 				// Go through all solutions in S to see if another solution has this ID
 				for (int i = 0; i < S.size(); i++) {
@@ -242,12 +243,14 @@ IP_report IPSolver::solve_return_solution(bool print) {
 	}
 	else {
 		z = -11223344;
+		found = true;
 	}
 
 	done_solve = true;
 
 	IP_R.s = s;
 	IP_R.opt_obj_value = z;
+	IP_R.solution_already_in_S = found;
 	return IP_R;
 }
 

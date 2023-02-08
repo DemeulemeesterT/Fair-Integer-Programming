@@ -229,7 +229,7 @@ void IPSolver::initializeGurobi(bool print) {
 		env->set(GRB_StringParam_LogFile, "Generated Log-files/IPTests.log");
 		model = new GRBModel(*env);
 		model->set(GRB_IntParam_PoolSolutions, 10); // Limit the number of solutions that will be stored.
-		model->set(GRB_DoubleParam_PoolGap, 0.0001); // Limit the search space by setting a gap for the worst possible solution that will be accepted
+		model->set(GRB_DoubleParam_PoolGap, 0.00001); // Limit the search space by setting a gap for the worst possible solution that will be accepted
 
 		X = new GRBVar[I.n];
 

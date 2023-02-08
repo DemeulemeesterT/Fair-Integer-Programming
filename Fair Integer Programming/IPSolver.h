@@ -54,6 +54,8 @@ struct MIPLIB_instance {
 struct IP_report {
 	double opt_obj_value;
 	solution s;
+	bool solution_already_in_S;
+		// Is 'true' if found solution was already in S.
 };
 
 class IPSolver

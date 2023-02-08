@@ -13,7 +13,7 @@ int main()
 	//RG = run_Kidney_exchange_all(true);
 
 	//KidneyExchange* KE = new KidneyExchange("50-instance-19", true);
-	KidneyExchange* KE = new KidneyExchange("10-instance-6", true);
+	KidneyExchange* KE = new KidneyExchange("20-instance-9", true);
 
 	inst I = KE->generate_instance(true, true);
 	IPSolver* K = new IPSolver(I, true);
@@ -30,7 +30,7 @@ int main()
 	//K->compare_time_normal_vs_RSD_without_partition(5, true);
 
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("N", 200, true, 0);
+	L->compare_methods("CL", 200, false, 0);
 	
 	//SimplicalDecomposition* SD = new SimplicalDecomposition(K, true);
 	//SD->SD_Nash(true);
