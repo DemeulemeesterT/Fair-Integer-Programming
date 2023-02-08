@@ -52,7 +52,7 @@ lottery LeximaxMaster::solve(bool print) {
 			GRBLinExpr obj = MIN_M;
 			model->setObjective(obj, GRB_MAXIMIZE);
 
-			//model->write("Generated Formulations/LeximaxModel.lp");
+			model->write("Generated Formulations/LeximaxModel.lp");
 
 			model->optimize();
 			obj_val_master = model->get(GRB_DoubleAttr_ObjVal);

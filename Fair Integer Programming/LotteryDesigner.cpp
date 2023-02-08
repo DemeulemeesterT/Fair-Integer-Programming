@@ -997,7 +997,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 					L.push_back(uniform(false));
 				}
 				else if (letter == "L") {
-					L.push_back(leximax(false));
+					L.push_back(leximax(true));
 				}
 				else if (letter == "R") {
 					L.push_back(RSD(iterations, false, seed));
@@ -1187,11 +1187,14 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 			printf("\n\n\t All agents are either always or never selected in this instance.\n");
 
 			// Return an empty lottery;
-			lottery L_empty;
-			L_empty.p = std::vector<double>(K->I.n, 0);
-			L_empty.w = std::vector<double>();
-			L_empty.S = std::vector<solution>();
-			L.push_back(L_empty);
+
+			for (int i = 0; i < s.size(); i++) {
+				lottery L_empty;
+				L_empty.p = std::vector<double>(K->I.n, 0);
+				L_empty.w = std::vector<double>();
+				L_empty.S = std::vector<solution>();
+				L.push_back(L_empty);
+			}
 		}
 	}
 	else {
