@@ -341,6 +341,8 @@ void IPSolver::initializeVariables(inst I_in, bool print) {
 	time_partition = 0;
 	time_greedy_partition = 0;
 
+	number_of_agents_at_once_RSD = 19;
+
 	read_MIPLIB_info(false);
 }
 

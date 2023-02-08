@@ -878,11 +878,6 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 		GRBLinExpr obj = 0.0;
 		double delta = 1;
 
-		// Build the objective function 
-		for (int i = 0; i < I.n; i++) {
-			obj += I.v[i] * X[i];
-		}
-
 		// We go through 'order' and remove all the agents that are not in M, so that are in Y or N
 		for (int i = order.size() - 1; i > -1; i--) {
 			if (M[order[i]] == 0) {
@@ -890,46 +885,77 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 			}
 		}
 
+		// Store solution of the agents of which we perturbed the objective coefficients
+		sol.x = std::vector<bool>(I.n, 0);
+		sol.y = std::vector<int>(I.t, 0);
+
+		// For the agents in 'Y' and 'N' we already know the solution values.
+		for (int i = 0; i < I.n; i++) {
+			if (Y[i] == 1) {
+				sol.x[i] = (bool) 1;
+			}
+			else if (N[i] == 1) {
+				sol.x[i] = (bool) 0;
+			}
+		}
+
+
 		// Taking into account the precision of the solver, we will perturb in different steps
-		// 
+		// For a precision of 1e-6, we can perturb \floor(-log_2(1e-6)) = 19 agents at once
+			// This parameter is defined in the function 'InitializeVariables'
+		for (int j = 0; j < M_size; j=j+number_of_agents_at_once_RSD) {
 
-		// Now we go through 'order' from the beginning, and shift the objective function accordingly.
-		for (int i = 0; i < order.size(); i++) {
-			counter++;
-			delta = delta * 0.5;
-			obj += (delta) * X[order[i]];
-		}
+			obj = 0.0;
 
-		// Lastly, add the objective coefficients of the Y-variables
-		for (int i = 0; i < I.t; i++) {
-			obj += I.v[I.n + i] * Y_var[i];
-		}
+			// Build the objective function 
+			for (int i = 0; i < I.n; i++) {
+				obj += I.v[i] * X[i];
+			}
 
-		model->setObjective(obj, GRB_MAXIMIZE);
-		//model->write("Generated Formulations/ModelRSD.lp");
-
-		// Optimize
-		model->optimize();
-		int status = model->get(GRB_IntAttr_Status);
-		if (status != 3) { // If feasible
-			// Store solution
-			sol.x = std::vector<bool>(I.n, 0);
-			for (int j = 0; j < I.n; j++) {
-				/*if (Y[j] == 1) { // Checking this saves us a bit of time on the expensive .get function
-					sol.x[j] = (bool)1;
-				}
-				else if (N[j] == 1) {
-					sol.x[j] = (bool)0;
+			// Now we go through 'order' from the beginning, and shift the objective function accordingly.
+			for (int i = j; i < j+number_of_agents_at_once_RSD; i++) {
+				if (i <= order.size()) {
+					counter++;
+					delta = delta * 0.5;
+					obj += (delta)*X[order[i]];
 				}
 				else {
-					sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
-				}*/
-				sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
-
+					i = j + number_of_agents_at_once_RSD;
+				}
 			}
-			sol.y = std::vector<int>(I.t, 0);
-			for (int j = 0; j < I.t; j++) {
-				sol.y[j] = Y_var[j].get(GRB_DoubleAttr_X);
+
+			// Lastly, add the objective coefficients of the Y-variables
+			for (int i = 0; i < I.t; i++) {
+				obj += I.v[I.n + i] * Y_var[i];
+			}
+
+			model->setObjective(obj, GRB_MAXIMIZE);
+			//model->write("Generated Formulations/ModelRSD.lp");
+
+			// Optimize
+			model->optimize();
+			int status = model->get(GRB_IntAttr_Status);
+			if (status != 3) { // If feasible
+				for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
+					sol.x[order[i]] = (bool)X[order[i]].get(GRB_DoubleAttr_X);
+				}
+				//for (int j = 0; j < I.n; j++) {
+					/*if (Y[j] == 1) { // Checking this saves us a bit of time on the expensive .get function
+						sol.x[j] = (bool)1;
+					}
+					else if (N[j] == 1) {
+						sol.x[j] = (bool)0;
+					}
+					else {
+						sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
+					}*/
+
+					//sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
+
+				//}
+				for (int i = 0; i < I.t; i++) {
+					sol.y[i] = Y_var[i].get(GRB_DoubleAttr_X);
+				}
 			}
 		}
 

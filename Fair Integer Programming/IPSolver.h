@@ -77,6 +77,8 @@ public:
 	
 	int solver_times;
 		// Counts the number of times the solver was called
+
+	int number_of_agents_at_once_RSD;
 	
 	inst I;
 		// Sets that contain the agents that are always, sometimes, never selected in a solution
