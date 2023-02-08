@@ -43,7 +43,7 @@ lottery LeximaxMaster::solve(bool print) {
 		// As long as the solution of the pricing problem has a non-negative reduced cost, continue
 		double obj_val_pricing = 1;
 		double obj_val_master;
-		while (obj_val_pricing > 0) {
+		while (obj_val_pricing > 0.0001) {
 			
 			if (print) {
 				printf("\nITERATION %i\n\n", iterations);
@@ -154,7 +154,7 @@ lottery LeximaxMaster::solve(bool print) {
 
 				double obj_val_pricing_epsilon = 1;
 				int iterations_subroutine = 1;
-				while (obj_val_pricing_epsilon > 0) {
+				while (obj_val_pricing_epsilon > 0.0001) {
 					if (print) {
 						printf("\nITERATION SUBROUTINE %i.%i.%i\n\n", iterations-1, i, iterations_subroutine);
 					}

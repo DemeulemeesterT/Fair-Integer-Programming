@@ -890,6 +890,9 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 			}
 		}
 
+		// Taking into account the precision of the solver, we will perturb in different steps
+		// 
+
 		// Now we go through 'order' from the beginning, and shift the objective function accordingly.
 		for (int i = 0; i < order.size(); i++) {
 			counter++;
