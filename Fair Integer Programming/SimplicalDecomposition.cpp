@@ -381,34 +381,13 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 
 		K->model->setObjective(obj, GRB_MAXIMIZE);
 		//K->model->write("Generated Formulations/IPModel.lp");
-		obj_val_pricing = K->solve(print);
-		solution s;
+		IP_report IP_R = K->solve_return_solution(print);
+			// IP_report contains only the optimal objective function and an optimal solution (see definition IPSolver.h)
+
+		obj_val_pricing = IP_R.opt_obj_value;
 
 		// Store solution
 		if (K->model->get(GRB_IntAttr_Status) != 3) { // If pricing problem not infeasible
-
-			s.x = std::vector<bool>(K->I.n, 0);
-			for (int j = 0; j < K->I.n; j++) {
-				s.x[j] = (bool)K->X[j].get(GRB_DoubleAttr_X);
-			}
-
-			s.y = std::vector<int>(K->I.t, 0);
-			for (int j = 0; j < K->I.t; j++) {
-				s.y[j] = K->Y_var[j].get(GRB_DoubleAttr_X);
-			}
-
-			// Compute the binary number represented by the solution.
-			int bin = 0;
-			int exponent = 0;
-			int exponent_sum = 0;
-			for (int i = K->I.n - 1; i > -1; i--) {
-				if (s.x[i] == true) {
-					bin += pow(2, exponent);
-					exponent_sum += exponent;
-				}
-				exponent++;
-			}
-			s.ID = bin;
 
 			// Check for all solutions that are already included in the master problem what their objective value for this gradient would be
 			double best_value = -1e30;
@@ -444,8 +423,8 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 
 			// Add a new column to the master if the reduced cost is non-negative
 			if (finished == false) {
-				addColumn(s, print);
-				L.S.push_back(s);
+				addColumn(IP_R.s, print);
+				L.S.push_back(IP_R.s);
 				//addColumn(K->S.back(), print);
 				//L.S.push_back(K->S.back());
 
@@ -455,9 +434,9 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 				// Block the found solution
 				GRBLinExpr lin = 0;
 				int counter = 0;
-				for (int i = 0; i < s.x.size(); i++) {
+				for (int i = 0; i < IP_R.s.x.size(); i++) {
 					if (K->M[i] == 1) { // If the agent is in M, that's the only case in which it matters
-						if (s.x[i] == 1) {// If the agent is selected
+						if (IP_R.s.x[i] == 1) {// If the agent is selected
 							lin += K->X[i];
 							counter++;
 						}

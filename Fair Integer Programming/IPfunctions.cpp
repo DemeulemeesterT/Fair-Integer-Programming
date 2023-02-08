@@ -123,8 +123,9 @@ double IPSolver::solve(bool print) {
 	return z;
 }
 
-solution IPSolver::solve_return_solution(bool print) {
+IP_report IPSolver::solve_return_solution(bool print) {
 
+	IP_report IP_R;
 	solution s;
 
 	solver_times++;
@@ -245,7 +246,9 @@ solution IPSolver::solve_return_solution(bool print) {
 
 	done_solve = true;
 
-	return s;
+	IP_R.s = s;
+	IP_R.opt_obj_value = z;
+	return IP_R;
 }
 
 

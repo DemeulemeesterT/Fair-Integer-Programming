@@ -84,7 +84,7 @@ lottery LeximaxMaster::solve(bool print) {
 				else {
 					// This means that the solution to the primal problem is optimal
 					// Remove the last added solution to K->S, because we will not create a variable for this
-					K->S.pop_back();
+					//K->S.pop_back();
 				}
 			}
 
@@ -100,8 +100,8 @@ lottery LeximaxMaster::solve(bool print) {
 			iterations++;
 		}
 
-		std::vector<double> w_store(K->S.size(),0.0);
-		for (int i = 0; i < K->S.size(); i++) {
+		std::vector<double> w_store(w.size(),0.0);
+		for (int i = 0; i < w.size(); i++) {
 			w_store[i] = (w[i].get(GRB_DoubleAttr_X));
 		}
 		
@@ -180,8 +180,10 @@ lottery LeximaxMaster::solve(bool print) {
 							}
 							obj -= dual_C_Sum1[0];
 							K->model->setObjective(obj, GRB_MAXIMIZE);
-							//K->model->write("Generated Formulations/IPModel.lp");
-							obj_val_pricing_epsilon = K->solve(false);
+							K->model->write("Generated Formulations/IPModel.lp");
+							IP_report IP_R = K->solve_return_solution(false);
+							obj_val_pricing = IP_R.opt_obj_value;
+							//obj_val_pricing_epsilon = K->solve(true);
 
 							// If the model was infeasible
 							if (K->model->get(GRB_IntAttr_Status) == 3) {
@@ -210,7 +212,7 @@ lottery LeximaxMaster::solve(bool print) {
 							else {// model was feasible
 								// Add a new column to the master if the reduced cost is non-negative
 								if (obj_val_pricing_epsilon > 0) {
-									addColumn(K->S.back(), print);
+									addColumn(IP_R.s, print);
 								}
 
 								else {

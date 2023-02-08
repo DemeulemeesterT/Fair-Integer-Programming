@@ -4,9 +4,9 @@ using namespace std;
 
 int main()
 {
-	//run_distribution_all_KE("CL", 3600.0, 200, false);
+	run_distribution_all_KE("CL", 3600.0, 200, false);
 	
-	
+	/*
 	//compare_time_normal_RSD(50, false);
 
 	//std::vector<reportGreedy> RG;
@@ -38,5 +38,5 @@ int main()
 	//delete SD;
 	delete K;
 	//delete KE;
-	
+	*/
 }

@@ -51,6 +51,11 @@ struct MIPLIB_instance {
 	double obj_val;
 };
 
+struct IP_report {
+	double opt_obj_value;
+	solution s;
+};
+
 class IPSolver
 {
 public:
@@ -120,8 +125,8 @@ public:
 	double solve(bool print);
 		// Solves the IP instance to optimality
 
-	solution solve_return_solution(bool print);
-		// Same as 'solve' but returns optimal solution.
+	IP_report solve_return_solution(bool print);
+		// Same as 'solve' but returns optimal solution and the optimal objective value
 
 	void analyze(bool print);
 		// Calls 'solve', 'partition' and 'find_identical agents'
