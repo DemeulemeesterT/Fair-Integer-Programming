@@ -80,7 +80,7 @@ lottery LeximaxMaster::solve(bool print) {
 			}
 			else { // model was feasible
 				// Add a new column to the master if the reduced cost is non-negative
-				if (obj_val_pricing > 0) {
+				if (obj_val_pricing > 0.0001) {
 					if (IP_R_pricing.solution_already_in_S == false) {
 						addColumn(IP_R_pricing.s, print);
 					}
@@ -160,7 +160,7 @@ lottery LeximaxMaster::solve(bool print) {
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
-					//model->write("Generated Formulations/LeximaxModel.lp");
+					model->write("Generated Formulations/LeximaxModel.lp");
 					model->optimize();
 
 					// If optimal solution of Epsilon = 0
@@ -178,7 +178,7 @@ lottery LeximaxMaster::solve(bool print) {
 							obj = 0.0;
 
 							// The dual variable of the epsilon-constraint:
-							obj -= dual_C_bound_MIN_M[0] * K->X[i];
+							obj += dual_C_bound_MIN_M[0] * K->X[i];
 
 							int counter_inner = 0;
 							for (int j = 0; j < K->I.n; j++) {
@@ -192,7 +192,7 @@ lottery LeximaxMaster::solve(bool print) {
 							K->model->setObjective(obj, GRB_MAXIMIZE);
 							K->model->write("Generated Formulations/IPModel.lp");
 							IP_report IP_R = K->solve_return_solution(false);
-							obj_val_pricing = IP_R.opt_obj_value;
+							obj_val_pricing_epsilon = IP_R.opt_obj_value;
 							//obj_val_pricing_epsilon = K->solve(true);
 
 							// If the model was infeasible
@@ -221,7 +221,7 @@ lottery LeximaxMaster::solve(bool print) {
 							
 							else {// model was feasible
 								// Add a new column to the master if the reduced cost is non-negative
-								if (obj_val_pricing_epsilon > 0) {
+								if (obj_val_pricing_epsilon > 0.0001) {
 									if (IP_R.solution_already_in_S == false) {
 										addColumn(IP_R.s, print);
 									}
@@ -325,6 +325,19 @@ void LeximaxMaster::addColumn(solution sol, bool print) {
 
 
 	K->block_solution(sol);
+
+	// Block the found solution (only the X-variables)
+	GRBLinExpr lin = 0;
+	counter = 0;
+	for (int i = 0; i < K->S.back().x.size(); i++) {
+		if (K->M[i] == 1) { // If the agent is in M, that's the only case in which it matters
+			if (K->S.back().x[i] == 1) {// If the agent is selected
+				lin += K->X[i];
+				counter++;
+			}
+		}
+	}
+	K->model->addConstr(lin <= (counter - 1));
 
 	// Add variable for this
 	char name_w[13];
