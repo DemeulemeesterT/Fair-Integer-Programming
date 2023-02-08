@@ -18,41 +18,46 @@ std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double t
 	std::string filename;
 	sprintf_s(filename_front, "Generated Results/ReportKE");
 	sprintf_s(filename_back, ".csv");
-	if (s == "C") {
-		filename_distr = "_NASH";
-	}
-	if (s == "R") {
-		filename_distr = "_RSD";
-	}
-	if (s == "L") {
-		filename_distr = "_LEXIMAX";
-	}
-	if (s == "U") {
-		filename_distr = "_UNIFORM";
-	}
-	if (s == "O") {
-		filename_distr = "_RE-INDEX";
-	}
-	if (s == "P") {
-		filename_distr = "PERTURB";
-	}
-	if (s == "T") {
-		filename_distr = "RSD-ONCE";
-	}
-
-	filename = filename_front + filename_distr + filename_back;
-
+	std::string letter;
 	std::ofstream O;
 	std::ofstream Q;
-	O.open(filename);
-	O << "Name, n, |M|, time solution, time partition, time distribution, generated solutions, used solutions, geometric mean, arithmetic mean, minimum selection probability" << "\n";
-	O.close();
 
-	// Now create a separate file that contains the distributions themselves
-	std::string filename_long = filename_front + filename_distr + "_distr" + filename_back;
-	Q.open(filename_long);
-	Q << "Name, n, |M|, distribution" << "\n";
-	Q.close();
+	for (int k = 0; k < s.size(); k++) {
+		letter = s[k];
+		// Decide the correct name of the file
+		if (s[k] == 'C') {
+			filename_distr = "_NASH";
+		}
+		if (s[k] == 'R') {
+			filename_distr = "_RSD";
+		}
+		if (s[k] == 'L') {
+			filename_distr = "_LEXIMAX";
+		}
+		if (s[k] == 'U') {
+			filename_distr = "_UNIFORM";
+		}
+		if (s[k] == 'O') {
+			filename_distr = "_RE-INDEX";
+		}
+		if (s[k] == 'P') {
+			filename_distr = "PERTURB";
+		}
+		if (s[k] == 'T') {
+			filename_distr = "RSD-ONCE";
+		}
+		filename = filename_front + filename_distr + filename_back;
+
+		O.open(filename);
+		O << "Name, n, |M|, time solution, time partition, time distribution, generated solutions, used solutions, geometric mean, arithmetic mean, minimum selection probability" << "\n";
+		O.close();
+
+		// Now create a separate file that contains the distributions themselves
+		std::string filename_long = filename_front + filename_distr + "_distr" + filename_back;
+		Q.open(filename_long);
+		Q << "Name, n, |M|, distribution" << "\n";
+		Q.close();
+	}
 
 	std::vector<ReportDistribution*> R;
 
@@ -87,7 +92,7 @@ std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double t
 			// Find a way to include time limits into this!
 			////////////////////////////////////////////////////////////
 
-			std::string letter;
+			letter;
 
 			for (int k = 0; k < s.size(); k++) {
 				letter = s[k];
