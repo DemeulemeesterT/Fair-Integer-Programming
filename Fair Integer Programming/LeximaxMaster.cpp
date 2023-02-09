@@ -52,7 +52,7 @@ lottery LeximaxMaster::solve(bool print) {
 			GRBLinExpr obj = MIN_M;
 			model->setObjective(obj, GRB_MAXIMIZE);
 
-			model->write("Generated Formulations/LeximaxModel.lp");
+			//model->write("Generated Formulations/LeximaxModel.lp");
 
 			model->optimize();
 			obj_val_master = model->get(GRB_DoubleAttr_ObjVal);
@@ -160,7 +160,7 @@ lottery LeximaxMaster::solve(bool print) {
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
-					model->write("Generated Formulations/LeximaxModel.lp");
+					//model->write("Generated Formulations/LeximaxModel.lp");
 					model->optimize();
 
 					// If optimal solution of Epsilon = 0
@@ -190,7 +190,7 @@ lottery LeximaxMaster::solve(bool print) {
 							}
 							obj -= dual_C_Sum1[0];
 							K->model->setObjective(obj, GRB_MAXIMIZE);
-							K->model->write("Generated Formulations/IPModel.lp");
+							//K->model->write("Generated Formulations/IPModel.lp");
 							IP_report IP_R = K->solve_return_solution(false);
 							obj_val_pricing_epsilon = IP_R.opt_obj_value;
 							//obj_val_pricing_epsilon = K->solve(true);

@@ -156,7 +156,7 @@ lottery LotteryDesigner::uniform(bool print) {
 		lin += K->I.v[K->I.n + j] * K->Y_var[j];
 	}
 	K->model->addConstr(lin == K->opt);
-	K->model->write("Generated formulations/IPModel.lp");
+	//K->model->write("Generated formulations/IPModel.lp");
 
 	clock_t start_time = clock();
 
@@ -726,7 +726,7 @@ lottery LotteryDesigner::Nash(bool print) {
 		}
 		model->setObjective(obj, GRB_MAXIMIZE);
 
-		model->write("Generated Formulations/ModelNash.lp");
+		//model->write("Generated Formulations/ModelNash.lp");
 
 		// Lastly, let 'log_p[i]' be the log of 'p[i]'
 		counter = 0;
@@ -736,7 +736,7 @@ lottery LotteryDesigner::Nash(bool print) {
 				counter++;
 			}
 		}
-		model->write("Generated Formulations/ModelNash.lp");
+		//model->write("Generated Formulations/ModelNash.lp");
 
 		model->optimize();
 		//model->write("ModelNash.lp");
@@ -897,10 +897,10 @@ lottery LotteryDesigner::Nash_LP_relax(bool print) {
 			}
 		}
 
-		model->write("Generated Formulations/ModelNash_LP_relax.lp");
+		//model->write("Generated Formulations/ModelNash_LP_relax.lp");
 
 		GRBModel presolved_model = model->presolve();
-		presolved_model.write("Generated Formulations/ModelNash_LP_relax_presolved.lp");
+		//presolved_model.write("Generated Formulations/ModelNash_LP_relax_presolved.lp");
 
 		model->optimize();
 		//model->write("ModelNash.lp");
@@ -944,7 +944,7 @@ lottery LotteryDesigner::Nash_LP_relax(bool print) {
 }
 
 
-std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterations, bool interactive_console, unsigned seed) {
+std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterations, bool print_report, bool interactive_console, unsigned seed) {
 	// Solve the named solution concepts and store the lotteries in a vector of lotteries
 	std::vector<lottery> L;
 	
@@ -1028,158 +1028,160 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 					delete SD;
 				}
 			}
-
-			// Now print everything in a nice, fancy table
-			printf("\n\n SELECTION PROBABILITIES (of the agents in M):\n\n");
-			std::string display;
-			printf("----------------");
-			for (int i = 0; i < L.size(); i++) {
-				printf("--------");
-			}
-			printf("\n\t");
-			for (int i = 0; i < s.size(); i++) {
-				letter = s[i];
-				if (letter == "U") {
-					display = "UNIF*";
+			
+			if (print_report == true) {
+				// Now print everything in a nice, fancy table
+				printf("\n\n SELECTION PROBABILITIES (of the agents in M):\n\n");
+				std::string display;
+				printf("----------------");
+				for (int i = 0; i < L.size(); i++) {
+					printf("--------");
 				}
-				else if (letter == "R") {
-					display = " RSD";
-				}
-				else if (letter == "L") {
-					display = "LEXI";
-				}
-				else if (letter == "O") {
-					display = "INDEX*";
-				}
-				else if (letter == "P") {
-					display = "PERT";
-				}
-				else if (letter == "N") {
-					display = "NASH_h*";
-				}
-				else if (letter == "S") {
-					display = "NASH_sd";
-				}
-				else if (letter == "Q") {
-					display = "NASHLP";
-				}
-				else if (letter == "C") {
-					display = "NASHCG";
-				}
-				printf("\t %s", display.c_str());
-			}
-			printf("\n----------------");
-			for (int i = 0; i < L.size(); i++) {
-				printf("--------");
-			}
-			printf("\n");
-
-			for (int i = 0; i < K->I.n; i++) {
-				if (K->M[i] == 1) {
-					if (i == 0) {
-						printf(" Agent  0:");
+				printf("\n\t");
+				for (int i = 0; i < s.size(); i++) {
+					letter = s[i];
+					if (letter == "U") {
+						display = "UNIF*";
 					}
-					else {
-						printf(" Agent %2.i:", i);
+					else if (letter == "R") {
+						display = " RSD";
 					}
-					for (int j = 0; j < L.size(); j++) {
-						printf("\t %.2f", L[j].p[i]);
+					else if (letter == "L") {
+						display = "LEXI";
+					}
+					else if (letter == "O") {
+						display = "INDEX*";
+					}
+					else if (letter == "P") {
+						display = "PERT";
+					}
+					else if (letter == "N") {
+						display = "NASH_h*";
+					}
+					else if (letter == "S") {
+						display = "NASH_sd";
+					}
+					else if (letter == "Q") {
+						display = "NASHLP";
+					}
+					else if (letter == "C") {
+						display = "NASHCG";
+					}
+					printf("\t %s", display.c_str());
+				}
+				printf("\n----------------");
+				for (int i = 0; i < L.size(); i++) {
+					printf("--------");
+				}
+				printf("\n");
+
+				for (int i = 0; i < K->I.n; i++) {
+					if (K->M[i] == 1) {
+						if (i == 0) {
+							printf(" Agent  0:");
+						}
+						else {
+							printf(" Agent %2.i:", i);
+						}
+						for (int j = 0; j < L.size(); j++) {
+							printf("\t %.2f", L[j].p[i]);
+						}
+						printf("\n");
+					}
+				}
+				printf("----------------");
+				for (int i = 0; i < L.size(); i++) {
+					printf("--------");
+				}
+
+				printf("\n Minimum :");
+				double minimum;
+				for (int i = 0; i < L.size(); i++) {
+					minimum = 1;
+					for (int j = 0; j < K->I.n; j++) {
+						if (K->M[j] == 1) {
+							if (L[i].p[j] < minimum) {
+								minimum = L[i].p[j];
+							}
+						}
+					}
+					printf("\t %.2f", minimum);
+				}
+
+				printf("\n\n Mean :\t");
+				double average;
+				for (int i = 0; i < L.size(); i++) {
+					average = 0;
+					for (int j = 0; j < K->I.n; j++) {
+						if (K->M[j] == 1) {
+							average += L[i].p[j];
+						}
+					}
+					printf("\t %.2f", average / (double)size_M);
+				}
+
+				printf("\n Geom. mean :");
+				double g_average;
+				for (int i = 0; i < L.size(); i++) {
+					g_average = 1;
+					for (int j = 0; j < K->I.n; j++) {
+						if (K->M[j] == 1) {
+							g_average = g_average * L[i].p[j];
+						}
+					}
+					printf("\t %.2f", pow(g_average, (double)1 / (double)size_M));
+				}
+
+				printf("\n\n Solut. used:");
+				int sum;
+				for (int i = 0; i < L.size(); i++) {
+					sum = 0;
+					for (int j = 0; j < L[i].S.size(); j++) {
+						if (L[i].w[j] > 0) {
+							sum++;
+						}
+					}
+					printf("\t %i", sum);
+				}
+
+				printf("\n Time :\t");
+				for (int i = 0; i < L.size(); i++) {
+					printf("\t %.2f", L[i].t);
+				}
+				printf("\n----------------");
+				for (int i = 0; i < L.size(); i++) {
+					printf("--------");
+				}
+
+				// DISCLAIMERS:
+				printf("\n");
+				if (K->I.Y_coeff_zero == false) {
+					printf("\n\n *DISCLAIMER: not all objective coefficients of the Y-variables are equal to zero.");
+					printf("\n\t This means that UNIFORM and RSD might not output a Pareto-optimal lottery over the solutions.");
+				}
+				for (int i = 0; i < s.size(); i++) {
+					letter = s[i];
+					if (letter == "U") {
+						printf("\n\n *DISCLAIMER 'UNIFORM': current maximum number of optimal solutions considered is set to 1000.");
+					}
+					else if (letter == "O") {
+						printf("\n\n *DISCLAIMER 'INDEX': presolve is set to off.");
+					}
+					else if (letter == "N") {
+						printf("\n\n *DISCLAIMER 'NASH': current maximum number of optimal solutions considered is set to 1000.");
+					}
+				}
+
+				printf("\n");
+				for (int i = 0; i < K->I.n; i++) {
+					for (int s = 0; s < L[0].S.size(); s++) {
+						printf("\t%i", (int)L[0].S[s].x[i]);
 					}
 					printf("\n");
 				}
-			}
-			printf("----------------");
-			for (int i = 0; i < L.size(); i++) {
-				printf("--------");
-			}
 
-			printf("\n Minimum :");
-			double minimum;
-			for (int i = 0; i < L.size(); i++) {
-				minimum = 1;
-				for (int j = 0; j < K->I.n; j++) {
-					if (K->M[j] == 1) {
-						if (L[i].p[j] < minimum) {
-							minimum = L[i].p[j];
-						}
-					}
-				}
-				printf("\t %.2f", minimum);
+				printf("\n\n");
 			}
-
-			printf("\n\n Mean :\t");
-			double average;
-			for (int i = 0; i < L.size(); i++) {
-				average = 0;
-				for (int j = 0; j < K->I.n; j++) {
-					if (K->M[j] == 1) {
-						average += L[i].p[j];
-					}
-				}
-				printf("\t %.2f", average / (double)size_M);
-			}
-
-			printf("\n Geom. mean :");
-			double g_average;
-			for (int i = 0; i < L.size(); i++) {
-				g_average = 1;
-				for (int j = 0; j < K->I.n; j++) {
-					if (K->M[j] == 1) {
-						g_average = g_average * L[i].p[j];
-					}
-				}
-				printf("\t %.2f", pow(g_average, (double)1 / (double)size_M));
-			}
-
-			printf("\n\n Solut. used:");
-			int sum;
-			for (int i = 0; i < L.size(); i++) {
-				sum = 0;
-				for (int j = 0; j < L[i].S.size(); j++) {
-					if (L[i].w[j] > 0) {
-						sum++;
-					}
-				}
-				printf("\t %i", sum);
-			}
-
-			printf("\n Time :\t");
-			for (int i = 0; i < L.size(); i++) {
-				printf("\t %.2f", L[i].t);
-			}
-			printf("\n----------------");
-			for (int i = 0; i < L.size(); i++) {
-				printf("--------");
-			}
-
-			// DISCLAIMERS:
-			printf("\n");
-			if (K->I.Y_coeff_zero == false) {
-				printf("\n\n *DISCLAIMER: not all objective coefficients of the Y-variables are equal to zero.");
-				printf("\n\t This means that UNIFORM and RSD might not output a Pareto-optimal lottery over the solutions.");
-			}
-			for (int i = 0; i < s.size(); i++) {
-				letter = s[i];
-				if (letter == "U") {
-					printf("\n\n *DISCLAIMER 'UNIFORM': current maximum number of optimal solutions considered is set to 1000.");
-				}
-				else if (letter == "O") {
-					printf("\n\n *DISCLAIMER 'INDEX': presolve is set to off.");
-				}
-				else if (letter == "N") {
-					printf("\n\n *DISCLAIMER 'NASH': current maximum number of optimal solutions considered is set to 1000.");
-				}
-			}
-
-			printf("\n");
-			for (int i = 0; i < K->I.n; i++) {
-				for (int s = 0; s < L[0].S.size(); s++) {
-					printf("\t%i", (int)L[0].S[s].x[i]);
-				}
-				printf("\n");
-			}
-
-			printf("\n\n");
 		}
 
 

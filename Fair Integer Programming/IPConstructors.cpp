@@ -277,7 +277,7 @@ void IPSolver::initializeGurobi(bool print) {
 			model->addConstr(con <= I.C[i]);
 		}
 
-		model->write("Generated Formulations/IPModel.lp");
+		//model->write("Generated Formulations/IPModel.lp");
 
 		model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
@@ -427,6 +427,7 @@ IPSolver::IPSolver(IPSolver* K_in, bool print) {
 	time_partition = K_in->time_partition;
 	time_greedy_partition = K_in->time_greedy_partition;
 
+	number_of_agents_at_once_RSD = K_in->number_of_agents_at_once_RSD;
 
 	initializeGurobi(print);
 }
@@ -442,7 +443,7 @@ IPSolver::IPSolver(const std::string& file_name, bool print) {
 			throw GRBException("Model is not a MIP");
 		}
 		if (print) {
-			model->write("Generated Formulations/sorrell3.lp");
+			//model->write("Generated Formulations/sorrell3.lp");
 		}
 
 		// Extract everything from this model, and place it in the correct format

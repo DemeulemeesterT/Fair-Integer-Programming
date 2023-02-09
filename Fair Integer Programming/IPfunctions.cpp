@@ -781,7 +781,7 @@ bool IPSolver::find_identical_agents_aid(int i, int j, bool print) {
 		std::cout << e.getMessage() << std::endl;
 	}
 
-	model_identical->write("Generated Formulations/ModelIdentical.lp");
+	//model_identical->write("Generated Formulations/ModelIdentical.lp");
 
 	model_identical->optimize();
 
@@ -914,7 +914,7 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 
 			// Now we go through 'order' from the beginning, and shift the objective function accordingly.
 			for (int i = j; i < j+number_of_agents_at_once_RSD; i++) {
-				if (i <= order.size()) {
+				if (i < order.size()) {
 					counter++;
 					delta = delta * 0.5;
 					obj += (delta)*X[order[i]];
@@ -937,7 +937,12 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 			int status = model->get(GRB_IntAttr_Status);
 			if (status != 3) { // If feasible
 				for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
-					sol.x[order[i]] = (bool)X[order[i]].get(GRB_DoubleAttr_X);
+					if (i < order.size()) {
+						sol.x[order[i]] = (bool)X[order[i]].get(GRB_DoubleAttr_X);
+					}
+					else {
+						i = j + number_of_agents_at_once_RSD;
+					}
 				}
 				//for (int j = 0; j < I.n; j++) {
 					/*if (Y[j] == 1) { // Checking this saves us a bit of time on the expensive .get function
@@ -1061,7 +1066,7 @@ solution IPSolver::RSD_once_without_partition(std::vector<int> order, bool print
 		//model->write("Generated Formulations/.lp");
 
 		// Optimize
-		model->write("Generated Formulations/ModelRSD.lp");
+		//model->write("Generated Formulations/ModelRSD.lp");
 		model->optimize();
 		int status = model->get(GRB_IntAttr_Status);
 		if (status != 3) { // If feasible

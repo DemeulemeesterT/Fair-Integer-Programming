@@ -85,7 +85,7 @@ std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double t
 			double time_partition = ((double)(clock() - start_time) / CLK_TCK);
 
 			LotteryDesigner* L = new LotteryDesigner(K, print);
-			std::vector<lottery> L_vector = L->compare_methods(s, iterations);
+			std::vector<lottery> L_vector = L->compare_methods(s, iterations, false);
 				// The first element of 'L_vector' will contain the lottery we asked for
 				
 			////////////////////////////////////////////////////////////

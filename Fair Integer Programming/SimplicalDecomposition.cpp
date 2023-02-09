@@ -47,7 +47,7 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 			counter++;
 		}
 	}
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 
 	// OBJECTIVE
 	// Set objective function
@@ -61,7 +61,7 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 	}
 	model->setObjective(obj, GRB_MAXIMIZE);
 
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 
 	// Add the columns
 	columns.resize(K->S_greedy.size());
@@ -85,7 +85,7 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 		L.S.push_back(K->S_greedy[s]);
 	}
 
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 
 	for (int i = 0; i < K->S_greedy.size(); i++) {
 		char name_w[13];
@@ -93,7 +93,7 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 		w.push_back(model->addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, columns[i], name_w));
 	}
 
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 
 	// Add constraint to knapsack to enforce the objective value to be equal to the optimal objective value
 	GRBLinExpr expr = 0.0;
@@ -117,7 +117,7 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 	clock_t start_time = clock();
 
 	while (gradient_improvement > 0.000001) {
-		model->write("Generated Formulations/SDNashMaster.lp");
+		//model->write("Generated Formulations/SDNashMaster.lp");
 		if (print) {
 			printf("ITERATION %i\n", iterations);
 		}
@@ -155,7 +155,7 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 
 
 		K->model->setObjective(obj, GRB_MAXIMIZE);
-		K->model->write("Generated Formulations/IPModel.lp");
+		//K->model->write("Generated Formulations/IPModel.lp");
 		obj_val_pricing = K->solve(false);
 
 		// Compute the gradient_improvement (grad(f(p_values)) * (y - p_values)), where p_values is the solution from the master, and y the solution from the pricing problem
@@ -342,7 +342,7 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 
 	bool finished = false;
 	while (finished == false) {
-		model->write("Generated Formulations/SDNashMaster.lp");
+		//model->write("Generated Formulations/SDNashMaster.lp");
 		if (print) {
 			printf("ITERATION %i\n", iterations);
 		}
@@ -519,7 +519,7 @@ void SimplicalDecomposition::addColumn(solution sol, bool print) {
 	GRBVar empty;
 	w.push_back(empty);
 	w.back() = model->addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, col, name_w);
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 }
 
 SimplicalDecomposition::SimplicalDecomposition(IPSolver* K_in, bool print) {
@@ -557,11 +557,11 @@ SimplicalDecomposition::SimplicalDecomposition(IPSolver* K_in, bool print) {
 	// Now define the columns
 	columns = std::vector<GRBColumn>();
 
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 	// Define variables
 	w = std::vector<GRBVar>();
 
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 
 }
 
