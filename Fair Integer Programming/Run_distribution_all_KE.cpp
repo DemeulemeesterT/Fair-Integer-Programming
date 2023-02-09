@@ -160,7 +160,7 @@ std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double t
 					}
 				}
 				if (K->M_size > 0) {
-					Nash_product = pow(Nash_product, (double)(1 / K->M_size));
+					Nash_product = pow(Nash_product, ((double)1 / (double) K->M_size));
 					mean = mean / (double)K->M_size;
 				}
 				else {

@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	run_distribution_all_KE("OP", 3600.0, 200, false);
+	run_distribution_all_KE("U", 3600.0, 200, false);
 	
 	/*
 	//compare_time_normal_RSD(50, false);

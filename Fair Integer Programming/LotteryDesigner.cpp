@@ -129,7 +129,7 @@ std::vector<std::vector<int>> LotteryDesigner::order_agents(std::vector<int> v, 
 //************ MAIN FUNCTIONS **************
 //******************************************
 
-lottery LotteryDesigner::uniform(bool print) {
+lottery LotteryDesigner::uniform(int iterations, bool print) {
 	lottery L;
 	L.p = std::vector<double>(K->I.n, 0);
 	L.w = std::vector<double>();
@@ -163,8 +163,9 @@ lottery LotteryDesigner::uniform(bool print) {
 	// Now keep solving the model until we can no longer find solutions with the optimal objective value
 	bool feasible = true;
 	int status;
+	IP_report IP_R;
 	while (feasible) {
-		K->solve(false);
+		IP_R = K->solve_return_solution(false);
 		status = K->model->get(GRB_IntAttr_Status);
 		if (status == 3) {
 			// The model is infeasible
@@ -172,10 +173,10 @@ lottery LotteryDesigner::uniform(bool print) {
 		}
 		else {
 			// Make sure the last found solution (which is added at the back of S) can no longer be found
-			K->block_solution(K->S.back());
+			K->block_solution(IP_R.s);
 		}
 
-		if (K->S.size() > 1000) {
+		if (K->S.size() > iterations) {
 			// To not keep looking forever, stop the search after 1000 found solutions.
 			feasible = false;
 		}
@@ -628,7 +629,7 @@ lottery LotteryDesigner::perturb_objective(int iterations, bool print, unsigned 
 	return L;
 }
 
-lottery LotteryDesigner::Nash(bool print) {
+lottery LotteryDesigner::Nash(int iterations, bool print) {
 	// Store the result in a lottery object 'L'
 	lottery L;
 	L.p = std::vector<double>(K->I.n, 0);
@@ -638,7 +639,7 @@ lottery LotteryDesigner::Nash(bool print) {
 	clock_t start_time = clock();
 
 	// So far, we first find all optimal solutions using 'uniform', and then solve our Nash model for those solutions
-	lottery L_uniform = uniform(false);
+	lottery L_uniform = uniform(iterations, false);
 
 	try {
 		GRBEnv* env = new GRBEnv();
@@ -994,7 +995,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 			for (int i = 0; i < s.size(); i++) {
 				letter = s[i];
 				if (letter == "U") {
-					L.push_back(uniform(false));
+					L.push_back(uniform(iterations, false));
 				}
 				else if (letter == "L") {
 					L.push_back(leximax(false));
@@ -1012,7 +1013,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 					L.push_back(perturb_objective(iterations, false, seed));
 				}
 				else if (letter == "N") {
-					L.push_back(Nash(false));
+					L.push_back(Nash(iterations, false));
 				}
 				else if (letter == "S") {
 					SimplicalDecomposition* SD = new SimplicalDecomposition(K, false);

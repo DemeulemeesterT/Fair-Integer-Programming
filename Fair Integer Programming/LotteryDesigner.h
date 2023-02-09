@@ -11,7 +11,7 @@ public:
 	IPSolver* K_initial;
 
 	// Main methods
-	lottery uniform(bool print);
+	lottery uniform(int iterations, bool print);
 	// 'uniform' selects each agent with a probability equal to the fraction of the optimal solutions in which they are selected
 	lottery leximax(bool print);
 	// 'leximax' finds a lottery that maximizes the lowest selection probability among the agents in M, and then the second-lowest...
@@ -24,7 +24,7 @@ public:
 	// Re-index the variables and solve the program again with the variables in this order.
 	lottery perturb_objective(int iterations, bool print, unsigned seed = 123456789);
 	// Randomly add small perturbations to the objective function
-	lottery Nash(bool print);
+	lottery Nash(int iterations, bool print);
 	// 'Nash' finds the point in the convex hull of the optimal solutions with the maximum geometric mean.
 		// In other words, it finds the point p = (p_1, ..., p_n) such that p_1 * p_2 * ... * p_n is maximized
 
