@@ -1,0 +1,6 @@
+NASH and LEXIMAX:
+run_distribution_all_KE("CL", 3600.0, 200, false);
+
+RSD:
+run_distribution_all_KE("R", 3600.0, 200, false);
+
