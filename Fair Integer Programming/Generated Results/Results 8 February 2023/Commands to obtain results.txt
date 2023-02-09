@@ -7,4 +7,7 @@ run_distribution_all_KE("R", 3600.0, 200, false);
 PERTURB and RE-INDEX
 run_distribution_all_KE("OP", 3600.0, 200, false);
 
+UNIFORM
+run_distribution_all_KE("U", 3600.0, 200, false);
+
 

@@ -124,6 +124,11 @@ public:
 	std::vector<MIPLIB_instance> MIPLIB_summary;
 		// Contains information about the MIPLIB instances (name, optimal or best-known solutions...)
 
+// GUROBI constraints
+	std::vector<GRBConstr> RSD_fixed;
+		// This vector will contain the constraints in which a variable is fixed to the found value in RSD
+		
+
 
 // FUNCTIONS
 	double solve(bool print);

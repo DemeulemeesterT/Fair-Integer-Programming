@@ -870,6 +870,7 @@ void IPSolver::identical_cluster(bool print) {
 
 solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 	solution sol;
+	RSD_fixed = std::vector<GRBConstr>();
 	
 	// We only want to permute the agents in 'M', because letting the agents in 'Y' or 'N' 
 	// choose among the optimal solutions will not have an impact.
@@ -903,6 +904,7 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 		// Taking into account the precision of the solver, we will perturb in different steps
 		// For a precision of 1e-6, we can perturb \floor(-log_2(1e-6)) = 19 agents at once
 			// This parameter is defined in the function 'InitializeVariables'
+		double z;
 		for (int j = 0; j < M_size; j=j+number_of_agents_at_once_RSD) {
 
 			obj = 0.0;
@@ -935,6 +937,7 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 			// Optimize
 			model->optimize();
 			int status = model->get(GRB_IntAttr_Status);
+			GRBLinExpr expr;
 			if (status != 3) { // If feasible
 				for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
 					if (i < order.size()) {
@@ -961,10 +964,25 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 				for (int i = 0; i < I.t; i++) {
 					sol.y[i] = Y_var[i].get(GRB_DoubleAttr_X);
 				}
+
+				z = model->get(GRB_DoubleAttr_ObjVal);
+
+				// Fix the variables by adding constraints:
+				for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
+					if (i < order.size()) {
+						expr = 0.0;
+						expr = X[order[i]];
+						//model->write("Generated Formulations/ModelRSD.lp");
+						RSD_fixed.push_back(model->addConstr(expr == (int)sol.x[order[i]]));
+						//model->write("Generated Formulations/ModelRSD.lp");
+					}
+					else {
+						i = j + number_of_agents_at_once_RSD;
+					}
+				}
 			}
 		}
 
-		double z = model->get(GRB_DoubleAttr_ObjVal);
 
 		// Compute the binary number represented by the solution.
 		int bin = 0;
@@ -983,6 +1001,16 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 		else {
 			sol.ID = -1;
 		}
+
+		// Delete the constraints that were added to fix the variables
+		for (int i = M_size - 1; i > -1; i--) {
+			//model->write("Generated Formulations/ModelRSD.lp");
+			model->remove(RSD_fixed[i]);
+			//model->write("Generated Formulations/ModelRSD.lp");
+
+		}
+		RSD_fixed.clear();
+
 	}
 	else {
 		sol.x = std::vector<bool>(I.n, 0);
