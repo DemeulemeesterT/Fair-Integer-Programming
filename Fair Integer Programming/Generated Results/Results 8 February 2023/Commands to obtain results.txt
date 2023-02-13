@@ -1,13 +1,8 @@
 NASH and LEXIMAX:
 run_distribution_all_KE("CL", 3600.0, 200, false);
 
-RSD:
-run_distribution_all_KE("R", 3600.0, 200, false);
+RSD, Perturb, Re-index and UNIFORM: 
+run_distribution_all_KE("UOPR", 3600.0, 1000, false);
 
-PERTURB and RE-INDEX
-run_distribution_all_KE("OP", 3600.0, 200, false);
-
-UNIFORM
-run_distribution_all_KE("U", 3600.0, 200, false);
 
 

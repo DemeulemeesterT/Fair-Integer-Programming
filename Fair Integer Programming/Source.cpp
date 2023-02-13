@@ -4,15 +4,15 @@ using namespace std;
 
 int main()
 {
-	//run_distribution_all_KE("R", 3600.0, 200, false);
+	run_distribution_all_KE("UOPR", 3600.0, 1000, false);
 	
-	
+	/*
 	//compare_time_normal_RSD(50, false);
 
 	//std::vector<reportGreedy> RG;
 	//RG = run_Kidney_exchange_all(true);
 
-	KidneyExchange* KE = new KidneyExchange("30-instance-19", true);
+	KidneyExchange* KE = new KidneyExchange("30-instance-18", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
 	inst I = KE->generate_instance(true, true);
@@ -30,7 +30,7 @@ int main()
 	//K->compare_time_normal_vs_RSD_without_partition(5, true);
 
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("RNL", 200, true, false, 0);
+	L->compare_methods("U", 200, true, false, 0);
 	
 	//SimplicalDecomposition* SD = new SimplicalDecomposition(K, true);
 	//SD->SD_Nash(true);
@@ -38,5 +38,5 @@ int main()
 	//delete SD;
 	delete K;
 	//delete KE;
-	
+	*/
 }

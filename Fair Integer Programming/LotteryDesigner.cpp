@@ -455,7 +455,8 @@ lottery LotteryDesigner::rename_variables(int iterations, bool print, unsigned s
 			model->addConstr(con <= K->I.C[i]);
 		}
 
-		//model->write("ModelReindexed.lp");
+		//model->
+		// "ModelReindexed.lp");
 		//model->getEnv().set(GRB_IntParam_Presolve, 0);
 		model->optimize();
 

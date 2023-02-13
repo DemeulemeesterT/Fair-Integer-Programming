@@ -187,7 +187,7 @@ IP_report IPSolver::solve_return_solution(bool print) {
 		for (int i = 0; i < I.t; i++) {
 			obj_val += I.v[I.n + i] * y[i];
 		}
-		if (obj_val == opt) {
+		if (obj_val >= opt - 0.00001) {
 			for (int i = 0; i < I.n; i++) {
 				if (Y[i] == -1) {
 					if (x[i] == 0) {
@@ -239,6 +239,9 @@ IP_report IPSolver::solve_return_solution(bool print) {
 			if (found == false) {
 				S.push_back(s);
 			}
+		}
+		else {
+			found = true;
 		}
 	}
 	else {
