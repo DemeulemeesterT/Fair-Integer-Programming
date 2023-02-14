@@ -1066,15 +1066,28 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 	return sol;
 }
 
-solution IPSolver::RSD_once_without_partition(std::vector<int> order, bool print) {
+solution IPSolver::RSD_once_no_partition(std::vector<int> order, bool print) {
+	// This is the updated function
 	solution sol;
+	RSD_fixed = std::vector<GRBConstr>();
 
-	// We only want to permute the agents in 'M', because letting the agents in 'Y' or 'N' 
-	// choose among the optimal solutions will not have an impact.
-	if (M_size > 0) {
-		int counter = 0;
-		GRBLinExpr obj = 0.0;
-		double delta = 1;
+	// We want to permute all agents, not only the agents in 'M'.
+
+	int counter = 0;
+	GRBLinExpr obj = 0.0;
+	double delta = 1;
+
+	// Store solution of the agents of which we perturbed the objective coefficients
+	sol.x = std::vector<bool>(I.n, 0);
+	sol.y = std::vector<int>(I.t, 0);
+
+	// Taking into account the precision of the solver, we will perturb in different steps
+	// For a precision of 1e-6, we can perturb \floor(-log_2(1e-6)) = 19 agents at once
+		// This parameter is defined in the function 'InitializeVariables'
+	double z;
+	for (int j = 0; j < I.n; j = j + number_of_agents_at_once_RSD) {
+
+		obj = 0.0;
 
 		// Build the objective function 
 		for (int i = 0; i < I.n; i++) {
@@ -1082,10 +1095,15 @@ solution IPSolver::RSD_once_without_partition(std::vector<int> order, bool print
 		}
 
 		// Now we go through 'order' from the beginning, and shift the objective function accordingly.
-		for (int i = 0; i < order.size(); i++) {
-			counter++;
-			delta = delta * 0.5;
-			obj += (delta)*X[order[i]];
+		for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
+			if (i < order.size()) {
+				counter++;
+				delta = delta * 0.5;
+				obj += (delta)*X[order[i]];
+			}
+			else {
+				i = j + number_of_agents_at_once_RSD;
+			}
 		}
 
 		// Lastly, add the objective coefficients of the Y-variables
@@ -1094,16 +1112,22 @@ solution IPSolver::RSD_once_without_partition(std::vector<int> order, bool print
 		}
 
 		model->setObjective(obj, GRB_MAXIMIZE);
-		//model->write("Generated Formulations/.lp");
+		//model->write("Generated Formulations/ModelRSD.lp");
 
 		// Optimize
-		//model->write("Generated Formulations/ModelRSD.lp");
 		model->optimize();
 		int status = model->get(GRB_IntAttr_Status);
+		GRBLinExpr expr;
 		if (status != 3) { // If feasible
-			// Store solution
-			sol.x = std::vector<bool>(I.n, 0);
-			for (int j = 0; j < I.n; j++) {
+			for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
+				if (i < order.size()) {
+					sol.x[order[i]] = (bool)X[order[i]].get(GRB_DoubleAttr_X);
+				}
+				else {
+					i = j + number_of_agents_at_once_RSD;
+				}
+			}
+			//for (int j = 0; j < I.n; j++) {
 				/*if (Y[j] == 1) { // Checking this saves us a bit of time on the expensive .get function
 					sol.x[j] = (bool)1;
 				}
@@ -1113,85 +1137,62 @@ solution IPSolver::RSD_once_without_partition(std::vector<int> order, bool print
 				else {
 					sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
 				}*/
-				sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
 
-			}
-			sol.y = std::vector<int>(I.t, 0);
-			for (int j = 0; j < I.t; j++) {
-				sol.y[j] = Y_var[j].get(GRB_DoubleAttr_X);
-			}
-		}
+				//sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
 
-		double z = model->get(GRB_DoubleAttr_ObjVal);
-
-		// Compute the binary number represented by the solution.
-		int bin = 0;
-		int exponent = 0;
-		int exponent_sum = 0;
-		for (int i = I.n - 1; i > -1; i--) {
-			if (sol.x[i] == true) {
-				bin += pow(2, exponent);
-				exponent_sum += exponent;
+			//}
+			for (int i = 0; i < I.t; i++) {
+				sol.y[i] = Y_var[i].get(GRB_DoubleAttr_X);
 			}
-			exponent++;
+
+			z = model->get(GRB_DoubleAttr_ObjVal);
+
+			// Fix the variables by adding constraints:
+			for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
+				if (i < order.size()) {
+					expr = 0.0;
+					expr = X[order[i]];
+					//model->write("Generated Formulations/ModelRSD.lp");
+					RSD_fixed.push_back(model->addConstr(expr == (int)sol.x[order[i]]));
+					//model->write("Generated Formulations/ModelRSD.lp");
+				}
+				else {
+					i = j + number_of_agents_at_once_RSD;
+				}
+			}
 		}
-		if (exponent_sum <= 80) {
-			sol.ID = bin;
+	}
+
+	// Compute the binary number represented by the solution.
+	int bin = 0;
+	int exponent = 0;
+	int exponent_sum = 0;
+	for (int i = I.n - 1; i > -1; i--) {
+		if (sol.x[i] == true) {
+			bin += pow(2, exponent);
+			exponent_sum += exponent;
 		}
-		else {
-			sol.ID = -1;
-		}
+		exponent++;
+	}
+	if (exponent_sum <= 80) {
+		sol.ID = bin;
 	}
 	else {
-		sol.x = std::vector<bool>(I.n, 0);
-		sol.y = std::vector<int>(I.t, 0);
-
-		// We know for each agent whether they are selected or not
-		for (int i = 0; i < I.n; i++) {
-			if (Y[i] == 1) {
-				sol.x[i] = 1;
-				model->addConstr(X[i] == 1);
-			}
-			else if (N[i] == 0){
-				//sol.x[i] = 0; // Already true because of the initialization of sol.x
-				model->addConstr(X[i] == 0);
-			}
-		}
-
-		// Now we solve the model to find the correct values of the Y-variables
-
-		// FIND THE CORRECT VALUES OF THE Y-VARIABLES STILL!
-		model->optimize();
-		int status = model->get(GRB_IntAttr_Status);
-		if (status != 3) { // If feasible
-			// Store solution
-			sol.y = std::vector<int>(I.t, 0);
-			for (int j = 0; j < I.t; j++) {
-				sol.y[j] = Y_var[j].get(GRB_DoubleAttr_X);
-			}
-		}
-
-		// Compute the binary number represented by the solution.
-		int bin = 0;
-		int exponent = 0;
-		int exponent_sum = 0;
-		for (int i = I.n - 1; i > -1; i--) {
-			if (sol.x[i] == true) {
-				bin += pow(2, exponent);
-				exponent_sum += exponent;
-			}
-			exponent++;
-		}
-		if (exponent_sum <= 80) {
-			sol.ID = bin;
-		}
-		else {
-			sol.ID = -1;
-		}
+		sol.ID = -1;
 	}
+
+	// Delete the constraints that were added to fix the variables
+	for (int i = I.n - 1; i > -1; i--) {
+		//model->write("Generated Formulations/ModelRSD.lp");
+		model->remove(RSD_fixed[i]);
+		//model->write("Generated Formulations/ModelRSD.lp");
+
+	}
+	RSD_fixed.clear();
 
 	return sol;
 }
+
 
 void IPSolver::block_solution(solution sol) {
 	GRBLinExpr expr = 0.0;
@@ -1237,7 +1238,7 @@ std::vector<time_report> IPSolver::compare_time_normal_vs_RSD_variants(int itera
 	clock_t start_time = clock();
 	solution sol;
 	for (int i = 0; i < iterations; i++) {
-		sol = RSD_once_without_partition(order, false);
+		sol = RSD_once_no_partition(order, false);
 		model->reset();
 	}
 	double time_RSD_without_partition = ((double)(clock() - start_time) / CLK_TCK);
@@ -1288,7 +1289,7 @@ std::vector<time_report> IPSolver::compare_time_normal_vs_RSD_without_partition(
 	clock_t start_time = clock();
 	solution sol;
 	for (int i = 0; i < iterations; i++) {
-		sol = RSD_once_without_partition(order, false);
+		sol = RSD_once_no_partition(order, false);
 		model->reset();
 	}
 	double time_RSD_without_partition = ((double)(clock() - start_time) / CLK_TCK);

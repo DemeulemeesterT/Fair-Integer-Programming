@@ -160,7 +160,7 @@ public:
 			// the agents that are not in 'order' will not have their objective coefficients permuted.
 			// Only the agents in M who appear in order will have their objective coefficients permuted
 
-	solution RSD_once_without_partition(std::vector<int> order, bool print);
+	solution RSD_once_no_partition(std::vector<int> order, bool print);
 		// Same as 'RSD_once', but does not take into account the partition of the agents into Y, N, and M.
 		// Objective coefficients of the agents in Y or N can also be permuted in this function.
 	

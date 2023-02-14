@@ -4,8 +4,9 @@ using namespace std;
 
 int main()
 {
-	run_distribution_all_KE("UOPR", 3600.0, 1000, false);
-	
+	//run_distribution_all_KE("UOPR", 3600.0, 1000, false);
+	compare_time_normal_RSD(1000, false);
+
 	/*
 	//compare_time_normal_RSD(50, false);
 
