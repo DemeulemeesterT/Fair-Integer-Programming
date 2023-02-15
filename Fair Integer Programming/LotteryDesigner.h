@@ -19,6 +19,9 @@ public:
 	// 'RSD' randomly orders the agents and let them discard the solutions in which they are not selected one by one in this order.
 	lottery RSD_once(bool print, unsigned seed = 123456789);
 	// Only runs RSD once.
+	lottery RSD_heuristic(int iterations, bool print, unsigned seed = 123456789);
+	// Only perturbs the objective function for the first 19 agents of the random order.
+		// Using RSD without partitioning, so without first finding Y, N, and M.
 
 	lottery rename_variables(int iterations, bool print, unsigned seed = 123456789);
 	// Re-index the variables and solve the program again with the variables in this order.

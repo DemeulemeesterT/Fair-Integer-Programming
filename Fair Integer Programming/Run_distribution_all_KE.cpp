@@ -31,6 +31,9 @@ std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double t
 		if (s[k] == 'R') {
 			filename_distr = "_RSD";
 		}
+		if (s[k] == 'H') {
+			filename_distr = "_RSDheuristic";
+		}
 		if (s[k] == 'L') {
 			filename_distr = "_LEXIMAX";
 		}
@@ -103,6 +106,9 @@ std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double t
 				}
 				if (s[k] == 'R') {
 					filename_distr = "_RSD";
+				}
+				if (s[k] == 'H') {
+					filename_distr = "_RSDheuristic";
 				}
 				if (s[k] == 'L') {
 					filename_distr = "_LEXIMAX";

@@ -4,6 +4,9 @@ run_distribution_all_KE("CL", 3600.0, 200, false);
 RSD, Perturb, Re-index and UNIFORM: 
 run_distribution_all_KE("UOPR", 3600.0, 1000, false);
 
+RSD-heuristic
+run_distribution_all_KE("H", 3600.0, 1000, false);
+
 
 
 

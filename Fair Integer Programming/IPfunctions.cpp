@@ -1194,6 +1194,105 @@ solution IPSolver::RSD_once_no_partition(std::vector<int> order, bool print) {
 }
 
 
+solution IPSolver::RSD_heuristic_no_partition(std::vector<int> order, bool print) {
+	// This is the updated function
+	solution sol;
+	RSD_fixed = std::vector<GRBConstr>();
+
+	// We want to permute all agents, not only the agents in 'M'.
+
+	int counter = 0;
+	GRBLinExpr obj = 0.0;
+	double delta = 1;
+
+	// Store solution of the agents of which we perturbed the objective coefficients
+	sol.x = std::vector<bool>(I.n, 0);
+	sol.y = std::vector<int>(I.t, 0);
+
+	// Taking into account the precision of the solver, we will perturb ONCE
+	// For a precision of 1e-6, we can perturb \floor(-log_2(1e-6)) = 19 agents at once
+		// This parameter is defined in the function 'InitializeVariables'
+	double z;
+	int j = 0;
+
+	obj = 0.0;
+
+	// Build the objective function 
+	for (int i = 0; i < I.n; i++) {
+		obj += I.v[i] * X[i];
+	}
+
+	// Now we go through 'order' from the beginning, and shift the objective function accordingly.
+	for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
+		if (i < order.size()) {
+			counter++;
+			delta = delta * 0.5;
+			obj += (delta)*X[order[i]];
+		}
+		else {
+			i = j + number_of_agents_at_once_RSD;
+		}
+	}
+
+	// Lastly, add the objective coefficients of the Y-variables
+	for (int i = 0; i < I.t; i++) {
+		obj += I.v[I.n + i] * Y_var[i];
+	}
+
+	model->setObjective(obj, GRB_MAXIMIZE);
+	//model->write("Generated Formulations/ModelRSD.lp");
+
+	// Optimize
+	model->optimize();
+	int status = model->get(GRB_IntAttr_Status);
+	GRBLinExpr expr;
+	if (status != 3) { // If feasible
+		for (int i = 0; i < I.n; i++) {
+			sol.x[i] = (bool)X[i].get(GRB_DoubleAttr_X);
+		}
+		//for (int j = 0; j < I.n; j++) {
+			/*if (Y[j] == 1) { // Checking this saves us a bit of time on the expensive .get function
+				sol.x[j] = (bool)1;
+			}
+			else if (N[j] == 1) {
+				sol.x[j] = (bool)0;
+			}
+			else {
+				sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
+			}*/
+
+			//sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
+
+		//}
+		for (int i = 0; i < I.t; i++) {
+			sol.y[i] = Y_var[i].get(GRB_DoubleAttr_X);
+		}
+
+		z = model->get(GRB_DoubleAttr_ObjVal);
+	}
+
+	// Compute the binary number represented by the solution.
+	int bin = 0;
+	int exponent = 0;
+	int exponent_sum = 0;
+	for (int i = I.n - 1; i > -1; i--) {
+		if (sol.x[i] == true) {
+			bin += pow(2, exponent);
+			exponent_sum += exponent;
+		}
+		exponent++;
+	}
+	if (exponent_sum <= 80) {
+		sol.ID = bin;
+	}
+	else {
+		sol.ID = -1;
+	}
+
+	return sol;
+}
+
+
 void IPSolver::block_solution(solution sol) {
 	GRBLinExpr expr = 0.0;
 	int counter = 0;

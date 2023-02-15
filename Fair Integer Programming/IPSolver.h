@@ -163,6 +163,9 @@ public:
 	solution RSD_once_no_partition(std::vector<int> order, bool print);
 		// Same as 'RSD_once', but does not take into account the partition of the agents into Y, N, and M.
 		// Objective coefficients of the agents in Y or N can also be permuted in this function.
+
+	solution RSD_heuristic_no_partition(std::vector<int> order, bool print);
+	// Same as 'RSD_once_no_partition', but only perturbs the objective function once, for the first 19 agents in the random order.
 	
 	void block_solution(solution sol);
 

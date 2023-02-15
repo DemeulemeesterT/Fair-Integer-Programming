@@ -381,6 +381,76 @@ lottery LotteryDesigner::RSD_once(bool print, unsigned seed) {
 	return L;
 }
 
+
+lottery LotteryDesigner::RSD_heuristic(int iterations, bool print, unsigned seed) {
+	lottery L;
+	L.p = std::vector<double>(K->I.n, 0);
+	L.w = std::vector<double>();
+	L.S = std::vector<solution>();
+
+	// Disable output if not wanted
+	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+
+	// We only want to permute the agents in 'M', because letting the agents in 'Y' or 'N' 
+	// choose among the optimal solutions will not have an impact.
+	// Create a list of (random) orders of the agents in 'M'
+	std::vector<int> M2;
+	for (int i = 0; i < K->I.n; i++) {
+		if (K->M[i] == 1) {
+			M2.push_back(i);
+		}
+	}
+
+	clock_t start_time = clock();
+
+	std::vector<std::vector<int>> orders = order_agents(M2, iterations, print, seed);
+
+	for (int i = 0; i < orders.size(); i++) {
+		solution sol = K->RSD_heuristic_no_partition(orders[i], print);
+
+		// Go through all solutions in S to see if another solution has this ID
+			// This method will not work for large numbers
+			// Largest number that can be stored in a double is 1.7e308
+			// Just add the solution if the ID is too large, don't perform check
+		bool found = false;
+		if (sol.ID != -1) { // This is the value we give the ID if exponents are too large
+			for (int i = 0; i < L.S.size(); i++) {
+				if (L.S[i].ID == sol.ID) {
+					found = true;
+					L.w[i] += 1 / (double)orders.size();
+					// Increase the selection weight of this solution
+					i = L.S.size();
+				}
+			}
+		}
+		// Now add this solution to 'L', with a selection probability equal to 1/orders.size()
+		if (found == false) {
+			L.S.push_back(sol);
+			L.w.push_back(1 / (double)orders.size());
+		}
+
+
+	}
+
+	// Calculate the selection probabilities of the agents, based on the solutions
+	for (int i = 0; i < L.S.size(); i++) {
+		for (int j = 0; j < K->I.n; j++) {
+			L.p[j] += L.w[i] * L.S[i].x[j];
+		}
+	}
+
+	if (print) {
+		print_lottery(L);
+	}
+
+	// Reset 'K', so that we don't "cheat" by making it easier for the other methods.
+	reset_K(print);
+
+	L.t = ((double)(clock() - start_time) / CLK_TCK);
+
+	return L;
+}
+
 lottery LotteryDesigner::rename_variables(int iterations, bool print, unsigned seed) {
 	lottery L;
 	L.p = std::vector<double>(K->I.n, 0);
@@ -974,6 +1044,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 				printf("\t L = Leximax\n");
 				printf("\t R = Random Serial Dictatorship\n");
 				printf("\t T = RSD (once)\n");
+				printf("\t H = RSD heuristic\n");
 				printf("\t O = Re-index the variables randomly\n");
 				printf("\t P = Perturb the objective function randomly\n");
 				printf("\t N = Nash solution (maximizes the geometric mean) - HEURISTIC\n");
@@ -1005,7 +1076,10 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 					L.push_back(RSD(iterations, false, seed));
 				}
 				else if (letter == "T") {
-					L.push_back(RSD(iterations, false, seed));
+					L.push_back(RSD_once(false, seed));
+				}
+				else if (letter == "H") {
+					L.push_back(RSD_heuristic(iterations, false, seed));
 				}
 				else if (letter == "O") {
 					L.push_back(rename_variables(iterations, false, seed));
@@ -1047,6 +1121,12 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 					}
 					else if (letter == "R") {
 						display = " RSD";
+					}
+					else if (letter == "T") {
+						display = " RSDo";
+					}
+					else if (letter == "H") {
+						display = " RSDh";
 					}
 					else if (letter == "L") {
 						display = "LEXI";
