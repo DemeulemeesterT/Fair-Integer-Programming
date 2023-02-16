@@ -267,7 +267,7 @@ void IPSolver::analyze(bool print) {
 }
 
 void IPSolver::partition(bool print) {
-	model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	//model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	clock_t start_time = clock();
 
@@ -682,7 +682,7 @@ bool IPSolver::find_identical_agents_aid(int i, int j, bool print) {
 		}
 	}
 
-	model_identical->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	//model_identical->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	try {
 		for (int l = 0; l < I.C.size(); l++) {

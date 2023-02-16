@@ -103,6 +103,7 @@ inst KidneyExchange::generate_instance(bool export_inst, bool print) {
 	I.n = n_pairs; // One X-variable for each pair
 	I.t = C.size(); // One Y-variable for each cycle
 	I.n_var = I.n + I.t;
+	I.n_var = I.n + I.t;
 	I.Y_bool = true;
 	I.Y_coeff_zero = true;
 

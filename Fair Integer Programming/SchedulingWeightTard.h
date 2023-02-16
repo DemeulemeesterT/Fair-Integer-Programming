@@ -32,6 +32,9 @@ public:
 	int n; 
 		// The number of jobs
 
+	std::string data_name;
+		// Name of the instance
+
 
 	// CONSTRUCTORS AND DESTRUCTORS
 	SchedulingWeightTard(std::string name, bool print);

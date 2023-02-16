@@ -6,8 +6,13 @@ int main()
 {
 	//run_distribution_all_KE("H", 3600.0, 1000, false);
 	//compare_time_normal_RSD(1000, false);
-	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", true);
-
+	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
+	inst I = SWT->generate_instance(1, false, false);
+	IPSolver* K = new IPSolver(I, true);
+	K->solve(true);
+	LotteryDesigner* L = new LotteryDesigner(K, true);
+	L->compare_methods("HR", 10, true, true, 0);
+	delete K;
 	delete SWT;
 
 	
