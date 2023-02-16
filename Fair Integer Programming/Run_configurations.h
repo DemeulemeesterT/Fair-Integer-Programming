@@ -1,5 +1,6 @@
 #include "IPSolver.h"
 #include "KidneyExchange.h"
+#include "SchedulingWeightTard.h"
 #include "LotteryDesigner.h"
 #include "SimplicalDecomposition.h"
 #include "ReportDistribution.h"

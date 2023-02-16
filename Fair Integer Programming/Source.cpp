@@ -6,6 +6,9 @@ int main()
 {
 	//run_distribution_all_KE("H", 3600.0, 1000, false);
 	//compare_time_normal_RSD(1000, false);
+	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", true);
+
+	delete SWT;
 
 	
 	//compare_time_normal_RSD(50, false);
@@ -13,6 +16,7 @@ int main()
 	//std::vector<reportGreedy> RG;
 	//RG = run_Kidney_exchange_all(true);
 
+	/*
 	KidneyExchange* KE = new KidneyExchange("30-instance-45", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
@@ -39,5 +43,5 @@ int main()
 	//delete SD;
 	delete K;
 	//delete KE;
-	
+	*/
 }

@@ -42,6 +42,9 @@
     <ClInclude Include="ReportDistribution.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SchedulingWeightTard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KidneyExchange.cpp">
@@ -75,6 +78,9 @@
       <Filter>Source Files\RunConfigurations</Filter>
     </ClCompile>
     <ClCompile Include="ReportDistribution.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SchedulingWeightTard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
