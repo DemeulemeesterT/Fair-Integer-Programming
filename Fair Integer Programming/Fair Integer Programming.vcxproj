@@ -149,6 +149,7 @@
     <ClInclude Include="KidneyExchange.h" />
     <ClInclude Include="LeximaxMaster.h" />
     <ClInclude Include="LotteryDesigner.h" />
+    <ClInclude Include="PartitionCallback.h" />
     <ClInclude Include="ReportDistribution.h" />
     <ClInclude Include="Run_configurations.h" />
     <ClInclude Include="SchedulingWeightTard.h" />

@@ -7,7 +7,7 @@ int main()
 	//run_distribution_all_KE("H", 3600.0, 1000, false);
 	//compare_time_normal_RSD(1000, false);
 	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
-	inst I = SWT->generate_instance(1, false, false);
+	inst I = SWT->generate_instance(0, false, false);
 	IPSolver* K = new IPSolver(I, true);
 	K->solve(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);

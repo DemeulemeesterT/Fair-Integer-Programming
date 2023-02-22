@@ -1,7 +1,10 @@
 #include "SchedulingWeightTard.h"
 
 void SchedulingWeightTard::read_data(std::string name, bool print) {
-	if (name == "wt40") {
+	if (name == "wt3") {
+		n = 3;
+	}
+	else if (name == "wt40") {
 		n = 40;
 	}
 	else if (name == "wt50") {
@@ -100,21 +103,24 @@ inst SchedulingWeightTard::generate_instance(int nr, bool export_inst, bool prin
 	// Formula to access the right y-variable in the constraint matrix
 	// y_jt = column 
 		// I.n (number of x-variables)
-		// + I.n * j (number of previous y-variables)
+		// + T * j (number of previous y-variables)
 		// + t (correct period)
 
 	int counter = I.n; // Will keep track of the correct Y-variable
 	int ConNr = 0; // Will keep track of the constraint number
 	for (int i = 0; i < I.n; i++) {
 		for (int t = 0; t < T; t++) { 
-			I.A[ConNr + i][counter + t] = 1;
-			I.A[ConNr + i + 1][counter + t] = -1;
+			I.A[ConNr + 2*i][counter + t] = 1;
+			I.A[ConNr + 2*i + 1][counter + t] = -1;
 		}
 		// Fix the capacities of the constraints
 		I.C.push_back(1);
 		I.C.push_back(-1);
+
+		// Change the y-variables we are considering
+		counter = counter + T;
 	}
-	ConNr += 2 * I.n;
+	ConNr = 2 * I.n;
 
 	// Then T constraints to ensure that at most one job can start
 	// \sum_j \sum_{s = max(0, t-p_j+1}^t y_js <= 1 for all t = 1...T
@@ -122,10 +128,10 @@ inst SchedulingWeightTard::generate_instance(int nr, bool export_inst, bool prin
 		for (int j = 0; j < I.n; j++) {
 			int start_s = 0;
 			if (t - Sched_I[nr].p[j] + 1 > 0) {
-				start_s = Sched_I[nr].p[j] + 1;
+				start_s = t - Sched_I[nr].p[j] + 1;
 			}
 			for (int s = start_s; s < t + 1; s++) {
-				I.A[ConNr][I.n + j * I.n + s] = 1;
+				I.A[ConNr][I.n + j * T + s] = 1;
 			}
 		}
 		I.C.push_back(1);
@@ -134,15 +140,17 @@ inst SchedulingWeightTard::generate_instance(int nr, bool export_inst, bool prin
 
 
 	// For each task we add the following constraint:
-	// t * y_jt <= d_j - p_j + (1-x_j) * (\sum_i(p_i) - d_j)
-		// If x_j = 1 (task j is scheduled before the due date), this implies that t * y_jt <= d_j - p_j
-		// If x_j = 0 (task j is scheduled after due date), this implies t * y_jt <= \sum_i p_i - p_j (which is automatically satisfied)
+	// \sum_t(t * y_jt) <= d_j - p_j + (1-x_j) * (\sum_i(p_i) - d_j)
+		// If x_j = 1 (task j is scheduled before the due date), this implies that \sum_t(t * y_jt) <= d_j - p_j
+		// If x_j = 0 (task j is scheduled after due date), this implies \sum_t(t * y_jt) <= \sum_i p_i - p_j (which is automatically satisfied)
 	// This can be rewritten as
 	// \sum_t (t * y_jt) + (\sum_i p_i - d_j) * x_j <= \sum_i p_i - p_j
+
+	// CARFEFUL: because the indexing starts from zero in this code, but from 1 in the input files, we use d_j - 1 here!
 	for (int i = 0; i < I.n; i++) {
-		I.A[ConNr][i] = T - Sched_I[nr].d[i];
+		I.A[ConNr][i] = T - (Sched_I[nr].d[i] - 1);
 		for (int t = 0; t < T; t++) {
-			I.A[ConNr][I.n + i * I.n + t] = t;
+			I.A[ConNr][I.n + i * T + t] = t;
 		}
 		ConNr++;
 		I.C.push_back(T - Sched_I[nr].p[i]);

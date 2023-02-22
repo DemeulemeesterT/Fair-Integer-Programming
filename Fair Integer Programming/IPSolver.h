@@ -9,6 +9,7 @@
 #include <vector>
 #include "gurobi_c++.h"
 #include <cmath>
+#include "PartitionCallback.h"
 
 // An IP instance
 struct inst {
@@ -133,6 +134,11 @@ public:
 // FUNCTIONS
 	double solve(bool print);
 		// Solves the IP instance to optimality
+
+	double solve_partition(bool print);
+		// Same as 'solve', but used in the partitioning step. 
+		// Contains an additional callback that causes the solver the stop once the upper bound 
+		// on the objective function is lower than the optimal objective function.
 
 	IP_report solve_return_solution(bool print);
 		// Same as 'solve' but returns optimal solution and the optimal objective value

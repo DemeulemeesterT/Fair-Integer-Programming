@@ -45,6 +45,9 @@
     <ClInclude Include="SchedulingWeightTard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PartitionCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KidneyExchange.cpp">

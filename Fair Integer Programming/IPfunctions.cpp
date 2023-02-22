@@ -4,7 +4,7 @@ double IPSolver::solve(bool print) {
 
 	solver_times++;
 
-	//model->write("Generated Formulations/IPModel.lp");
+	model->write("Generated Formulations/IPModel.lp");
 
 	model->optimize();
 	int status = model->get(GRB_IntAttr_Status);
@@ -117,6 +117,137 @@ double IPSolver::solve(bool print) {
 	else {
 		z = -11223344;
 	}
+
+	done_solve = true;
+
+	return z;
+}
+
+double IPSolver::solve_partition(bool print) {
+
+	solver_times++;
+
+	model->write("Generated Formulations/IPModel.lp");
+
+	// Create callback and add it to the model.
+	PartitionCallback cb = PartitionCallback(opt, print);
+		// 'opt' is the optimal solution of the problem
+	model->setCallback(&cb);
+
+	model->optimize();
+	int status = model->get(GRB_IntAttr_Status);
+	double z;
+	if (status != 3) { // If feasible
+		z = model->get(GRB_DoubleAttr_ObjVal);
+
+		// Store solution
+		std::vector<bool> x(I.n, 0);
+		for (int j = 0; j < I.n; j++) {
+			x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
+		}
+
+		std::vector<int> y(I.t, 0);
+		for (int j = 0; j < I.t; j++) {
+			y[j] = Y_var[j].get(GRB_DoubleAttr_X);
+		}
+
+		if (print) {
+			for (int j = 0; j < I.n; j++) {
+				if (x[j] == 1) {
+					printf("\tX_%i = %.2f\n", j, (double)x[j]);
+				}
+			}
+			for (int j = 0; j < I.t; j++) {
+				if (y[j] > 0) {
+					printf("\tY_%i = %.2f\n", j, (double)y[j]);
+				}
+			}
+		}
+
+		// Check: capacities satisfied?
+		std::vector<double> sum(I.m, 0);
+		for (int k = 0; k < I.m; k++) {
+			for (int j = 0; j < I.n; j++) {
+				if (x[j] > 0) {
+					sum[k] += I.A[k][j];
+				}
+			}
+		}
+
+		if (solver_times == 1) {
+			// Initialize 'opt' if solved for the first time
+			opt = z;
+		}
+
+		// Fill in Y, M and N
+		double obj_val = 0;	// We should calculate it ourselves, because when we use this problem as a pricing problem
+							// the obtained objective value is different
+		for (int i = 0; i < I.n; i++) {
+			obj_val += I.v[i] * x[i];
+		}
+		for (int i = 0; i < I.t; i++) {
+			obj_val += I.v[I.n + i] * y[i];
+		}
+		if (obj_val == opt) {
+			for (int i = 0; i < I.n; i++) {
+				if (Y[i] == -1) {
+					if (x[i] == 0) {
+						// i is definitely not selected in all solutions
+						Y[i] = 0;
+					}
+				}
+				if (N[i] == -1) {
+					if (x[i] == 1) {
+						// i is selected in at least one solution
+						N[i] = 0;
+					}
+				}
+			}
+
+			// Add the solution to S if it is not yet in there
+			solution s;
+
+			// Compute the binary number represented by the solution.
+			int bin = 0;
+			int exponent = 0;
+			int exponent_sum = 0;
+			for (int i = I.n - 1; i > -1; i--) {
+				if (x[i] == true) {
+					bin += pow(2, exponent);
+					exponent_sum += exponent;
+				}
+				exponent++;
+			}
+
+			// This method will not work for large numbers
+			// Largest number that can be stored in a double is 1.7e308
+			// Just add the solution if the ID is too large, don't perform check
+			bool found = false;
+			if (exponent_sum <= 80) {
+				// Go through all solutions in S to see if another solution has this ID
+				for (int i = 0; i < S.size(); i++) {
+					if (S[i].ID == bin) {
+						found = true;
+						i = S.size();
+					}
+				}
+			}
+
+			// Add solution to S
+			s.x = x;
+			s.y = y;
+			s.ID = bin;
+			if (found == false) {
+				S.push_back(s);
+			}
+		}
+	}
+	else {
+		z = -11223344;
+	}
+
+	// We should remove the callback 
+	model->setCallback(NULL);
 
 	done_solve = true;
 
@@ -277,7 +408,7 @@ void IPSolver::partition(bool print) {
 		// Whether he belongs to Y:
 		if (Y[i] == -1) {
 			GRBConstr c = model->addConstr(X[i] == 0);
-			int z = this->solve(false);
+			int z = this->solve_partition(false);
 			if (z != opt) {
 				Y[i] = 1;
 				M[i] = 0;
