@@ -48,11 +48,15 @@ protected:
                 //double objbst = getDoubleInfo(GRB_CB_MIP_OBJBST);
                 double objbnd = getDoubleInfo(GRB_CB_MIP_OBJBND);
                 //int solcnt = getIntInfo(GRB_CB_MIP_SOLCNT);
-                if (objbnd < opt) {
-                    if (print) {
-                        std::cout << "Stop early - objective bound lower than optimal solution" << std::endl;
+                if (opt != -112233445566) {
+                    // This condition checks whether the model has already been solved once
+                    // -112233445566 is the initialization value of 'opt'
+                    if (objbnd < opt) {
+                        if (print) {
+                            std::cout << "Stop early - objective bound lower than optimal solution" << std::endl;
+                        }
+                        abort();
                     }
-                    abort();
                 }
             }
             /*else if (where == GRB_CB_MIPSOL) {

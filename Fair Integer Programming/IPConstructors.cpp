@@ -302,6 +302,7 @@ void IPSolver::initializeVariables(inst I_in, bool print) {
 	I.Y_bool = I_in.Y_bool;
 	I.Y_coeff_zero = I_in.Y_coeff_zero;
 	I.data_name = I_in.data_name;
+	opt = -112233445566;
 	for (int i = 0; i < I.n_var; i++) {
 		I.v.push_back(I_in.v[i]);
 	}

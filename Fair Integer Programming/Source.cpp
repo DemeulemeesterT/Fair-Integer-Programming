@@ -7,13 +7,14 @@ int main()
 	//run_distribution_all_KE("H", 3600.0, 1000, false);
 	//compare_time_normal_RSD(1000, false);
 	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
-	inst I = SWT->generate_instance(0, false, false);
+	inst I = SWT->generate_instance(0, false, true);
 	IPSolver* K = new IPSolver(I, true);
 	K->solve(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
 	L->compare_methods("HR", 10, true, true, 0);
 	delete K;
 	delete SWT;
+	
 
 	
 	//compare_time_normal_RSD(50, false);
@@ -22,7 +23,7 @@ int main()
 	//RG = run_Kidney_exchange_all(true);
 
 	/*
-	KidneyExchange* KE = new KidneyExchange("30-instance-45", true);
+	KidneyExchange* KE = new KidneyExchange("30-instance-1", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
 	inst I = KE->generate_instance(true, true);

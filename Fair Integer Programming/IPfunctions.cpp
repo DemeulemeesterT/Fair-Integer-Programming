@@ -408,7 +408,7 @@ void IPSolver::partition(bool print) {
 		// Whether he belongs to Y:
 		if (Y[i] == -1) {
 			GRBConstr c = model->addConstr(X[i] == 0);
-			int z = this->solve_partition(false);
+			int z = this->solve_partition(print);
 			if (z != opt) {
 				Y[i] = 1;
 				M[i] = 0;
