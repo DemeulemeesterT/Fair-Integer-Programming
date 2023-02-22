@@ -23,6 +23,15 @@ struct reportGreedy {
 std::vector<reportGreedy> run_Kidney_exchange_all(bool print);
 
 std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double time_limit, int iterations, bool print);
+	// Can be used to find distributions for multiple Kidney Exchange instances sequentially
+	// Note 22/02/2023: the time_limit parameter is not implemented yet
+		// The choice of the instances to be run can be controlled at the beginning of 'Run_distribution_all_KE.cpp'
+
+std::vector<ReportDistribution*> run_distribution_all_SWT(std::string s, int nr_instances, double time_limit, int iterations, bool print);
+	// Can be used to find distributions for multiple Scheduling Weighted Tardiness instances sequentially
+	// Note 22/02/2023: the time_limit parameter is not implemented yet
+		// The choice of the instances to be run can be controlled at the beginning of 'Run_distribution_all_SWT.cpp'
+
 
 void compare_time_normal_RSD(int iter, bool print);
 

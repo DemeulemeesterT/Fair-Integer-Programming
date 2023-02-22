@@ -4,7 +4,7 @@ double IPSolver::solve(bool print) {
 
 	solver_times++;
 
-	model->write("Generated Formulations/IPModel.lp");
+	//model->write("Generated Formulations/IPModel.lp");
 
 	model->optimize();
 	int status = model->get(GRB_IntAttr_Status);
@@ -127,7 +127,7 @@ double IPSolver::solve_partition(bool print) {
 
 	solver_times++;
 
-	model->write("Generated Formulations/IPModel.lp");
+	//model->write("Generated Formulations/IPModel.lp");
 
 	// Create callback and add it to the model.
 	PartitionCallback cb = PartitionCallback(opt, print);
@@ -137,7 +137,7 @@ double IPSolver::solve_partition(bool print) {
 	model->optimize();
 	int status = model->get(GRB_IntAttr_Status);
 	double z;
-	if (status != 3) { // If feasible
+	if (status == 2) { // If optimal
 		z = model->get(GRB_DoubleAttr_ObjVal);
 
 		// Store solution
@@ -419,7 +419,7 @@ void IPSolver::partition(bool print) {
 		}
 		if (N[i] == -1) {
 			GRBConstr c = model->addConstr(X[i] == 1);
-			int z = this->solve(false);
+			int z = this->solve_partition(print);
 			if (z != opt) {
 				N[i] = 1;
 				M[i] = 0;

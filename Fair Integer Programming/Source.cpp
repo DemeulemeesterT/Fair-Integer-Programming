@@ -5,8 +5,10 @@ using namespace std;
 int main()
 {
 	//run_distribution_all_KE("H", 3600.0, 1000, false);
+	run_distribution_all_SWT("HNRULPO", 1, 3600.0, 10, false);
 	//compare_time_normal_RSD(1000, false);
-	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
+	
+	/*SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
 	inst I = SWT->generate_instance(0, false, true);
 	IPSolver* K = new IPSolver(I, true);
 	K->solve(true);
@@ -14,6 +16,7 @@ int main()
 	L->compare_methods("HR", 10, true, true, 0);
 	delete K;
 	delete SWT;
+	*/
 	
 
 	

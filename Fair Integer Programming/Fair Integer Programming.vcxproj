@@ -164,6 +164,7 @@
     <ClCompile Include="LotteryDesigner.cpp" />
     <ClCompile Include="ReportDistribution.cpp" />
     <ClCompile Include="Run_distribution_all_KE.cpp" />
+    <ClCompile Include="Run_distribution_all_SWT.cpp" />
     <ClCompile Include="run_Kidney_Exchange_all.cpp" />
     <ClCompile Include="SchedulingWeightTard.cpp" />
     <ClCompile Include="SimplicalDecomposition.cpp" />
