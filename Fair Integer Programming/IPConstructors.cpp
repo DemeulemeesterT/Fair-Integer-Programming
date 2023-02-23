@@ -273,7 +273,7 @@ void IPSolver::initializeGurobi(bool print) {
 			}
 			for (int j = 0; j < I.t; j++) {
 				con += I.A[i][I.n + j] * Y_var[j];
-			}
+ 			}
 			model->addConstr(con <= I.C[i]);
 		}
 

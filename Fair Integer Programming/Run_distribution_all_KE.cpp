@@ -3,7 +3,7 @@
 std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double time_limit, int iterations, bool print) {
 	// Prepare to go through all instances
 	std::vector<std::vector<int>> P;
-	P.push_back({ 10,50 }); // The first number is the number of agents, the second the ID of the instance
+	//P.push_back({ 10,50 }); // The first number is the number of agents, the second the ID of the instance
 	P.push_back({ 20,50 });
 	P.push_back({ 30,50 });
 	P.push_back({ 40,65 });

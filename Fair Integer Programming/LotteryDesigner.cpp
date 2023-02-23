@@ -136,7 +136,7 @@ lottery LotteryDesigner::uniform(int iterations, bool print) {
 	L.S = std::vector<solution>();
 
 	// Disable output if not wanted
-	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   
+	//K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   
 
 	// Find all optimal solutions
 	// First we exclude all already found solutions to be found again
@@ -225,7 +225,7 @@ lottery LotteryDesigner::leximax(bool print) {
 		// Add the solution to the master problem again, etc.
 
 	// Disable output if not wanted
-	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	//K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 
 	LeximaxMaster* M = new LeximaxMaster(K, print);
@@ -250,7 +250,7 @@ lottery LotteryDesigner::RSD(int iterations, bool print, unsigned seed) {
 	L.S = std::vector<solution>();
 
 	// Disable output if not wanted
-	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	//K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	// We only want to permute the agents in 'M', because letting the agents in 'Y' or 'N' 
 	// choose among the optimal solutions will not have an impact.
@@ -319,7 +319,7 @@ lottery LotteryDesigner::RSD_once(bool print, unsigned seed) {
 	L.S = std::vector<solution>();
 
 	// Disable output if not wanted
-	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	//K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	// We only want to permute the agents in 'M', because letting the agents in 'Y' or 'N' 
 	// choose among the optimal solutions will not have an impact.
@@ -389,7 +389,7 @@ lottery LotteryDesigner::RSD_heuristic(int iterations, bool print, unsigned seed
 	L.S = std::vector<solution>();
 
 	// Disable output if not wanted
-	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	//K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	// We only want to permute the agents in 'M', because letting the agents in 'Y' or 'N' 
 	// choose among the optimal solutions will not have an impact.
@@ -473,7 +473,7 @@ lottery LotteryDesigner::rename_variables(int iterations, bool print, unsigned s
 	for (int j = 0; j < orders.size(); j++) {
 		GRBModel* model = new GRBModel(*env);
 		//model->set(GRB_IntParam_PoolSolutions, 10); // Limit the number of solutions that will be stored.
-		model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+		//model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 		//model->getEnv().set(GRB_IntParam_Presolve, 0);
 
 		GRBVar* X = new GRBVar[K->I.n];
@@ -605,7 +605,7 @@ lottery LotteryDesigner::perturb_objective(int iterations, bool print, unsigned 
 	L.w = std::vector<double>();
 	L.S = std::vector<solution>();
 
-	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	//K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	clock_t start_time = clock();
 
@@ -718,7 +718,7 @@ lottery LotteryDesigner::Nash(int iterations, bool print) {
 
 		GRBModel* model = new GRBModel(*env);
 		//model->set(GRB_IntParam_PoolSolutions, 10); // Limit the number of solutions that will be stored.
-		model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+		//model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 		int size_M = 0;
 		for (int i = 0; i < K->I.n; i++) {

@@ -224,7 +224,7 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 }
 
 lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
-	model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
+	//model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	if (print) {

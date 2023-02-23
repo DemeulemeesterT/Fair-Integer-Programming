@@ -5,15 +5,16 @@ using namespace std;
 int main()
 {
 	//run_distribution_all_KE("H", 3600.0, 1000, false);
-	run_distribution_all_SWT("HNRULPO", 1, 3600.0, 10, false);
+	//run_distribution_all_SWT("HC", 1, 3600.0, 10, false);
 	//compare_time_normal_RSD(1000, false);
 	
-	/*SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
+	/*
+	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt4", false);
 	inst I = SWT->generate_instance(0, false, true);
 	IPSolver* K = new IPSolver(I, true);
 	K->solve(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("HR", 10, true, true, 0);
+	L->compare_methods("HCR", 1, true, false, 0);
 	delete K;
 	delete SWT;
 	*/
@@ -25,7 +26,7 @@ int main()
 	//std::vector<reportGreedy> RG;
 	//RG = run_Kidney_exchange_all(true);
 
-	/*
+	
 	KidneyExchange* KE = new KidneyExchange("30-instance-1", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
@@ -44,7 +45,7 @@ int main()
 	//K->compare_time_normal_vs_RSD_without_partition(5, true);
 
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("HR", 1000, true, false, 0);
+	L->compare_methods("HCR", 10, true, false, 0);
 	
 	//SimplicalDecomposition* SD = new SimplicalDecomposition(K, true);
 	//SD->SD_Nash(true);
@@ -52,5 +53,5 @@ int main()
 	//delete SD;
 	delete K;
 	//delete KE;
-	*/
+	
 }

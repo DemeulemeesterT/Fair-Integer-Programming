@@ -4,6 +4,9 @@ void SchedulingWeightTard::read_data(std::string name, bool print) {
 	if (name == "wt3") {
 		n = 3;
 	}
+	else if (name == "wt4") {
+		n = 4;
+	}
 	else if (name == "wt40") {
 		n = 40;
 	}

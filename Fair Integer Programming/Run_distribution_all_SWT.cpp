@@ -4,9 +4,10 @@ std::vector<ReportDistribution*> run_distribution_all_SWT(std::string s, int nr_
 	// Prepare to go through all instances
 	std::vector<std::vector<int>> P;
 
-	P.push_back({ 40,nr_instances }); // The first number is the number of jobs in the instance, the second number is the number of instances we want to read for this amount of jobs
-	P.push_back({ 50,nr_instances });
-	P.push_back({ 100, nr_instances });
+	P.push_back({ 4,1 });
+	//P.push_back({ 40,nr_instances }); // The first number is the number of jobs in the instance, the second number is the number of instances we want to read for this amount of jobs
+	//P.push_back({ 50,nr_instances });
+	//P.push_back({ 100, nr_instances });
 
 	// Change this conditional on the name of the distribution you're looking for.
 	char filename_front[50];
@@ -119,10 +120,10 @@ std::vector<ReportDistribution*> run_distribution_all_SWT(std::string s, int nr_
 					filename_distr = "_RE-INDEX";
 				}
 				if (s[k] == 'P') {
-					filename_distr = "PERTURB";
+					filename_distr = "_PERTURB";
 				}
 				if (s[k] == 'T') {
-					filename_distr = "RSD-ONCE";
+					filename_distr = "_RSD-ONCE";
 				}
 
 				filename = filename_front + filename_distr + filename_back;
