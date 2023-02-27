@@ -1282,9 +1282,16 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 
 			for (int i = 0; i < s.size(); i++) {
 				lottery L_empty;
-				L_empty.p = std::vector<double>(K->I.n, 0);
-				L_empty.w = std::vector<double>();
-				L_empty.S = std::vector<solution>();
+				for (int j = 0; j < K->I.n; j++) {
+					if (K->Y[j] == 1) {
+						L_empty.p.push_back(1);
+					}
+					else {
+						L_empty.p.push_back(0);
+					}
+				}
+				L_empty.w.push_back(1);
+				L_empty.S.push_back(K->S[0]);
 				L.push_back(L_empty);
 			}
 		}

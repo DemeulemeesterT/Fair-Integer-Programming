@@ -4,7 +4,7 @@ std::vector<ReportDistribution*> run_distribution_all_SWT(std::string s, int nr_
 	// Prepare to go through all instances
 	std::vector<std::vector<int>> P;
 
-	P.push_back({ 4,1 });
+	P.push_back({ 3,2 });
 	//P.push_back({ 40,nr_instances }); // The first number is the number of jobs in the instance, the second number is the number of instances we want to read for this amount of jobs
 	//P.push_back({ 50,nr_instances });
 	//P.push_back({ 100, nr_instances });
@@ -197,9 +197,10 @@ std::vector<ReportDistribution*> run_distribution_all_SWT(std::string s, int nr_
 			}
 			delete L;
 			delete K;
-			delete SWT;
 			L_vector.clear();
 		}
+
+		delete SWT;
 	}
 
 	return R;
