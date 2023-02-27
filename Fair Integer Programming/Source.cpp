@@ -8,16 +8,16 @@ int main()
 	//run_distribution_all_SWT("HC", 1, 3600.0, 10, false);
 	//compare_time_normal_RSD(1000, false);
 	
-	/*
+	
 	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt4", false);
 	inst I = SWT->generate_instance(0, false, true);
 	IPSolver* K = new IPSolver(I, true);
 	K->solve(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("HCR", 1, true, false, 0);
+	L->compare_methods("HRC", 1, true, false, 0);
 	delete K;
 	delete SWT;
-	*/
+	
 	
 
 	
@@ -26,7 +26,7 @@ int main()
 	//std::vector<reportGreedy> RG;
 	//RG = run_Kidney_exchange_all(true);
 
-	
+	/*
 	KidneyExchange* KE = new KidneyExchange("30-instance-1", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
@@ -53,5 +53,5 @@ int main()
 	//delete SD;
 	delete K;
 	//delete KE;
-	
+	*/
 }

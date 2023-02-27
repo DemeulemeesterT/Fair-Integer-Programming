@@ -79,9 +79,9 @@ std::vector<std::vector<int>> LotteryDesigner::order_agents(std::vector<int> v, 
 	// Create a vector that will store all orderings
 	std::vector<std::vector<int>> orders;
 
-	// if the number of agents in M is smaller than 8, we can simply go over all orderings
-	// Otherwise we have to take a sample of all orderings.
-	if (v.size() <= 8) {
+	// if the number of agents in M is smaller than 4, we can simply go over all orderings
+	// Otherwise we will take a sample of all orderings.
+	if (v.size() <= 4) {
 		iterations = 1;
 		for (int i = 0; i < v.size(); i++) {
 			iterations = iterations * (i + 1); // Computes the factorial number
@@ -1024,6 +1024,14 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 	if (K->done_partition == false) {
 		printf("\n\t We first have to find a partitioning of the agents to know which agents are always/never/sometimes selected.\n");
 		K->partition(true);
+
+		// Now store this information in 'K_initial', so we can reset this later for the other methods
+		K_initial->Y = K->Y;
+		K_initial->M = K->M;
+		K_initial->N = K->N;
+		K_initial->done_partition = true;
+		K_initial->M_size = K->M_size;
+		K_initial->time_partition = K->time_partition;
 	}
 	
 	// Not all rules work (yet) for integer Y-variables
