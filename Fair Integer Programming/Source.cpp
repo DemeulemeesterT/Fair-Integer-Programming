@@ -9,12 +9,12 @@ int main()
 	//compare_time_normal_RSD(1000, false);
 	
 	
-	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt4", false);
+	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
 	inst I = SWT->generate_instanceLawlerMoore(0, false, true);
 	IPSolver* K = new IPSolver(I, true);
 	K->solve(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("HRC", 1, true, false, 0);
+	L->compare_methods("RLCU", 1000, true, false, 0);
 	delete K;
 	delete SWT;
 	

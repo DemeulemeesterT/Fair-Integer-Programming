@@ -166,7 +166,45 @@ inst SchedulingWeightTard::generate_instanceTIF(int nr, bool export_inst, bool p
 
 inst SchedulingWeightTard::generate_instanceLawlerMoore(int nr, bool export_inst, bool print) {
 	inst I;
-	order_jobs(nr, print);
+	SchedWT_inst S = order_jobs(nr, print); // Order the jobs in increasing due date
+
+	I.n = n; // One binary variable for each task (scheduled before due date or not)
+
+	I.t = 0; // No auxiliary variables
+
+	I.n_var = I.n + I.t;
+	I.Y_bool = true;
+	I.Y_coeff_zero = true;
+
+	I.m = n;
+
+	// Objective coefficients
+		// Minimizing the weights of the tasks that are planned after the due date would result in objective function
+		// min \sum_j (w_j * (1 - x_j)) = min \sum_j (w_j - w_j * x_j)
+		// which will find the same optimal objective value as min \sum_j -w_j * x_j
+		// which is equivalent to max \sum_j w_j * x_j
+			// And we maximize the objective function i IPSolver class
+	for (int i = 0; i < I.n; i++) {
+		I.v.push_back(S.w[i]);
+	}
+	for (int i = 0; i < I.t; i++) {
+		I.v.push_back(0);
+	}
+
+	// Initialize constraint matrix
+	I.A = std::vector<std::vector<double>>(I.m, std::vector<double>(I.n_var, 0.0));
+
+	// Constraint
+	// for each job k:
+	// \sum_j=1^k p_j * x_j <= d_k
+		// Where the jobs are ranked from earliest to latest due date
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < i + 1; j++) {
+			I.A[i][j] = S.p[j];
+		}
+		I.C.push_back(S.d[i]);
+	}
+
 	return I;
 }
 
@@ -177,15 +215,27 @@ SchedWT_inst SchedulingWeightTard::order_jobs(int nr, bool print) {
 	S.d = std::vector<int>();
 
 	// Go through the jobs and put them in order of increasing due date
+	bool inserted;
 	for (int i = 0; i < n; i++) {
+		inserted = false;
 		if (S.d.size() > 0) {
-			for (int j = 0; j < S.d.size(); j++) {
+			for (int j = 0; j < i; j++) {
 				if (Sched_I[nr].d[i] < S.d[j]) {
 					// Earlier due date, insert before 
 					S.d.insert(S.d.begin() + j, Sched_I[nr].d[i]);
 					S.p.insert(S.p.begin() + j, Sched_I[nr].p[i]);
 					S.w.insert(S.w.begin() + j, Sched_I[nr].w[i]);
+
+					j = i;
+					inserted = true;
 				}
+			}
+
+			// Maybe add it as the last element if it is bigger than all others
+			if (inserted == false) {
+				S.d.insert(S.d.begin() + i, Sched_I[nr].d[i]);
+				S.p.insert(S.p.begin() + i, Sched_I[nr].p[i]);
+				S.w.insert(S.w.begin() + i, Sched_I[nr].w[i]);
 			}
 		}
 		else {

@@ -279,7 +279,7 @@ void IPSolver::initializeGurobi(bool print) {
 
 		//model->write("Generated Formulations/IPModel.lp");
 
-		//model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+		model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 		env_identical = new GRBEnv();
 		env_identical->set(GRB_StringParam_LogFile, "Generated Log-files/IPIdentical.log");
