@@ -61,7 +61,7 @@ void SchedulingWeightTard::read_data(std::string name, bool print) {
 }
 
 
-inst SchedulingWeightTard::generate_instance(int nr, bool export_inst, bool print) {
+inst SchedulingWeightTard::generate_instanceTIF(int nr, bool export_inst, bool print) {
 	inst I;
 
 	I.n = n; // One binary variable for each task (scheduled before due date or not)
@@ -162,6 +162,40 @@ inst SchedulingWeightTard::generate_instance(int nr, bool export_inst, bool prin
 	I.data_name = data_name;
 
 	return I;
+}
+
+inst SchedulingWeightTard::generate_instanceLawlerMoore(int nr, bool export_inst, bool print) {
+	inst I;
+	order_jobs(nr, print);
+	return I;
+}
+
+SchedWT_inst SchedulingWeightTard::order_jobs(int nr, bool print) {
+	SchedWT_inst S;
+	S.w = std::vector<int>();
+	S.p = std::vector<int>();
+	S.d = std::vector<int>();
+
+	// Go through the jobs and put them in order of increasing due date
+	for (int i = 0; i < n; i++) {
+		if (S.d.size() > 0) {
+			for (int j = 0; j < S.d.size(); j++) {
+				if (Sched_I[nr].d[i] < S.d[j]) {
+					// Earlier due date, insert before 
+					S.d.insert(S.d.begin() + j, Sched_I[nr].d[i]);
+					S.p.insert(S.p.begin() + j, Sched_I[nr].p[i]);
+					S.w.insert(S.w.begin() + j, Sched_I[nr].w[i]);
+				}
+			}
+		}
+		else {
+			S.d.push_back(Sched_I[nr].d[i]);
+			S.w.push_back(Sched_I[nr].w[i]);
+			S.p.push_back(Sched_I[nr].p[i]);
+		}
+	}
+
+	return S;
 }
 
 

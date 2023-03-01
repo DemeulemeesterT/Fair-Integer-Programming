@@ -5,19 +5,19 @@ using namespace std;
 int main()
 {
 	//run_distribution_all_KE("H", 3600.0, 1000, false);
-	run_distribution_all_SWT("RLCHUOP", 10, 3600.0, 10, false);
+	//run_distribution_all_SWT("RLCHUOP", 10, 3600.0, 10, false);
 	//compare_time_normal_RSD(1000, false);
 	
-	/*
+	
 	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt4", false);
-	inst I = SWT->generate_instance(0, false, true);
+	inst I = SWT->generate_instanceLawlerMoore(0, false, true);
 	IPSolver* K = new IPSolver(I, true);
 	K->solve(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
 	L->compare_methods("HRC", 1, true, false, 0);
 	delete K;
 	delete SWT;
-	*/
+	
 	
 
 	

@@ -4,10 +4,10 @@ std::vector<ReportDistribution*> run_distribution_all_SWT(std::string s, int nr_
 	// Prepare to go through all instances
 	std::vector<std::vector<int>> P;
 
-	P.push_back({ 3,2 });
-	//P.push_back({ 40,nr_instances }); // The first number is the number of jobs in the instance, the second number is the number of instances we want to read for this amount of jobs
-	//P.push_back({ 50,nr_instances });
-	//P.push_back({ 100, nr_instances });
+	//P.push_back({ 3,2 });
+	P.push_back({ 40,nr_instances }); // The first number is the number of jobs in the instance, the second number is the number of instances we want to read for this amount of jobs
+	P.push_back({ 50,nr_instances });
+	P.push_back({ 100, nr_instances });
 
 	// Change this conditional on the name of the distribution you're looking for.
 	char filename_front[50];
@@ -71,7 +71,7 @@ std::vector<ReportDistribution*> run_distribution_all_SWT(std::string s, int nr_
 		name = name_instance + numstr1;
 		SchedulingWeightTard* SWT = new SchedulingWeightTard(name, false);
 		for (int i = 0; i < P[p][1]; i++) {
-			inst I = SWT->generate_instance(i, false, false);
+			inst I = SWT->generate_instanceTIF(i, false, false);
 			IPSolver* K = new IPSolver(I, false);
 			char numstr2[21];
 			sprintf_s(numstr2, "-%i", i);
