@@ -5,10 +5,10 @@ using namespace std;
 int main()
 {
 	//run_distribution_all_KE("H", 3600.0, 1000, false);
-	//run_distribution_all_SWT("RLCHUOP", 10, 3600.0, 10, false);
+	run_distribution_all_SWT("RLC", 50, 3600.0, 1000, false);
 	//compare_time_normal_RSD(1000, false);
 	
-	
+	/*
 	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
 	inst I = SWT->generate_instanceLawlerMoore(0, false, true);
 	IPSolver* K = new IPSolver(I, true);
@@ -17,7 +17,7 @@ int main()
 	L->compare_methods("RLCU", 1000, true, false, 0);
 	delete K;
 	delete SWT;
-	
+	*/
 	
 
 	

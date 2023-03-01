@@ -71,7 +71,7 @@ std::vector<ReportDistribution*> run_distribution_all_SWT(std::string s, int nr_
 		name = name_instance + numstr1;
 		SchedulingWeightTard* SWT = new SchedulingWeightTard(name, false);
 		for (int i = 0; i < P[p][1]; i++) {
-			inst I = SWT->generate_instanceTIF(i, false, false);
+			inst I = SWT->generate_instanceLawlerMoore(i, false, false);
 			IPSolver* K = new IPSolver(I, false);
 			char numstr2[21];
 			sprintf_s(numstr2, "-%i", i);
