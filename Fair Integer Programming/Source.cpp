@@ -4,9 +4,9 @@ using namespace std;
 
 int main()
 {
-	run_distribution_all_KE("H", 3600.0, 1, false);
+	//run_distribution_all_KE("H", 3600.0, 1, false);
 	//run_distribution_all_SWT("H", 50, 3600.0, 1000, false);
-	//compare_time_normal_RSD(1000, false);
+	compare_time_normal_RSD(1000, false);
 	
 	/*
 	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);

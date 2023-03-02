@@ -176,6 +176,7 @@ public:
 	void block_solution(solution sol);
 
 	std::vector<time_report> compare_time_normal_vs_RSD_variants(int iterations, bool print);
+	std::vector<time_report> compare_time_normal_vs_RSD_heuristic(int iterations, bool print);
 	std::vector<time_report> compare_time_normal_vs_RSD_without_partition(int iterations, bool print);
 
 

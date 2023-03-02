@@ -1508,6 +1508,61 @@ std::vector<time_report> IPSolver::compare_time_normal_vs_RSD_variants(int itera
 
 }
 
+std::vector<time_report> IPSolver::compare_time_normal_vs_RSD_heuristic(int iterations, bool print) {
+	std::vector<time_report> TR;
+
+	std::vector<int> order;
+	for (int i = 0; i < I.n; i++) {
+		order.push_back(i); // Just order agents {0,1,2,...,I.n}
+	}
+
+	if (done_partition == false) {
+		partition(false);
+	}
+
+	clock_t start_time = clock();
+	solution sol;
+	for (int i = 0; i < iterations; i++) {
+		sol = RSD_heuristic_no_partition(order, false);
+		model->reset();
+	}
+	double time_RSD_heuristic = ((double)(clock() - start_time) / CLK_TCK);
+
+	start_time = clock();
+	for (int i = 0; i < iterations; i++) {
+		sol = RSD_once(order, false);
+		model->reset();
+	}
+	double time_RSD = ((double)(clock() - start_time) / CLK_TCK);
+
+	start_time = clock();
+	for (int i = 0; i < iterations; i++) {
+		solve(false);
+		model->reset();
+	}
+	double time_normal = ((double)(clock() - start_time) / CLK_TCK);
+
+	if (print) {
+		printf(" Time normal = %.3f\n", time_normal);
+		printf(" Time RSD = %.3f\n", time_RSD);
+		printf(" Time RSD heuristic = %.3f\n", time_RSD_heuristic);
+
+	}
+
+	time_report empty;
+	empty.label = "Normal";
+	empty.t = time_normal / iterations;
+	TR.push_back(empty);
+	empty.label = "RSD";
+	empty.t = time_RSD / iterations;
+	TR.push_back(empty);
+	empty.label = "RSD_heuristic";
+	empty.t = time_RSD_heuristic / iterations;
+	TR.push_back(empty);
+	return TR;
+
+}
+
 std::vector<time_report> IPSolver::compare_time_normal_vs_RSD_without_partition(int iterations, bool print) {
 	std::vector<time_report> TR;
 
