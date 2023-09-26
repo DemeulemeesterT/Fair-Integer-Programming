@@ -13,12 +13,12 @@ double IPSolver::solve(bool print) {
 		z = model->get(GRB_DoubleAttr_ObjVal);
 
 		// Store solution
-		std::vector<bool> x(I.n, 0);
+		std::vector<double> x(I.n, 0);
 		for (int j = 0; j < I.n; j++) {
 			x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
 		}
 
-		std::vector<int> y(I.t, 0);
+		std::vector<double> y(I.t, 0);
 		for (int j = 0; j < I.t; j++) {
 			y[j] = Y_var[j].get(GRB_DoubleAttr_X);
 		}
@@ -141,12 +141,12 @@ double IPSolver::solve_partition(bool print) {
 		z = model->get(GRB_DoubleAttr_ObjVal);
 
 		// Store solution
-		std::vector<bool> x(I.n, 0);
+		std::vector<double> x(I.n, 0);
 		for (int j = 0; j < I.n; j++) {
 			x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
 		}
 
-		std::vector<int> y(I.t, 0);
+		std::vector<double> y(I.t, 0);
 		for (int j = 0; j < I.t; j++) {
 			y[j] = Y_var[j].get(GRB_DoubleAttr_X);
 		}
@@ -271,12 +271,12 @@ IP_report IPSolver::solve_return_solution(bool print) {
 		z = model->get(GRB_DoubleAttr_ObjVal);
 
 		// Store solution
-		std::vector<bool> x(I.n, 0);
+		std::vector<double> x(I.n, 0);
 		for (int j = 0; j < I.n; j++) {
 			x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
 		}
 
-		std::vector<int> y(I.t, 0);
+		std::vector<double> y(I.t, 0);
 		for (int j = 0; j < I.t; j++) {
 			y[j] = Y_var[j].get(GRB_DoubleAttr_X);
 		}
@@ -496,12 +496,12 @@ void IPSolver::greedy_partition(bool print) {
 
 			// Check if this solution is optimal
 			if (z == opt) {
-				std::vector<bool> x(I.n, 0);
+				std::vector<double> x(I.n, 0);
 				for (int j = 0; j < I.n; j++) {
 					x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
 				}
 
-				std::vector<int> y(I.t, 0);
+				std::vector<double> y(I.t, 0);
 				for (int j = 0; j < I.t; j++) {
 					y[j] = Y_var[j].get(GRB_DoubleAttr_X);
 				}
@@ -1036,8 +1036,8 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 		}
 
 		// Store solution of the agents of which we perturbed the objective coefficients
-		sol.x = std::vector<bool>(I.n, 0);
-		sol.y = std::vector<int>(I.t, 0);
+		sol.x = std::vector<double>(I.n, 0);
+		sol.y = std::vector<double>(I.t, 0);
 
 		// For the agents in 'Y' and 'N' we already know the solution values.
 		for (int i = 0; i < I.n; i++) {
@@ -1162,8 +1162,8 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 
 	}
 	else {
-		sol.x = std::vector<bool>(I.n, 0);
-		sol.y = std::vector<int>(I.t, 0);
+		sol.x = std::vector<double>(I.n, 0);
+		sol.y = std::vector<double>(I.t, 0);
 
 		// We know for each agent whether they are selected or not
 		for (int i = 0; i < I.n; i++) {
@@ -1184,7 +1184,7 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 		int status = model->get(GRB_IntAttr_Status);
 		if (status != 3) { // If feasible
 			// Store solution
-			sol.y = std::vector<int>(I.t, 0);
+			sol.y = std::vector<double>(I.t, 0);
 			for (int j = 0; j < I.t; j++) {
 				sol.y[j] = Y_var[j].get(GRB_DoubleAttr_X);
 			}
@@ -1224,8 +1224,8 @@ solution IPSolver::RSD_once_no_partition(std::vector<int> order, bool print) {
 	double delta = 1;
 
 	// Store solution of the agents of which we perturbed the objective coefficients
-	sol.x = std::vector<bool>(I.n, 0);
-	sol.y = std::vector<int>(I.t, 0);
+	sol.x = std::vector<double>(I.n, 0);
+	sol.y = std::vector<double>(I.t, 0);
 
 	// Taking into account the precision of the solver, we will perturb in different steps
 	// For a precision of 1e-6, we can perturb \floor(-log_2(1e-6)) = 19 agents at once
@@ -1352,8 +1352,8 @@ solution IPSolver::RSD_heuristic_no_partition(std::vector<int> order, bool print
 	double delta = 1;
 
 	// Store solution of the agents of which we perturbed the objective coefficients
-	sol.x = std::vector<bool>(I.n, 0);
-	sol.y = std::vector<int>(I.t, 0);
+	sol.x = std::vector<double>(I.n, 0);
+	sol.y = std::vector<double>(I.t, 0);
 
 	// Taking into account the precision of the solver, we will perturb ONCE
 	// For a precision of 1e-6, we can perturb \floor(-log_2(1e-6)) = 19 agents at once

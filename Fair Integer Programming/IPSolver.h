@@ -30,8 +30,8 @@ struct inst {
 
 // One optimal solution to an instance
 struct solution {
-	std::vector<bool> x;
-	std::vector<int> y;
+	std::vector<double> x;
+	std::vector<double> y;
 	int ID; // This is a unique identifier of the solution. Is equal to -1 if ID is too large to store.
 };
 

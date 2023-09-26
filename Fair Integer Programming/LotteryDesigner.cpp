@@ -533,13 +533,13 @@ lottery LotteryDesigner::rename_variables(int iterations, bool print, unsigned s
 
 		// Store solution
 		solution sol;
-		sol.x = std::vector<bool>(K->I.n, 0);
+		sol.x = std::vector<double>(K->I.n, 0);
 		for (int i = 0; i < K->I.n; i++) {
 			// Now we have to assign this solution value again to the agent that is represented by this variable
 			agent = orders[j][i];
 			sol.x[agent] = (bool)X[i].get(GRB_DoubleAttr_X);
 		}
-		sol.y = std::vector<int>(K->I.t, 0);
+		sol.y = std::vector<double>(K->I.t, 0);
 		for (int i = 0; i < K->I.t; i++) {
 			sol.y[i] = Y_var[i].get(GRB_DoubleAttr_X);
 		}
@@ -648,7 +648,7 @@ lottery LotteryDesigner::perturb_objective(int iterations, bool print, unsigned 
 
 		// Store solution
 		solution sol;
-		sol.x = std::vector<bool>(K->I.n, 0);
+		sol.x = std::vector<double>(K->I.n, 0);
 		for (int i = 0; i < K->I.n; i++) {
 			sol.x[i] = (bool)K->X[i].get(GRB_DoubleAttr_X);
 		}
