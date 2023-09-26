@@ -147,7 +147,7 @@
   <ItemGroup>
     <ClInclude Include="IPSolver.h" />
     <ClInclude Include="KidneyExchange.h" />
-    <ClInclude Include="LeximaxMaster.h" />
+    <ClInclude Include="LeximinMaster.h" />
     <ClInclude Include="LotteryDesigner.h" />
     <ClInclude Include="PartitionCallback.h" />
     <ClInclude Include="ReportDistribution.h" />
@@ -161,7 +161,7 @@
     <ClCompile Include="IPfunctions_dichotomous.cpp" />
     <ClCompile Include="IPfunctions_cardinal.cpp" />
     <ClCompile Include="KidneyExchange.cpp" />
-    <ClCompile Include="LeximaxMaster.cpp" />
+    <ClCompile Include="LeximinMaster.cpp" />
     <ClCompile Include="LotteryDesigner.cpp" />
     <ClCompile Include="ReportDistribution.cpp" />
     <ClCompile Include="Run_distribution_all_KE.cpp" />

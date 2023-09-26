@@ -36,7 +36,7 @@
     <ClInclude Include="SimplicalDecomposition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LeximaxMaster.h">
+    <ClInclude Include="LeximinMaster.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReportDistribution.h">
@@ -74,7 +74,7 @@
     <ClCompile Include="run_Kidney_Exchange_all.cpp">
       <Filter>Source Files\RunConfigurations</Filter>
     </ClCompile>
-    <ClCompile Include="LeximaxMaster.cpp">
+    <ClCompile Include="LeximinMaster.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Run_distribution_all_KE.cpp">

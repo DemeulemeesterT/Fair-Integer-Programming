@@ -237,7 +237,17 @@ void IPSolver::initializeGurobi(bool print) {
 		for (int i = 0; i < I.n; i++) {
 			char name_x[13];
 			sprintf_s(name_x, "x_%i", i);
-			X[i] = model->addVar(0.0, 1.0, 0.0, GRB_BINARY, name_x);
+			if (I.X_bool == true) {
+				X[i] = model->addVar(0.0, 1.0, 0.0, GRB_BINARY, name_x);
+			}
+			else {
+				if (I.X_integer == true) {
+					X[i] = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_INTEGER, name_x);
+				}
+				else {
+					X[i] = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS, name_x);
+				}
+			}
 		}
 
 		Y_var = new GRBVar[I.t];
@@ -248,7 +258,12 @@ void IPSolver::initializeGurobi(bool print) {
 				Y_var[i] = model->addVar(0.0, 1.0, 0.0, GRB_BINARY, name_y);
 			}
 			else {
-				Y_var[i] = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_INTEGER, name_y);
+				if (I.Y_integer == true) {
+					Y_var[i] = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_INTEGER, name_y);
+				}
+				else {
+					Y_var[i] = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS, name_y);
+				}
 			}
 		}
 
@@ -303,6 +318,7 @@ void IPSolver::initializeVariables(inst I_in, bool print) {
 	I.X_bool = I_in.X_bool;
 	I.X_integer = I_in.X_integer;
 	I.Y_coeff_zero = I_in.Y_coeff_zero;
+	I.Y_integer = I_in.Y_integer;
 	I.data_name = I_in.data_name;
 	opt = -112233445566;
 	for (int i = 0; i < I.n_var; i++) {
@@ -384,6 +400,9 @@ IPSolver::IPSolver(IPSolver* K_in, bool print) {
 	I.n_var = K_in->I.n_var;
 	I.Y_bool = K_in->I.Y_bool;
 	I.Y_coeff_zero = K_in->I.Y_coeff_zero;
+	I.Y_integer = K_in->I.Y_integer;
+	I.X_bool = K_in->I.X_bool;
+	I.X_integer = K_in->I.X_integer;
 	opt = K_in->opt;
 
 	solver_times = K_in->solver_times;
@@ -402,6 +421,9 @@ IPSolver::IPSolver(IPSolver* K_in, bool print) {
 	Y = K_in->Y;
 	M = K_in->M;
 	N = K_in->N;
+
+	Xmin = K_in->Xmin;
+	Xmax = K_in->Xmax;
 
 	M_size = K_in->M_size;
 

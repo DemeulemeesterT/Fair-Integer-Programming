@@ -1,11 +1,16 @@
 #include "IPSolver.h"
-#include "LeximaxMaster.h"
+#include "LeximinMaster.h"
 #include "SimplicalDecomposition.h"
 
 #pragma once
 class LotteryDesigner
 {
 public:
+	// DISCLAIMER: this code was first written for only binary X-variables.
+		// For that reason, we use the term 'probability' to refer to the expected utility of an agent
+		// in the distribution.
+
+
 	// Variables
 	IPSolver* K;
 	IPSolver* K_initial;
@@ -13,8 +18,8 @@ public:
 	// Main methods
 	lottery uniform(int iterations, bool print);
 	// 'uniform' selects each agent with a probability equal to the fraction of the optimal solutions in which they are selected
-	lottery leximax(bool print);
-	// 'leximax' finds a lottery that maximizes the lowest selection probability among the agents in M, and then the second-lowest...
+	lottery leximin(bool print);
+	// 'leximin' finds a lottery that maximizes the lowest selection probability among the agents in M, and then the second-lowest...
 	lottery RSD(int iterations, bool print, unsigned seed = 123456789);
 	// 'RSD' randomly orders the agents and let them discard the solutions in which they are not selected one by one in this order.
 	lottery RSD_once(bool print, unsigned seed = 123456789);
@@ -40,7 +45,7 @@ public:
 	// It will print the results in this order
 	// Letters are
 		// U = Uniform
-		// L = Leximax
+		// L = Leximin
 		// R = RSD
 		// O = Rename Variables ("Order")
 		// P = Perturb objective

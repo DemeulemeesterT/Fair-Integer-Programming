@@ -23,6 +23,7 @@ struct inst {
 	int n_var; // The total number of variables = n + t
 	bool Y_bool; // 'true' if Y-variables are binary, 'false' if Y-variables are integer 
 	bool Y_coeff_zero; // 'true' if Y-variables all have coefficient zero in the objective function, 'false' otherwise.
+	bool Y_integer; // 'true' if Y-variables are integer;
 	bool X_bool; // 'true' if X-variables are binary (dichotomous preferences), 'false' if X-variables are integer or real (cardinal preferences)
 	bool X_integer; // 'true' if X-variables are integer, 'false' if X-variables are real values.
 };
@@ -214,6 +215,10 @@ public:
 // VARIABLES
 	std::vector<double> Xmin, Xmax;
 		// Minimum and maximum value each of the X-variables obtain in any of the optimal solutions
+		// These two vectors can contain all information that was stored in N, M, and Y.
+			// If i \in M, then Xmin[i] = 0 and Xmax[i] = 1.
+			// If i \in N, then Xmin[i] = Xmax[i] = 0.
+			// If i \in Y, then Xmin[i] = Xmax[i] = 1.
 
 
 // FUNCTIONS

@@ -1,7 +1,7 @@
 #include "IPSolver.h"
 
 #pragma once
-class LeximaxMaster
+class LeximinMaster
 {
 public:
 	IPSolver* K;
@@ -42,7 +42,7 @@ public:
 	std::vector<double> dual_C_bound_MIN_M;
 
 	std::vector<double> prob_agents;
-	// Contains the probabilities with which the agents in M are selected in the leximax distribution
+	// Contains the probabilities with which the agents in M are selected in the leximin distribution
 
 	lottery solve(bool print);
 	void getDualValues(bool epsilon_constraint, bool print);
@@ -53,7 +53,7 @@ public:
 	// Auxiliary functions
 	void defineModelConVar(bool print);
 
-	LeximaxMaster(IPSolver* K_in, bool print);
-	~LeximaxMaster();
+	LeximinMaster(IPSolver* K_in, bool print);
+	~LeximinMaster();
 };
 

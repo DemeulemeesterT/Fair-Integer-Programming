@@ -393,8 +393,8 @@ void IPSolver::analyze(bool print) {
 	solve(false);
 	printf("\n*******************************************\n\t         PARTITION\n*******************************************\n");
 	partition(print);
-	printf("\n\n*******************************************\n\t     IDENTICAL AGENTS\n*******************************************\n");
-	find_identical_agents(print);
+	//printf("\n\n*******************************************\n\t     IDENTICAL AGENTS\n*******************************************\n");
+	//find_identical_agents(print);
 }
 
 void IPSolver::partition(bool print) {
@@ -417,6 +417,8 @@ void IPSolver::partition(bool print) {
 					M[i] = 0;
 					N[i] = 0;
 					unselected = false;
+					Xmin[i] = 1;
+					Xmax[i] = 1;
 				}
 				model->remove(c);
 			}
@@ -427,6 +429,8 @@ void IPSolver::partition(bool print) {
 					N[i] = 1;
 					M[i] = 0;
 					Y[i] = 0;
+					Xmin[i] = 0;
+					Xmax[i] = 0;
 					unselected = false;
 				}
 				model->remove(c);
@@ -436,7 +440,8 @@ void IPSolver::partition(bool print) {
 				M[i] = 1;
 				Y[i] = 0;
 				N[i] = 0;
-
+				Xmin[i] = 0;
+				Xmax[i] = 1;
 			}
 
 		}

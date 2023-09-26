@@ -11,7 +11,7 @@ void IPSolver::partition_cardinal(bool print) {
 	for (int j = 0; j < I.t; j++) {
 		lin += I.v[I.n + j] * Y_var[j];
 	}
-	model->addConstr(lin == opt);
+	GRBConstr OPT_CONSTRAINT = model->addConstr(lin == opt);
 
 	GRBLinExpr obj = 0;
 
@@ -33,12 +33,22 @@ void IPSolver::partition_cardinal(bool print) {
 
 	double length = ((double)(clock() - start_time) / CLK_TCK);
 
+	// Remove the constraint to enforce optimal objective value
+	model->write("Generated Formulations/IPModel.lp");
+	model->remove(OPT_CONSTRAINT);
+	model->write("Generated Formulations/IPModel.lp");
+
+
 	// Determine the nunmber of agents in M
 		// This is the number of agents for whom Xmin[i] is not equal to Xmax[i]
 	M_size = 0;
 	for (int i = 0; i < I.n; i++) {
 		if (Xmin[i] != Xmax[i]) {
+			M[i] = 1;
 			M_size++;
+		}
+		else {
+			M[i] = 0;
 		}
 	}
 	
@@ -50,9 +60,10 @@ void IPSolver::partition_cardinal(bool print) {
 					printf("X[%i]\t\t%.2f\t\t%.2f\n", i, Xmin[i], Xmax[i]);
 				}
 			}
-			printf("\n\t %i agents in M.\n", M_size);
+			printf("\n %i agents in M.\n", M_size);
 		}
 	}
+
 	time_partition = length;
 
 	done_partition = true;

@@ -216,7 +216,7 @@ lottery LotteryDesigner::uniform(int iterations, bool print) {
 	return L;
 }
 
-lottery LotteryDesigner::leximax(bool print) {
+lottery LotteryDesigner::leximin(bool print) {
 	// We want to build a column generation framework that maximizes the selection probability
 	// of the least-selected agent in M
 		// First we solve a master problem, based on the optimal solutions we already know.
@@ -228,7 +228,7 @@ lottery LotteryDesigner::leximax(bool print) {
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 
-	LeximaxMaster* M = new LeximaxMaster(K, print);
+	LeximinMaster* M = new LeximinMaster(K, print);
 	lottery L = M->solve(print);
 	delete M;
 
@@ -1049,7 +1049,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 				printf("\n\n ****************************************************************************");
 				printf("\n Which methods do you want to compare? Type the corresponding letters + ENTER\n");
 				printf("\t U = Uniform\n");
-				printf("\t L = Leximax\n");
+				printf("\t L = Leximin\n");
 				printf("\t R = Random Serial Dictatorship\n");
 				printf("\t T = RSD (once)\n");
 				printf("\t H = RSD heuristic\n");
@@ -1078,7 +1078,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 					L.push_back(uniform(iterations, false));
 				}
 				else if (letter == "L") {
-					L.push_back(leximax(false));
+					L.push_back(leximin(false));
 				}
 				else if (letter == "R") {
 					L.push_back(RSD(iterations, false, seed));

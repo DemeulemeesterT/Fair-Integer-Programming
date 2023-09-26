@@ -1,6 +1,6 @@
-#include "LeximaxMaster.h"
+#include "LeximinMaster.h"
 
-lottery LeximaxMaster::solve(bool print) {
+lottery LeximinMaster::solve(bool print) {
 	model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
@@ -20,7 +20,7 @@ lottery LeximaxMaster::solve(bool print) {
 	// Create a lottery object corresponding to store the solution
 	lottery L;
 
-	// We will use two while loops to find the leximax_legacy solution.
+	// We will use two while loops to find the leximin_legacy solution.
 	// In the inner loop, we will find the weights of the solutions in order to 
 		// maximize the selection probability of the worst-off agent in M "that is remaining"
 	// In the outer loop, we decide which agents are remaining.
@@ -52,7 +52,7 @@ lottery LeximaxMaster::solve(bool print) {
 			GRBLinExpr obj = MIN_M;
 			model->setObjective(obj, GRB_MAXIMIZE);
 
-			//model->write("Generated Formulations/LeximaxModel.lp");
+			//model->write("Generated Formulations/LeximinModel.lp");
 
 			model->optimize();
 			obj_val_master = model->get(GRB_DoubleAttr_ObjVal);
@@ -139,7 +139,7 @@ lottery LeximaxMaster::solve(bool print) {
 		model->setObjective(obj, GRB_MAXIMIZE);
 		int counter = -1;
 
-		// Add constraint to force that 'MIN_M'=found objective value
+		// Add constraint to force that 'MIN_M'= found objective value
 		C_bound_MIN_M = model->addConstr(MIN_M == obj_val_master);
 		double epsilon_opt = 0.0;
 
@@ -160,11 +160,11 @@ lottery LeximaxMaster::solve(bool print) {
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
-					//model->write("Generated Formulations/LeximaxModel.lp");
+					//model->write("Generated Formulations/LeximinModel.lp");
 					model->optimize();
 
 					// If optimal solution of Epsilon = 0
-						// The leximax selection probability of agent i should be equal to MIN_M
+						// The leximin selection probability of agent i should be equal to MIN_M
 					epsilon_opt = model->get(GRB_DoubleAttr_ObjVal);
 					if (epsilon_opt < 0.001) {
 						// This means that we are not yet sure whether we found the optimal value of epsilon
@@ -214,7 +214,7 @@ lottery LeximaxMaster::solve(bool print) {
 
 								// And by setting the coefficient of MIN_M in that constraint to zero
 								model->chgCoeff(C_bound[counter], MIN_M, 0.0);
-								//model->write("Generated Formulations/LeximaxModel.lp");
+								//model->write("Generated Formulations/LeximinModel.lp");
 
 								M_remaining[i] = 0;
 							}
@@ -242,7 +242,7 @@ lottery LeximaxMaster::solve(bool print) {
 
 									// And by setting the coefficient of MIN_M in that constraint to zero
 									model->chgCoeff(C_bound[counter], MIN_M, 0.0);
-									//model->write("Generated Formulations/LeximaxModel.lp");
+									//model->write("Generated Formulations/LeximinModel.lp");
 
 									M_remaining[i] = 0;
 
@@ -261,9 +261,9 @@ lottery LeximaxMaster::solve(bool print) {
 							}
 							else {
 								printf("\t Pricing problem INFEASIBLE or ALL optimal solutions are found\n\n");
-								//model->write("Generated Formulations/LeximaxModel.lp");
+								//model->write("Generated Formulations/LeximinModel.lp");
 								//K->model->computeIIS();
-								//K->model->write("Generated Formulations/LeximaxModal_IIS.ilp");
+								//K->model->write("Generated Formulations/LeximinModal_IIS.ilp");
 
 							}
 						}
@@ -280,7 +280,7 @@ lottery LeximaxMaster::solve(bool print) {
 				}
 				// Undo the modifications to the model to solve it again in the next iteration
 				model->chgCoeff(C_bound[counter], Epsilon, 0.0);
-				//model->write("Generated Formulations/LeximaxModel.lp");
+				//model->write("Generated Formulations/LeximinModel.lp");
 
 
 			}
@@ -288,7 +288,7 @@ lottery LeximaxMaster::solve(bool print) {
 
 		// Remove constraint to force that 'MIN_M' is found objective value.
 		model->remove(C_bound_MIN_M);
-		//model->write("Generated Formulations/LeximaxModel.lp");
+		//model->write("Generated Formulations/LeximinModel.lp");
 
 
 		// Count the number of agents for which no selection probability is fixed yet
@@ -305,23 +305,28 @@ lottery LeximaxMaster::solve(bool print) {
 	return L;
 }
 
-void LeximaxMaster::addColumn(solution sol, bool print) {
+void LeximinMaster::addColumn(solution sol, bool print) {
 	GRBColumn col;
-	//model->write("Generated Formulations/LeximaxModel.lp");
+	//model->write("Generated Formulations/LeximinModel.lp");
 
 	int counter = 0;
 	for (int i = 0; i < K->I.n; i++) {
 		if (K->M[i] == 1) {
 			// It only makes sense to include the agents in 'M'
 			if (sol.x[i] == 1) {
-				col.addTerm(1, C_bound[counter]);
+				col.addTerm(sol.x[i]/(K->Xmax[i] - K->Xmin[i]), C_bound[counter]);
+				// Formulated like this, the leximin formulation can also be used for
+					// non-binary X-variables.
+					// For binary X-variables, the coefficient was simply 1.
+					// And for agents in M, this will still be the case for binary X-variables,
+					// as 1/(1-0) = 1.
 			}
 			counter++;
 		}
 	}
 	col.addTerm(1, C_Sum1);
 	columns.push_back(col);
-	//model->write("Generated Formulations/LeximaxModel.lp");
+	//model->write("Generated Formulations/LeximinModel.lp");
 
 
 	K->block_solution(sol);
@@ -345,11 +350,11 @@ void LeximaxMaster::addColumn(solution sol, bool print) {
 	GRBVar empty;
 	w.push_back(empty);
 	w.back() = model->addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, col, name_w);
-	//model->write("Generated Formulations/LeximaxMaster.lp");
+	model->write("Generated Formulations/LeximinMaster.lp");
 }
 
 
-void LeximaxMaster::getDualValues(bool epsilon_constraint, bool print) {
+void LeximinMaster::getDualValues(bool epsilon_constraint, bool print) {
 	dual_C_bound.clear();
 	dual_C_Sum1.clear();
 	dual_C_bound_MIN_M.clear();
@@ -392,10 +397,10 @@ void LeximaxMaster::getDualValues(bool epsilon_constraint, bool print) {
 	}
 }
 
-void LeximaxMaster::defineModelConVar(bool print) {
+void LeximinMaster::defineModelConVar(bool print) {
 	env = new GRBEnv();
 	model = new GRBModel(*env);
-	env->set(GRB_StringParam_LogFile, "Generated Log-files/LeximaxMaster.log");
+	env->set(GRB_StringParam_LogFile, "Generated Log-files/LeximinMaster.log");
 
 	// Define 'MIN_M' variable, which we will maximize iteratively
 	MIN_M = GRBVar();
@@ -408,11 +413,21 @@ void LeximaxMaster::defineModelConVar(bool print) {
 	// We will initialize the model by adding this constraint for all agents in M
 	C_bound = std::vector<GRBConstr>(K->M_size);
 	//C_bound = new GRBConstr[K->M.size()];
+
+	// To allow us to use our model for non-binary X-variables, we will add the following constant term to each of these constraints
+		// This term will be zero for binary X-variables.
+	double RHS_constant = 0;
+	for (int i = 0; i < K->I.n; i++) {
+		if (K->M[i] == 1) {
+
+			RHS_constant += K->Xmin[i] / (K->Xmax[i] - K->Xmin[i]);
+		}
+	}
 	int counter = 0;
 	for (int i = 0; i < K->I.n; i++) {
 		if (K->M[i] == 1) {
 			sprintf_s(name, "C_bound_%i", i);
-			C_bound[counter] = model->addConstr(-MIN_M >= 0.0, name);
+			C_bound[counter] = model->addConstr(-MIN_M - RHS_constant >= 0.0, name);
 			counter++;
 		}
 	}
@@ -432,9 +447,14 @@ void LeximaxMaster::defineModelConVar(bool print) {
 		for (int i = 0; i < K->I.n; i++) {
 			if (K->M[i] == 1) {
 				// It only makes sense to include the agents in 'M'
-				if (K->S[s].x[i] == 1) {
-					columns[s].addTerm(1, C_bound[counter]);
-				}
+				//if (K->S[s].x[i] == 1) {
+					columns[s].addTerm(K->S[s].x[i] / (K->Xmax[i] - K->Xmin[i]), C_bound[counter]);
+					// Formulated like this, the leximin formulation can also be used for
+						// non-binary X-variables.
+						// For binary X-variables, the coefficient was simply 1.
+						// And for agents in M, this will still be the case for binary X-variables,
+						// as 1/(1-0) = 1.
+				//}
 				counter++;
 			}
 		}
@@ -450,7 +470,7 @@ void LeximaxMaster::defineModelConVar(bool print) {
 	sprintf_s(name, "Epsilon");
 	Epsilon = model->addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, name);
 
-	//model->write("Generated Formulations/LeximaxMaster.lp");
+	//model->write("Generated Formulations/LeximinMaster.lp");
 	// Define variables
 	w = std::vector<GRBVar>(K->S.size());
 	for (int i = 0; i < K->S.size(); i++) {
@@ -473,18 +493,18 @@ void LeximaxMaster::defineModelConVar(bool print) {
 	}
 
 	//if (print) {
-		//model->write("Generated Formulations/LeximaxMaster.lp");
+		//model->write("Generated Formulations/LeximinMaster.lp");
 	//}
 }
 
-LeximaxMaster::LeximaxMaster(IPSolver* K_in, bool print) {
+LeximinMaster::LeximinMaster(IPSolver* K_in, bool print) {
 	K = new IPSolver(K_in, print);
-	//K->model->write("Generated Formulations/LeximaxMaster.lp");
+	//K->model->write("Generated Formulations/LeximinMaster.lp");
 
 	defineModelConVar(print);
 }
 
-LeximaxMaster::~LeximaxMaster() {
+LeximinMaster::~LeximinMaster() {
 	delete K;
 	delete model;
 	delete env;
