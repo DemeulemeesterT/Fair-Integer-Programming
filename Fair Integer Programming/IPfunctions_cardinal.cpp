@@ -69,7 +69,7 @@ void IPSolver::partition_cardinal(bool print) {
 
 
 
-double IPSolver::solve_partition_cardinal(int i, bool fill_Xmin, bool print) {
+double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 	solver_times++;
 
 	model->optimize();
@@ -103,10 +103,10 @@ double IPSolver::solve_partition_cardinal(int i, bool fill_Xmin, bool print) {
 
 	// Fill in 'Xmin'/'Xmax'
 	if (fill_Xmin == true) {
-		Xmin[i] = x[i];
+		Xmin[k] = x[k];
 	}
 	else {
-		Xmax[i] = x[i];
+		Xmax[k] = x[k];
 	}
 
 	if (print) {
@@ -145,7 +145,31 @@ double IPSolver::solve_partition_cardinal(int i, bool fill_Xmin, bool print) {
 		s.x = x;
 		s.y = y;
 		s.ID = 0; // We won't use the binary represenation of a solution for cardinal solutions
-		S.push_back(s);
+		
+		check_solution_in_S_cardinal(s, print);
 	}
 	return z;
+}
+
+void IPSolver::check_solution_in_S_cardinal(solution s, bool print) {
+	// Go through all existing optimal solutions to check whether solution is already in 'S'
+	bool found = false;
+	for (int i = 0; i < S.size(); i++) {
+		bool identical = true;
+		for (int j = 0; j < I.n; j++) {
+			if (s.x[j] != S[i].x[j]) {
+				identical = false;
+				j = I.n;
+			}
+		}
+
+		if (identical == true) {
+			found = true;
+			i = S.size();
+		}
+	}
+
+	if (found == false) {
+		S.push_back(s);
+	}
 }
