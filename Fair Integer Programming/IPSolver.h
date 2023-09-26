@@ -23,6 +23,8 @@ struct inst {
 	int n_var; // The total number of variables = n + t
 	bool Y_bool; // 'true' if Y-variables are binary, 'false' if Y-variables are integer 
 	bool Y_coeff_zero; // 'true' if Y-variables all have coefficient zero in the objective function, 'false' otherwise.
+	bool X_bool; // 'true' if X-variables are binary (dichotomous preferences), 'false' if X-variables are integer or real (cardinal preferences)
+	bool X_integer; // 'true' if X-variables are integer, 'false' if X-variables are real values.
 };
 
 // One optimal solution to an instance
@@ -37,6 +39,10 @@ struct lottery {
 	std::vector<solution> S; // The set of optimal solutions
 	std::vector<double> w; // The weights of the optimal solutions in the lottery
 	std::vector<double> p; // The selection probabilities of the agents
+		// NOTE: this code was first written for binary X-variables (dichotomous preferences).
+			// That's why we use the term 'probabilities' to refer to the expected value of the decision variable
+			// in the final distribution.
+			// In general, 'p' refers to the vector containing the expected utilities of the agents
 	double t; // The solution time needed to find this lottery.
 };
 
@@ -72,6 +78,10 @@ public:
 		// Environment used to find identical agents
 		// Created here to avoid message 'Academic license - ...' being printed every time.
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////// BINARY X-VARIABLES & GENERAL ////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////
 
 // GENERAL VARIABLES
 	int opt;
@@ -148,6 +158,8 @@ public:
 	
 	void partition(bool print);
 		// Find sets Y, M and N
+			// If the X-variables are not binary, this will find the lowest and the highest value
+			// that each of the agents experiences in any of the optimal solutions.
 
 	void greedy_partition(bool print);
 		// Find greedy partition based on algorithm by 
@@ -179,9 +191,6 @@ public:
 	std::vector<time_report> compare_time_normal_vs_RSD_heuristic(int iterations, bool print);
 	std::vector<time_report> compare_time_normal_vs_RSD_without_partition(int iterations, bool print);
 
-
-
-
 	// (DE)CONSTRUCTORS
 
 	// There are four constructors in this class:
@@ -196,6 +205,23 @@ public:
 	IPSolver(const std::string& file_name, bool print);
 
 	~IPSolver();
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////// NON-BINARY X-VARIABLES /////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+// VARIABLES
+	std::vector<double> Xmin, Xmax;
+		// Minimum and maximum value each of the X-variables obtain in any of the optimal solutions
+
+
+// FUNCTIONS
+	void partition_cardinal(bool print);
+		// Solves the 'partition' problem for non-binary variables
+		// Will find minimal and maximal value each variable obtains in any of the optimal solutions
+
+
 
 private:
 	// AUXILIARY FUNCTIONS

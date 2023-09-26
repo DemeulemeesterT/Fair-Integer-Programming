@@ -27,10 +27,11 @@ int main()
 	//RG = run_Kidney_exchange_all(true);
 
 	
-	KidneyExchange* KE = new KidneyExchange("30-instance-1", true);
+	KidneyExchange* KE = new KidneyExchange("10-instance-2", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
 	inst I = KE->generate_instance(true, true);
+	I.X_bool = false;
 	IPSolver* K = new IPSolver(I, true);
 	//K->compare_time_normal_vs_RSD_variants(50, true);
 	

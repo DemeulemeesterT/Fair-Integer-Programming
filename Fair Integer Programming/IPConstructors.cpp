@@ -300,6 +300,8 @@ void IPSolver::initializeVariables(inst I_in, bool print) {
 	I.t = I_in.t;
 	I.n_var = I_in.n_var;
 	I.Y_bool = I_in.Y_bool;
+	I.X_bool = I_in.X_bool;
+	I.X_integer = I_in.X_integer;
 	I.Y_coeff_zero = I_in.Y_coeff_zero;
 	I.data_name = I_in.data_name;
 	opt = -112233445566;
@@ -345,6 +347,10 @@ void IPSolver::initializeVariables(inst I_in, bool print) {
 	number_of_agents_at_once_RSD = 19;
 
 	read_MIPLIB_info(false);
+
+	// CARDINAL X
+	Xmin = std::vector<double>(I.n, -1);
+	Xmax = std::vector<double>(I.n, -1);
 }
 
 IPSolver::IPSolver(bool print) {

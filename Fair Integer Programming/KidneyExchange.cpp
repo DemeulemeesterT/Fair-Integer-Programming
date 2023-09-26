@@ -107,6 +107,9 @@ inst KidneyExchange::generate_instance(bool export_inst, bool print) {
 	I.Y_bool = true;
 	I.Y_coeff_zero = true;
 
+	I.X_bool = true;
+	I.X_integer = false;
+
 	I.m = 2 * I.n; // Twice one constraint for each agent
 
 	// Objective coefficients

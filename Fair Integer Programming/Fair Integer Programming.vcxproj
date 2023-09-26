@@ -158,7 +158,8 @@
   <ItemGroup>
     <ClCompile Include="compare_time_normal_RSD.cpp" />
     <ClCompile Include="IPConstructors.cpp" />
-    <ClCompile Include="IPfunctions.cpp" />
+    <ClCompile Include="IPfunctions_dichotomous.cpp" />
+    <ClCompile Include="IPfunctions_cardinal.cpp" />
     <ClCompile Include="KidneyExchange.cpp" />
     <ClCompile Include="LeximaxMaster.cpp" />
     <ClCompile Include="LotteryDesigner.cpp" />

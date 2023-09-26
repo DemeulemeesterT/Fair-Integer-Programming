@@ -65,7 +65,7 @@
     <ClCompile Include="IPConstructors.cpp">
       <Filter>Source Files\IPSolver</Filter>
     </ClCompile>
-    <ClCompile Include="IPfunctions.cpp">
+    <ClCompile Include="IPfunctions_dichotomous.cpp">
       <Filter>Source Files\IPSolver</Filter>
     </ClCompile>
     <ClCompile Include="compare_time_normal_RSD.cpp">
@@ -88,6 +88,9 @@
     </ClCompile>
     <ClCompile Include="Run_distribution_all_SWT.cpp">
       <Filter>Source Files\RunConfigurations</Filter>
+    </ClCompile>
+    <ClCompile Include="IPfunctions_cardinal.cpp">
+      <Filter>Source Files\IPSolver</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

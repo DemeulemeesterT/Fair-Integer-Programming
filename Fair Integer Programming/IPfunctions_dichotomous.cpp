@@ -400,60 +400,70 @@ void IPSolver::analyze(bool print) {
 void IPSolver::partition(bool print) {
 	model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
-	clock_t start_time = clock();
+	// First, check whether X-variables are binary (dichotomous) or not (cardinal preferences)
+	if (I.X_bool) {
 
-	for (int i = 0; i < I.n; i++) {
-		bool unselected = true;
-		// Check for every agent:
-		// Whether he belongs to Y:
-		if (Y[i] == -1) {
-			GRBConstr c = model->addConstr(X[i] == 0);
-			int z = this->solve_partition(print);
-			if (z != opt) {
-				Y[i] = 1;
-				M[i] = 0;
-				N[i] = 0;
-				unselected = false;
+		clock_t start_time = clock();
+
+		for (int i = 0; i < I.n; i++) {
+			bool unselected = true;
+			// Check for every agent:
+			// Whether he belongs to Y:
+			if (Y[i] == -1) {
+				GRBConstr c = model->addConstr(X[i] == 0);
+				int z = this->solve_partition(print);
+				if (z != opt) {
+					Y[i] = 1;
+					M[i] = 0;
+					N[i] = 0;
+					unselected = false;
+				}
+				model->remove(c);
 			}
-			model->remove(c);
-		}
-		if (N[i] == -1) {
-			GRBConstr c = model->addConstr(X[i] == 1);
-			int z = this->solve_partition(print);
-			if (z != opt) {
-				N[i] = 1;
-				M[i] = 0;
+			if (N[i] == -1) {
+				GRBConstr c = model->addConstr(X[i] == 1);
+				int z = this->solve_partition(print);
+				if (z != opt) {
+					N[i] = 1;
+					M[i] = 0;
+					Y[i] = 0;
+					unselected = false;
+				}
+				model->remove(c);
+			}
+
+			if (unselected) {
+				M[i] = 1;
 				Y[i] = 0;
-				unselected = false;
+				N[i] = 0;
+
 			}
-			model->remove(c);
-		}
-
-		if (unselected) {
-			M[i] = 1;
-			Y[i] = 0;
-			N[i] = 0;
 
 		}
 
-	}
+		double length = ((double)(clock() - start_time) / CLK_TCK);
 
-	double length = ((double)(clock() - start_time) / CLK_TCK);
-
-	// Determine the nunmber of agents in M
-	M_size = 0;
-	for (int i = 0; i < I.n; i++) {
-		if (M[i] == 1) {
-			M_size++;
+		// Determine the nunmber of agents in M
+		M_size = 0;
+		for (int i = 0; i < I.n; i++) {
+			if (M[i] == 1) {
+				M_size++;
+			}
 		}
-	}
-	if (print) {
-		print_partition(length);
+		if (print) {
+			print_partition(length);
+		}
+
+		time_partition = length;
+
+		done_partition = true;
 	}
 
-	time_partition = length;
 
-	done_partition = true;
+	// CARDINAL PREFERENCES
+	else {
+		partition_cardinal(print);
+	}
 }
 
 void IPSolver::greedy_partition(bool print) {
