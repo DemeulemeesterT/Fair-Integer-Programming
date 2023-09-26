@@ -225,10 +225,11 @@ lottery LotteryDesigner::leximin(bool print) {
 		// Add the solution to the master problem again, etc.
 
 	// Disable output if not wanted
-	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	//K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 
 	LeximinMaster* M = new LeximinMaster(K, print);
+	M->model->write("Generated Formulations/LeximinMaster.lp");
 	lottery L = M->solve(print);
 	delete M;
 
@@ -1035,7 +1036,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 	}
 	
 	// Not all rules work (yet) for integer Y-variables
-	if (K->I.Y_bool == true) {
+	//if (K->I.Y_bool == true) {
 		// There is only something to compare if the set 'M' is non-empty
 		int size_M = 0;
 		for (int i = 0; i < K->I.n; i++) {
@@ -1078,7 +1079,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 					L.push_back(uniform(iterations, false));
 				}
 				else if (letter == "L") {
-					L.push_back(leximin(false));
+					L.push_back(leximin(true));
 				}
 				else if (letter == "R") {
 					L.push_back(RSD(iterations, false, seed));
@@ -1295,11 +1296,11 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 				L.push_back(L_empty);
 			}
 		}
-	}
+	/*}
 	else {
 		printf("\n\n\t Not all functions work (yet) for integer Y-variables.\n");
 		printf("\t (More specifically, think about how to exclude a solution in 'block_solution' for integer Ys.)\n");
-	}
+	}*/
 
 	return L;
 }

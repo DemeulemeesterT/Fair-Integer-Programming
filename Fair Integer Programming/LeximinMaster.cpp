@@ -55,6 +55,7 @@ lottery LeximinMaster::solve(bool print) {
 			//model->write("Generated Formulations/LeximinModel.lp");
 
 			model->optimize();
+			model->write("Generated Formulations/LeximinMaster.lp");
 			obj_val_master = model->get(GRB_DoubleAttr_ObjVal);
 			getDualValues(false, print);
 

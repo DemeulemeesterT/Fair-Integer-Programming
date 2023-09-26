@@ -226,6 +226,10 @@ public:
 		// Solves the 'partition' problem for non-binary variables
 		// Will find minimal and maximal value each variable obtains in any of the optimal solutions
 
+	double solve_partition_cardinal(int i, bool fill_Xmin, bool print);
+		// Solves a modified version of the problem during the partitioning when X-variables are not binary (cardinal preferences)
+		// We will find value of variable X[i], and store it in Xmin/Xmax (depending on 'fill_Xmin')
+
 
 
 private:

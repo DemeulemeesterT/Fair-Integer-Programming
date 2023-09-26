@@ -165,14 +165,14 @@ double IPSolver::solve_partition(bool print) {
 		}
 
 		// Check: capacities satisfied?
-		std::vector<double> sum(I.m, 0);
+		/*std::vector<double> sum(I.m, 0);
 		for (int k = 0; k < I.m; k++) {
 			for (int j = 0; j < I.n; j++) {
 				if (x[j] > 0) {
 					sum[k] += I.A[k][j];
 				}
 			}
-		}
+		}*/
 
 		if (solver_times == 1) {
 			// Initialize 'opt' if solved for the first time
