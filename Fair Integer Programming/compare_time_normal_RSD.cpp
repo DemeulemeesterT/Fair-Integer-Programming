@@ -44,17 +44,17 @@ void compare_time_normal_RSD(int iter, bool print) {
 
 }
 
-void compare_time_normal_RSD_SWT(int iter, bool print) {
+void compare_time_normal_RSD_SWT(int iter, int nr_instances, bool print) {
 	// Prepare to go through all instances
 	std::vector<std::vector<int>> P;
 
 	//P.push_back({ 3,2 });
-	P.push_back({ 40,nr_instances }); // The first number is the number of jobs in the instance, the second number is the number of instances we want to read for this amount of jobs
-	P.push_back({ 50,nr_instances });
+	//P.push_back({ 40,nr_instances }); // The first number is the number of jobs in the instance, the second number is the number of instances we want to read for this amount of jobs
+	//P.push_back({ 50,nr_instances });
 	P.push_back({ 100, nr_instances });
 
 	std::ofstream O;
-	O.open("Generated Results/RSD_vs_Normal_KE.csv");
+	O.open("Generated Results/RSD_vs_Normal_KE_SWT.csv");
 	O << "Name; Agents; t_Normal; t_RSD_heuristic; t_RSD; t_partition" << "\n";
 	O.close();
 
@@ -72,7 +72,7 @@ void compare_time_normal_RSD_SWT(int iter, bool print) {
 			std::vector<time_report> TR = K->compare_time_normal_vs_RSD_heuristic(iter, false);
 
 			std::ofstream O;
-			O.open("Generated Results/RSD_vs_Normal_KE.csv", std::fstream::app);
+			O.open("Generated Results/RSD_vs_Normal_KE_SWT.csv", std::fstream::app);
 			O << name << "; " << K->I.n << "; " << TR[0].t << "; " << TR[2].t << "; " << TR[1].t << "; " << K->time_partition << "\n";
 
 			O.close();

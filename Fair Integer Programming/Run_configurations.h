@@ -36,7 +36,7 @@ std::vector<ReportDistribution*> run_distribution_all_SWT(std::string s, int nr_
 void compare_time_normal_RSD(int iter, bool print);
 	// Compare time solving one instance, solving RSD, and solving RSDheuristic for KIDNEY EXCHANGE
 
-void compare_time_normal_RSD_SWT(int iter, bool print);
+void compare_time_normal_RSD_SWT(int iter, int nr_instances, bool print);
 	// Compare time solving one instance, solving RSD, and solving RSDheuristic for MINIMIZING THE WEIGHTED NUMBER OF TARDY JOBS
 
 
