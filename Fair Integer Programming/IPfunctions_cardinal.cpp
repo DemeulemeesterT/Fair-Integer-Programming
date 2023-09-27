@@ -137,7 +137,7 @@ double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 		obj_val += I.v[I.n + i] * y[i];
 	}
 
-	if (obj_val == opt) {
+	if (obj_val >= opt - 0.00001) {
 		// Add the solution to S if it is not yet in there
 		solution s;
 
@@ -151,7 +151,109 @@ double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 	return z;
 }
 
-void IPSolver::check_solution_in_S_cardinal(solution s, bool print) {
+IP_report IPSolver::solve_return_solution_cardinal(bool print) {
+	IP_report IP_R;
+	solution s;
+	bool found;
+	
+	solver_times++;
+	model->write("Generated Formulations/IPModel.lp");
+	model->optimize();
+	int status = model->get(GRB_IntAttr_Status);
+	double z;
+	if (status != 3) { // If feasible
+		z = model->get(GRB_DoubleAttr_ObjVal);
+
+		// Store solution
+		std::vector<double> x(I.n, 0);
+		if (I.X_integer == true) {
+			for (int j = 0; j < I.n; j++) {
+				x[j] = (int)X[j].get(GRB_DoubleAttr_X);
+			}
+		}
+		else {
+			for (int j = 0; j < I.n; j++) {
+				x[j] = X[j].get(GRB_DoubleAttr_X);
+			}
+		}
+
+		std::vector<double> y(I.t, 0);
+		if (I.Y_integer == true) {
+			for (int j = 0; j < I.t; j++) {
+				y[j] = (int)Y_var[j].get(GRB_DoubleAttr_X);
+			}
+		}
+		else {
+			for (int j = 0; j < I.t; j++) {
+				y[j] = Y_var[j].get(GRB_DoubleAttr_X);
+			}
+		}
+
+		if (print) {
+			for (int j = 0; j < I.n; j++) {
+				if (x[j] == 1) {
+					printf("\tX_%i = %.2f\n", j, (double)x[j]);
+				}
+			}
+			for (int j = 0; j < I.t; j++) {
+				if (y[j] > 0) {
+					printf("\tY_%i = %.2f\n", j, (double)y[j]);
+				}
+			}
+		}
+
+		if (solver_times == 1) {
+			// Initialize 'opt' if solved for the first time
+			opt = z;
+		}
+
+		// Calculate objective value
+		double obj_val = 0;	// We should calculate it ourselves, because when we use this problem as a pricing problem
+								// the obtained objective value is different
+		for (int i = 0; i < I.n; i++) {
+			obj_val += I.v[i] * x[i];
+		}
+		for (int i = 0; i < I.t; i++) {
+			obj_val += I.v[I.n + i] * y[i];
+		}
+
+		if (obj_val >= opt - 0.00001) {
+			// Add the solution to S if it is not yet in there
+			solution s;
+
+			// Add solution to S
+			s.x = x;
+			s.y = y;
+			s.ID = 0; // We won't use the binary represenation of a solution for cardinal solutions
+
+			found = check_solution_in_S_cardinal(s, print);
+		}
+	}
+	else {
+		z = -11223344;
+		found = true;
+	}
+
+	done_solve = true;
+
+	IP_R.s = s;
+	IP_R.opt_obj_value = z;
+	IP_R.solution_already_in_S = found;
+	return IP_R;
+}
+
+IP_report IPSolver::solve_return_solution_MENU(bool print) {
+	if (this->I.X_bool == true) {
+		return solve_return_solution(print);
+	}
+	else {
+		return solve_return_solution_cardinal(print);
+	}
+}
+
+
+
+bool IPSolver::check_solution_in_S_cardinal(solution s, bool print) {
 	// Go through all existing optimal solutions to check whether solution is already in 'S'
 	bool found = false;
 	for (int i = 0; i < S.size(); i++) {
@@ -172,4 +274,6 @@ void IPSolver::check_solution_in_S_cardinal(solution s, bool print) {
 	if (found == false) {
 		S.push_back(s);
 	}
+
+	return found;
 }

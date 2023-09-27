@@ -165,7 +165,7 @@ lottery LotteryDesigner::uniform(int iterations, bool print) {
 	int status;
 	IP_report IP_R;
 	while (feasible) {
-		IP_R = K->solve_return_solution(false);
+		IP_R = K->solve_return_solution_MENU(false);
 		status = K->model->get(GRB_IntAttr_Status);
 		if (status == 3) {
 			// The model is infeasible
@@ -229,7 +229,8 @@ lottery LotteryDesigner::leximin(bool print) {
 
 
 	LeximinMaster* M = new LeximinMaster(K, print);
-	M->model->write("Generated Formulations/LeximinMaster.lp");
+	M->K->model->write("Generated Formulations/IPModel.lp");
+
 	lottery L = M->solve(print);
 	delete M;
 
@@ -1033,7 +1034,10 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 		K_initial->done_partition = true;
 		K_initial->M_size = K->M_size;
 		K_initial->time_partition = K->time_partition;
+		K_initial->Xmin = K->Xmin;
+		K_initial->Xmax = K->Xmax;
 	}
+
 	
 	// Not all rules work (yet) for integer Y-variables
 	//if (K->I.Y_bool == true) {

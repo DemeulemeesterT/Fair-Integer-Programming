@@ -13,8 +13,9 @@ lottery LeximinMaster::solve(bool print) {
 	for (int i = 0; i < K->I.t; i++) {
 		expr += K->I.v[K->I.n + i] * K->Y_var[i];
 	}
-	K->model->addConstr(expr == K->opt);
 
+	K->model->addConstr(expr == K->opt);
+	K->model->write("Generated Formulations/IPModel.lp");
 	int iterations = 1;
 
 	// Create a lottery object corresponding to store the solution
@@ -60,18 +61,20 @@ lottery LeximinMaster::solve(bool print) {
 			getDualValues(false, print);
 
 			// Change the objective of the knapsack problem, which will serve as our pricing problem
+				// To allow for non-binary X-variables, we write the full formulation
+				// This means that we divide the X-variables by (Xmax[i] - Xmin[i]) for the agents in that were not yet fixed.
 			obj = 0.0;
 
 			int counter = 0;
 			for (int i = 0; i < K->I.n; i++) {
 				if (K->M[i] == 1) {
-					obj -= dual_C_bound[counter] * K->X[i];
+					obj -= dual_C_bound[counter] * K->X[i] / (K->Xmax[i] - K->Xmin[i]);
 					counter++;
 				}
 			}
 			obj -= dual_C_Sum1[0];
 			K->model->setObjective(obj, GRB_MAXIMIZE);
-			IP_report IP_R_pricing = K->solve_return_solution(false);
+			IP_report IP_R_pricing = K->solve_return_solution_MENU(false);
 			obj_val_pricing = IP_R_pricing.opt_obj_value;
 			
 			// If the model was not infeasible
@@ -185,14 +188,14 @@ lottery LeximinMaster::solve(bool print) {
 							for (int j = 0; j < K->I.n; j++) {
 								if (K->M[j] == 1) {
 
-									obj -= dual_C_bound[counter_inner] * K->X[j];
+									obj -= dual_C_bound[counter_inner] * K->X[j] / (K->Xmax[i] - K->Xmin[i]);
 									counter_inner++;
 								}
 							}
 							obj -= dual_C_Sum1[0];
 							K->model->setObjective(obj, GRB_MAXIMIZE);
 							//K->model->write("Generated Formulations/IPModel.lp");
-							IP_report IP_R = K->solve_return_solution(false);
+							IP_report IP_R = K->solve_return_solution_MENU(false);
 							obj_val_pricing_epsilon = IP_R.opt_obj_value;
 							//obj_val_pricing_epsilon = K->solve(true);
 
@@ -449,6 +452,7 @@ void LeximinMaster::defineModelConVar(bool print) {
 			if (K->M[i] == 1) {
 				// It only makes sense to include the agents in 'M'
 				//if (K->S[s].x[i] == 1) {
+				double test_value = K->S[s].x[i] / (K->Xmax[i] - K->Xmin[i]);
 					columns[s].addTerm(K->S[s].x[i] / (K->Xmax[i] - K->Xmin[i]), C_bound[counter]);
 					// Formulated like this, the leximin formulation can also be used for
 						// non-binary X-variables.
@@ -463,6 +467,8 @@ void LeximinMaster::defineModelConVar(bool print) {
 		columns[s].addTerm(1, C_Sum1);
 
 		K->block_solution(K->S[s]);
+		K->model->write("Generated Formulations/IPModel.lp");
+
 	}
 
 	//Epsilon_column = GRBColumn();

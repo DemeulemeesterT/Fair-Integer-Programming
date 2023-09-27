@@ -381,7 +381,7 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 
 		K->model->setObjective(obj, GRB_MAXIMIZE);
 		//K->model->write("Generated Formulations/IPModel.lp");
-		IP_report IP_R = K->solve_return_solution(print);
+		IP_report IP_R = K->solve_return_solution_MENU(print);
 			// IP_report contains only the optimal objective function and an optimal solution (see definition IPSolver.h)
 
 		obj_val_pricing = IP_R.opt_obj_value;

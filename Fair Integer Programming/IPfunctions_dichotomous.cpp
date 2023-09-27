@@ -1440,23 +1440,29 @@ solution IPSolver::RSD_heuristic_no_partition(std::vector<int> order, bool print
 
 
 void IPSolver::block_solution(solution sol) {
-	GRBLinExpr expr = 0.0;
-	int counter = 0;
-	for (int i = 0; i < I.n; i++) {
-		if (sol.x[i] == 1) {
-			expr += X[i];
-			counter++;
+	if (I.X_bool == true) {
+		GRBLinExpr expr = 0.0;
+		int counter = 0;
+		for (int i = 0; i < I.n; i++) {
+			if (sol.x[i] == 1) {
+				expr += X[i];
+				counter++;
+			}
 		}
-	}
-	for (int i = 0; i < I.t; i++) {
-		if (sol.y[i] == 1) {
-			expr += Y_var[i];
-			counter++;
+		for (int i = 0; i < I.t; i++) {
+			if (sol.y[i] == 1) {
+				expr += Y_var[i];
+				counter++;
+			}
 		}
-	}
-	model->addConstr(expr <= (counter - 1));
+		model->addConstr(expr <= (counter - 1));
 
-	//model->write("Generated Formulations/IPModel.lp");
+		//model->write("Generated Formulations/IPModel.lp");
+	}
+	else {
+		// We are not aware of an elegant method to exclude a single solution when variables can take any integer values...
+
+	}
 }
 
 void IPSolver::change_obj_function(std::vector<double> w) {

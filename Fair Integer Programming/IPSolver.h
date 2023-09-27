@@ -230,8 +230,16 @@ public:
 		// Solves a modified version of the problem during the partitioning when X-variables are not binary (cardinal preferences)
 		// We will find value of variable X[k], and store it in Xmin/Xmax (depending on 'fill_Xmin')
 
-	void check_solution_in_S_cardinal(solution s, bool print);
+	bool check_solution_in_S_cardinal(solution s, bool print);
 		// Will add solution 's' to set S if it is not already there.
+		// Returns boolean 'found', which is true if value was already in S.
+
+	IP_report solve_return_solution_cardinal(bool print);
+		// Same as 'solve_partition_cardinal', but also returns solution and some other information that is useful in, e.g., leximin.
+			// Cardinal equivalent of 'solve_return_solution' for binary X-variables.
+
+	IP_report solve_return_solution_MENU(bool print);
+		// Will guide to the correct solve_return_solution() function, depending on binary or non-binary X-variables.
 
 
 
