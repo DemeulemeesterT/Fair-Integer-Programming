@@ -68,12 +68,13 @@ lottery LeximinMaster::solve(bool print) {
 			int counter = 0;
 			for (int i = 0; i < K->I.n; i++) {
 				if (K->M[i] == 1) {
-					obj -= dual_C_bound[counter] * K->X[i] / (K->Xmax[i] - K->Xmin[i]);
+					obj += dual_C_bound[counter] * K->X[i] / (K->Xmax[i] - K->Xmin[i]);
 					counter++;
 				}
 			}
-			obj -= dual_C_Sum1[0];
+			obj += dual_C_Sum1[0];
 			K->model->setObjective(obj, GRB_MAXIMIZE);
+			K->model->write("Generated Formulations/IPModel.lp");
 			IP_report IP_R_pricing = K->solve_return_solution_MENU(false);
 			obj_val_pricing = IP_R_pricing.opt_obj_value;
 			
@@ -145,6 +146,7 @@ lottery LeximinMaster::solve(bool print) {
 
 		// Add constraint to force that 'MIN_M'= found objective value
 		C_bound_MIN_M = model->addConstr(MIN_M == obj_val_master);
+		model->write("Generated Formulations/LeximinMaster.lp");
 		double epsilon_opt = 0.0;
 
 		for (int i = 0; i < K->I.n; i++) {
@@ -164,7 +166,7 @@ lottery LeximinMaster::solve(bool print) {
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
-					//model->write("Generated Formulations/LeximinModel.lp");
+					model->write("Generated Formulations/LeximinModel.lp");
 					model->optimize();
 
 					// If optimal solution of Epsilon = 0
@@ -182,19 +184,20 @@ lottery LeximinMaster::solve(bool print) {
 							obj = 0.0;
 
 							// The dual variable of the epsilon-constraint:
-							obj += dual_C_bound_MIN_M[0] * K->X[i];
+							double test_value = dual_C_bound_MIN_M[0] / (K->Xmax[i] - K->Xmin[i]);
+							obj += dual_C_bound_MIN_M[0] * K->X[i] / (K->Xmax[i] - K->Xmin[i]);
 
 							int counter_inner = 0;
 							for (int j = 0; j < K->I.n; j++) {
 								if (K->M[j] == 1) {
-
-									obj -= dual_C_bound[counter_inner] * K->X[j] / (K->Xmax[i] - K->Xmin[i]);
+									test_value = dual_C_bound[counter_inner] / (K->Xmax[i] - K->Xmin[i]);
+									obj += dual_C_bound[counter_inner] * K->X[j] / (K->Xmax[i] - K->Xmin[i]);
 									counter_inner++;
 								}
 							}
-							obj -= dual_C_Sum1[0];
+							obj += dual_C_Sum1[0];
 							K->model->setObjective(obj, GRB_MAXIMIZE);
-							//K->model->write("Generated Formulations/IPModel.lp");
+							K->model->write("Generated Formulations/IPModel.lp");
 							IP_report IP_R = K->solve_return_solution_MENU(false);
 							obj_val_pricing_epsilon = IP_R.opt_obj_value;
 							//obj_val_pricing_epsilon = K->solve(true);
@@ -246,7 +249,7 @@ lottery LeximinMaster::solve(bool print) {
 
 									// And by setting the coefficient of MIN_M in that constraint to zero
 									model->chgCoeff(C_bound[counter], MIN_M, 0.0);
-									//model->write("Generated Formulations/LeximinModel.lp");
+									model->write("Generated Formulations/LeximinModel.lp");
 
 									M_remaining[i] = 0;
 
