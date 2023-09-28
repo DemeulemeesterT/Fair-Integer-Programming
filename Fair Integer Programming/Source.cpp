@@ -26,7 +26,7 @@ int main()
 	//std::vector<reportGreedy> RG;
 	//RG = run_Kidney_exchange_all(true);
 
-
+	/*
 	// INSTANCE TO TEST CARDINAL MODEL
 	inst I;
 	I.m = 1;
@@ -41,13 +41,13 @@ int main()
 	I.Y_integer = false;
 	I.X_bool = false;
 	I.X_integer = true;
-
-	/*
-	KidneyExchange* KE = new KidneyExchange("10-instance-2", true);
+	*/
+	
+	KidneyExchange* KE = new KidneyExchange("60-instance-38", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
 	inst I = KE->generate_instance(true, true);
-	*/
+	
 	IPSolver* K = new IPSolver(I, true);
 	//K->compare_time_normal_vs_RSD_variants(50, true);
 	

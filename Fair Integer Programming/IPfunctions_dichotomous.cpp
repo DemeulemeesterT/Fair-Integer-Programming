@@ -376,7 +376,7 @@ IP_report IPSolver::solve_return_solution(bool print) {
 		}
 	}
 	else {
-		z = -11223344;
+		z = 11223344;
 		found = true;
 	}
 

@@ -230,7 +230,7 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 		}
 	}
 	else {
-		z = -11223344;
+		z = 11223344;
 		found = true;
 	}
 

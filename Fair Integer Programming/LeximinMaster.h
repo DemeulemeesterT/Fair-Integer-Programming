@@ -52,6 +52,9 @@ public:
 
 	// Auxiliary functions
 	void defineModelConVar(bool print);
+	bool check_reduced_cost_S_zero(std::vector<int> M_remaining, bool print);
+		// Returns 'true' if for certain dual prices, the reduced cost of all solutions in S is equal to zero.
+		// To check correctness of the code.
 
 	LeximinMaster(IPSolver* K_in, bool print);
 	~LeximinMaster();

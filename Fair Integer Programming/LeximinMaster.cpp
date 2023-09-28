@@ -41,10 +41,10 @@ lottery LeximinMaster::solve(bool print) {
 		bool all_solutions_in_S = false;
 		// This boolean will become true if all optimal solutions are included in K->S.
 
-		// As long as the solution of the pricing problem has a non-negative reduced cost, continue
-		double obj_val_pricing = 1;
+		// As long as the solution of the pricing problem has a negative reduced cost, continue
+		double obj_val_pricing = -1;
 		double obj_val_master;
-		while (obj_val_pricing > 0.0001) {
+		while (obj_val_pricing < -0.0001) {
 			
 			if (print) {
 				printf("\nITERATION %i\n\n", iterations);
@@ -68,13 +68,22 @@ lottery LeximinMaster::solve(bool print) {
 			int counter = 0;
 			for (int i = 0; i < K->I.n; i++) {
 				if (K->M[i] == 1) {
-					obj += dual_C_bound[counter] * K->X[i] / (K->Xmax[i] - K->Xmin[i]);
+					if (M_remaining[i] == 1) {
+						obj += dual_C_bound[counter] * K->X[i] / (K->Xmax[i] - K->Xmin[i]);
+					}
+					else {
+						obj += dual_C_bound[counter] * K->X[i];
+					}
 					counter++;
 				}
 			}
 			obj += dual_C_Sum1[0];
-			K->model->setObjective(obj, GRB_MAXIMIZE);
+			K->model->setObjective(obj, GRB_MINIMIZE);
 			K->model->write("Generated Formulations/IPModel.lp");
+
+			//bool correct_master = check_reduced_cost_S_zero(M_remaining, print);
+
+
 			IP_report IP_R_pricing = K->solve_return_solution_MENU(false);
 			obj_val_pricing = IP_R_pricing.opt_obj_value;
 			
@@ -84,8 +93,8 @@ lottery LeximinMaster::solve(bool print) {
 				obj_val_pricing = 0; // This will stop the master-pricing iterations
 			}
 			else { // model was feasible
-				// Add a new column to the master if the reduced cost is non-negative
-				if (obj_val_pricing > 0.0001) {
+				// Add a new column to the master if the reduced cost is negative
+				if (obj_val_pricing < -0.0001) {
 					if (IP_R_pricing.solution_already_in_S == false) {
 						addColumn(IP_R_pricing.s, print);
 					}
@@ -158,9 +167,9 @@ lottery LeximinMaster::solve(bool print) {
 				// Change  the corresponding constraint by adding a small epsilon value
 				// We will do this by setting the coefficient of the column 'Epsilon' to minus one for that constraint
 
-				double obj_val_pricing_epsilon = 1;
+				double obj_val_pricing_epsilon = -1;
 				int iterations_subroutine = 1;
-				while (obj_val_pricing_epsilon > 0.0001) {
+				while (obj_val_pricing_epsilon < -0.0001) {
 					if (print) {
 						printf("\nITERATION SUBROUTINE %i.%i.%i\n\n", iterations-1, i, iterations_subroutine);
 					}
@@ -184,20 +193,28 @@ lottery LeximinMaster::solve(bool print) {
 							obj = 0.0;
 
 							// The dual variable of the epsilon-constraint:
-							double test_value = dual_C_bound_MIN_M[0] / (K->Xmax[i] - K->Xmin[i]);
-							obj += dual_C_bound_MIN_M[0] * K->X[i] / (K->Xmax[i] - K->Xmin[i]);
+							//double test_value = dual_C_bound_MIN_M[0] / (K->Xmax[i] - K->Xmin[i]);
+							//obj += dual_C_bound_MIN_M[0] * K->X[i] / (K->Xmax[i] - K->Xmin[i]);
 
 							int counter_inner = 0;
 							for (int j = 0; j < K->I.n; j++) {
 								if (K->M[j] == 1) {
-									test_value = dual_C_bound[counter_inner] / (K->Xmax[i] - K->Xmin[i]);
-									obj += dual_C_bound[counter_inner] * K->X[j] / (K->Xmax[i] - K->Xmin[i]);
+									if (M_remaining[i] == 1) {
+										//test_value = dual_C_bound[counter_inner] / (K->Xmax[j] - K->Xmin[j]);
+										obj += dual_C_bound[counter_inner] * K->X[j] / (K->Xmax[j] - K->Xmin[j]);
+									}
+									else {
+										obj += dual_C_bound[counter_inner] * K->X[j];
+									}
 									counter_inner++;
 								}
 							}
 							obj += dual_C_Sum1[0];
-							K->model->setObjective(obj, GRB_MAXIMIZE);
+							K->model->setObjective(obj, GRB_MINIMIZE);
 							K->model->write("Generated Formulations/IPModel.lp");
+
+							//bool correct_epsilon = check_reduced_cost_S_zero(M_remaining, print);
+
 							IP_report IP_R = K->solve_return_solution_MENU(false);
 							obj_val_pricing_epsilon = IP_R.opt_obj_value;
 							//obj_val_pricing_epsilon = K->solve(true);
@@ -228,7 +245,7 @@ lottery LeximinMaster::solve(bool print) {
 							
 							else {// model was feasible
 								// Add a new column to the master if the reduced cost is non-negative
-								if (obj_val_pricing_epsilon > 0.0001) {
+								if (obj_val_pricing_epsilon < -0.0001) {
 									if (IP_R.solution_already_in_S == false) {
 										addColumn(IP_R.s, print);
 									}
@@ -506,6 +523,33 @@ void LeximinMaster::defineModelConVar(bool print) {
 		//model->write("Generated Formulations/LeximinMaster.lp");
 	//}
 }
+
+bool LeximinMaster::check_reduced_cost_S_zero(std::vector<int> M_remaining, bool print) {
+	double red_cost;
+	bool all_zero = true;
+	for (int t = 0; t < K->S.size(); t++) {
+		red_cost = 0;
+		int counter = 0;
+		for (int i = 0; i < K->I.n; i++) {
+			if (K->M[i] == 1) {
+				if (M_remaining[i] == 1) {
+					red_cost += dual_C_bound[counter] * K->S[t].x[i] / (K->Xmax[i] - K->Xmin[i]);
+				}
+				else {
+					red_cost += dual_C_bound[counter] * K->S[t].x[i];
+				}
+				counter++;
+			}
+		}
+		red_cost += dual_C_Sum1[0];
+
+		if (abs(red_cost - 0.0) > 0.0000001) {
+			all_zero = false;
+		}
+	}
+	return all_zero;
+}
+
 
 LeximinMaster::LeximinMaster(IPSolver* K_in, bool print) {
 	K = new IPSolver(K_in, print);
