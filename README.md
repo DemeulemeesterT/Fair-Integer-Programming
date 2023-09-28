@@ -71,7 +71,8 @@ L->compare_methods(string, 10, interactive_display, print, 0);
   A string such as `LCR` will compute the leximin, Nash, and RSD distributions, for example.
 * `interactive_display` is a boolean variable. If entered as `true`, you can see the menu of possible distributions to choose from.
 
-The resulting output could look this, for example, where the uniform, leximin, Nash, and RSD distributions have been computed.
+The resulting output could look this, for example, where the uniform, leximin, Nash, and RSD distributions have been computed.  
+
 ![Example Output Distributions](https://github.com/DemeulemeesterT/Fair-Integer-Programming/assets/59369043/954b0065-070a-4991-a18c-f5221bfc5675)
 
   
