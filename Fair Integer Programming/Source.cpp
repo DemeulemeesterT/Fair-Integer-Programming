@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	//run_distribution_all_KE("H", 3600.0, 1, false);
+	run_distribution_all_KE("L", 3600.0, 1, false);
 	//run_distribution_all_SWT("H", 50, 3600.0, 1000, false);
 	//compare_time_normal_RSD_SWT(1000, 50, false);
 	
@@ -43,10 +43,11 @@ int main()
 	I.X_integer = true;
 	*/
 	
-	KidneyExchange* KE = new KidneyExchange("60-instance-38", true);
+	/*
+	KidneyExchange* KE = new KidneyExchange("40-instance-48", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
-	inst I = KE->generate_instance(true, true);
+	inst I = KE->generate_instance(true, false);
 	
 	IPSolver* K = new IPSolver(I, true);
 	//K->compare_time_normal_vs_RSD_variants(50, true);
@@ -57,10 +58,10 @@ int main()
 
 	//IPSolver* K = new IPSolver(true);
 	//K->partition(true);
-	K->analyze(true);
+	K->analyze(false);
 	//K->compare_partition_vs_greedy(true);
 	//K->compare_time_normal_vs_RSD_without_partition(5, true);
-	LotteryDesigner* L = new LotteryDesigner(K, true);
+	LotteryDesigner* L = new LotteryDesigner(K, false);
 
 	L->compare_methods("L", 10, true, false, 0);
 	
@@ -70,5 +71,5 @@ int main()
 	//delete SD;
 	delete K;
 	//delete KE;
-	
+	*/
 }

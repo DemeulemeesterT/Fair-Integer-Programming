@@ -15,7 +15,7 @@ lottery LeximinMaster::solve(bool print) {
 	}
 
 	K->model->addConstr(expr == K->opt);
-	K->model->write("Generated Formulations/IPModel.lp");
+	//K->model->write("Generated Formulations/IPModel.lp");
 	int iterations = 1;
 
 	// Create a lottery object corresponding to store the solution
@@ -56,7 +56,7 @@ lottery LeximinMaster::solve(bool print) {
 			//model->write("Generated Formulations/LeximinModel.lp");
 
 			model->optimize();
-			model->write("Generated Formulations/LeximinMaster.lp");
+			//model->write("Generated Formulations/LeximinMaster.lp");
 			obj_val_master = model->get(GRB_DoubleAttr_ObjVal);
 			getDualValues(false, print);
 
@@ -64,6 +64,23 @@ lottery LeximinMaster::solve(bool print) {
 				// To allow for non-binary X-variables, we write the full formulation
 				// This means that we divide the X-variables by (Xmax[i] - Xmin[i]) for the agents in that were not yet fixed.
 			obj = 0.0;
+
+			/*
+			// CHECK: which variables selected with positive weight?
+			std::vector<double> w_check(w.size(), 0.0);
+			for (int i = 0; i < w.size(); i++) {
+				w_check[i] = (w[i].get(GRB_DoubleAttr_X));
+			}
+
+			double sum_check = 0;
+			for (int i = 0; i < w.size(); i++) {
+				if (w_check[i] > 0) {
+					printf("Solution %i\t%.2f\n", i, w_check[i]);
+					sum_check += w_check[i];
+				}
+			}
+			printf("Sum = %.4f\n\n", sum_check);
+			*/
 
 			int counter = 0;
 			for (int i = 0; i < K->I.n; i++) {
@@ -79,7 +96,7 @@ lottery LeximinMaster::solve(bool print) {
 			}
 			obj += dual_C_Sum1[0];
 			K->model->setObjective(obj, GRB_MINIMIZE);
-			K->model->write("Generated Formulations/IPModel.lp");
+			//K->model->write("Generated Formulations/IPModel.lp");
 
 			//bool correct_master = check_reduced_cost_S_zero(M_remaining, print);
 
@@ -105,10 +122,10 @@ lottery LeximinMaster::solve(bool print) {
 				}
 				else {
 					// This means that the solution to the primal problem is optimal
-					if (IP_R_pricing.solution_already_in_S == false) {
+					//if (IP_R_pricing.solution_already_in_S == false) {
 						// Remove the last added solution to K->S, because we will not create a variable for this
-						K->S.pop_back();
-					}
+					//	K->S.pop_back();
+					//}
 				}
 			}
 
@@ -155,7 +172,7 @@ lottery LeximinMaster::solve(bool print) {
 
 		// Add constraint to force that 'MIN_M'= found objective value
 		C_bound_MIN_M = model->addConstr(MIN_M == obj_val_master);
-		model->write("Generated Formulations/LeximinMaster.lp");
+		//model->write("Generated Formulations/LeximinMaster.lp");
 		double epsilon_opt = 0.0;
 
 		for (int i = 0; i < K->I.n; i++) {
@@ -175,7 +192,7 @@ lottery LeximinMaster::solve(bool print) {
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
-					model->write("Generated Formulations/LeximinModel.lp");
+					//model->write("Generated Formulations/LeximinModel.lp");
 					model->optimize();
 
 					// If optimal solution of Epsilon = 0
@@ -211,7 +228,7 @@ lottery LeximinMaster::solve(bool print) {
 							}
 							obj += dual_C_Sum1[0];
 							K->model->setObjective(obj, GRB_MINIMIZE);
-							K->model->write("Generated Formulations/IPModel.lp");
+							//K->model->write("Generated Formulations/IPModel.lp");
 
 							//bool correct_epsilon = check_reduced_cost_S_zero(M_remaining, print);
 
@@ -266,7 +283,7 @@ lottery LeximinMaster::solve(bool print) {
 
 									// And by setting the coefficient of MIN_M in that constraint to zero
 									model->chgCoeff(C_bound[counter], MIN_M, 0.0);
-									model->write("Generated Formulations/LeximinModel.lp");
+									//model->write("Generated Formulations/LeximinModel.lp");
 
 									M_remaining[i] = 0;
 
@@ -374,7 +391,7 @@ void LeximinMaster::addColumn(solution sol, bool print) {
 	GRBVar empty;
 	w.push_back(empty);
 	w.back() = model->addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, col, name_w);
-	model->write("Generated Formulations/LeximinMaster.lp");
+	//model->write("Generated Formulations/LeximinMaster.lp");
 }
 
 
@@ -487,7 +504,7 @@ void LeximinMaster::defineModelConVar(bool print) {
 		columns[s].addTerm(1, C_Sum1);
 
 		K->block_solution(K->S[s]);
-		K->model->write("Generated Formulations/IPModel.lp");
+		//K->model->write("Generated Formulations/IPModel.lp");
 
 	}
 

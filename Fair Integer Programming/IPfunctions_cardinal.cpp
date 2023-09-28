@@ -12,7 +12,7 @@ void IPSolver::partition_cardinal(bool print) {
 		lin += I.v[I.n + j] * Y_var[j];
 	}
 	GRBConstr OPT_CONSTRAINT = model->addConstr(lin == opt);
-	model->write("Generated Formulations/IPModel.lp");
+	//model->write("Generated Formulations/IPModel.lp");
 
 
 	GRBLinExpr obj = 0;
@@ -32,9 +32,9 @@ void IPSolver::partition_cardinal(bool print) {
 	double length = ((double)(clock() - start_time) / CLK_TCK);
 
 	// Remove the constraint to enforce optimal objective value
-	model->write("Generated Formulations/IPModel.lp");
+	//model->write("Generated Formulations/IPModel.lp");
 	model->remove(OPT_CONSTRAINT);
-	model->write("Generated Formulations/IPModel.lp");
+	//model->write("Generated Formulations/IPModel.lp");
 
 
 	// Determine the number of agents in M
@@ -145,8 +145,10 @@ double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 		s.x = x;
 		s.y = y;
 		s.ID = 0; // We won't use the binary represenation of a solution for cardinal solutions
-		
-		check_solution_in_S_cardinal(s, print);
+
+		if (done_partition == false) {
+			check_solution_in_S_cardinal(s, print);
+		}
 	}
 	return z;
 }
@@ -157,7 +159,7 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 	bool found;
 	
 	solver_times++;
-	model->write("Generated Formulations/IPModel.lp");
+	//model->write("Generated Formulations/IPModel.lp");
 	model->optimize();
 	int status = model->get(GRB_IntAttr_Status);
 	double z;
@@ -226,7 +228,10 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 			s.y = y;
 			s.ID = 0; // We won't use the binary represenation of a solution for cardinal solutions
 
-			found = check_solution_in_S_cardinal(s, print);
+			found = false;
+			if (done_partition == false) {
+				found = check_solution_in_S_cardinal(s, print);
+			}
 		}
 	}
 	else {
@@ -254,6 +259,8 @@ IP_report IPSolver::solve_return_solution_MENU(bool print) {
 
 
 bool IPSolver::check_solution_in_S_cardinal(solution s, bool print) {
+	// This step is only needed during the partitioning phase, and no longer during, e.g., leximin
+
 	// Go through all existing optimal solutions to check whether solution is already in 'S'
 	bool found = false;
 	for (int i = 0; i < S.size(); i++) {

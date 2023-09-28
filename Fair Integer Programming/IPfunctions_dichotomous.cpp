@@ -335,8 +335,21 @@ IP_report IPSolver::solve_return_solution(bool print) {
 			}
 
 			// Add the solution to S if it is not yet in there
+
+			// Add solution to S if it wasn't already there.
+			s.x = x;
+			s.y = y;
+			s.ID = -1; // We no longer use ID, because it was not working for larger numbers...
+			found = false;
+			if (done_partition == false) {
+				found = check_solution_in_S_cardinal(s, print);
+			}
+			if (found == false) {
+				S.push_back(s);
+			}
 			
 
+			/*
 			// Compute the binary number represented by the solution.
 			int bin = 0;
 			int exponent = 0;
@@ -362,14 +375,7 @@ IP_report IPSolver::solve_return_solution(bool print) {
 					}
 				}
 			}
-
-			// Add solution to S
-			s.x = x;
-			s.y = y;
-			s.ID = bin;
-			if (found == false) {
-				S.push_back(s);
-			}
+			*/
 		}
 		else {
 			found = true;
@@ -1441,7 +1447,7 @@ solution IPSolver::RSD_heuristic_no_partition(std::vector<int> order, bool print
 
 void IPSolver::block_solution(solution sol) {
 	if (I.X_bool == true) {
-		GRBLinExpr expr = 0.0;
+		/*GRBLinExpr expr = 0.0;
 		int counter = 0;
 		for (int i = 0; i < I.n; i++) {
 			if (sol.x[i] == 1) {
@@ -1458,6 +1464,7 @@ void IPSolver::block_solution(solution sol) {
 		model->addConstr(expr <= (counter - 1));
 
 		//model->write("Generated Formulations/IPModel.lp");
+		*/
 	}
 	else {
 		// We are not aware of an elegant method to exclude a single solution when variables can take any integer values...
