@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	run_distribution_all_KE("L", 3600.0, 1, false);
+	//run_distribution_all_KE("L", 3600.0, 1, false);
 	//run_distribution_all_SWT("H", 50, 3600.0, 1000, false);
 	//compare_time_normal_RSD_SWT(1000, 50, false);
 	
@@ -43,7 +43,7 @@ int main()
 	I.X_integer = true;
 	*/
 	
-	/*
+	
 	KidneyExchange* KE = new KidneyExchange("40-instance-48", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
@@ -63,7 +63,7 @@ int main()
 	//K->compare_time_normal_vs_RSD_without_partition(5, true);
 	LotteryDesigner* L = new LotteryDesigner(K, false);
 
-	L->compare_methods("L", 10, true, false, 0);
+	L->compare_methods("ULRC", 1000, true, false, 0);
 	
 	//SimplicalDecomposition* SD = new SimplicalDecomposition(K, true);
 	//SD->SD_Nash(true);
@@ -71,5 +71,5 @@ int main()
 	//delete SD;
 	delete K;
 	//delete KE;
-	*/
+	
 }
