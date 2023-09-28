@@ -16,6 +16,32 @@ The code uses the Gurobi optimization software (version 10.0.0), and calls it fr
 [1]: https://support.gurobi.com/hc/en-us/articles/360013194392-How-do-I-configure-a-new-Gurobi-C-project-with-Microsoft-Visual-Studio-2017-
 [2]: https://www.gurobi.com/academia/academic-program-and-licenses/
 
+## Minimal working example for kidney exchange instances
+This is a minimal working example, which can simply be pasted into the `source.cpp` file:  
+
+```
+#include "Run_configurations.h"
+
+using namespace std;
+
+int main()
+{
+	KidneyExchange* KE = new KidneyExchange("40-instance-48", true);
+
+	inst I = KE->generate_instance(true, false);
+	
+	IPSolver* K = new IPSolver(I, true);
+	
+	K->analyze(false);
+	
+	LotteryDesigner* L = new LotteryDesigner(K, false);
+
+	L->compare_methods("ULRC", 1000, true, false, 0);
+	
+	delete K;	
+}
+```
+
 ## Use
 ### Creating an `inst` object for your formulation
 To use the code, the integer programming formulation must be transformed into an object of the structure `inst`. An instance of an `inst` object contains the following elements
@@ -71,9 +97,10 @@ L->compare_methods(string, 10, interactive_display, print, 0);
   A string such as `LCR` will compute the leximin, Nash, and RSD distributions, for example.
 * `interactive_display` is a boolean variable. If entered as `true`, you can see the menu of possible distributions to choose from.
 
-The resulting output could look this, for example, where the uniform, leximin, Nash, and RSD distributions have been computed.  
+The resulting output could look this for an instance with binary $X$-variables, where, for example, the uniform, leximin, Nash, and RSD distributions have been computed.  
 
 ![Example Output Distributions](https://github.com/DemeulemeesterT/Fair-Integer-Programming/assets/59369043/954b0065-070a-4991-a18c-f5221bfc5675)
+
 
   
 
