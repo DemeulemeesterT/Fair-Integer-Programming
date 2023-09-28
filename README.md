@@ -17,6 +17,7 @@ The code uses the Gurobi optimization software (version 10.0.0), and calls it fr
 [2]: https://www.gurobi.com/academia/academic-program-and-licenses/
 
 ## Use
+### Creating an `inst` object for your formulation
 To use the code, the integer programming formulation must be transformed into an object of the structure `inst`. An instance of an `inst` object contains the following elements
 * `m`: number of constraints in the model (integer)
 * `n`: number of agents, which we refer to as $X$-variables (integer)
@@ -32,17 +33,47 @@ To use the code, the integer programming formulation must be transformed into an
 * `X_integer`: boolean which is `true` if the $X$-variables are all integer
 * `data_name`: name of the formulation (optional)
 
+There are several ways to create an object of the `inst` structure, but this process is problem-specific and formulation-specific. The reason for this is that it is not clear from a given formulation which variables should be considered as $X$-variables (because they represent the agents in a certain problem), and which variables should be considered as auxiliary variables. For the cycle formulation of the kidney exchange problem, a code has been written to read data from a file (`KidneyExchange::read_data()`) and create the corresponding `inst` object (`KidneyExchange::generate_instance()`). This code can be used to guide you into writing your own code for a specific problem and a specific formulation.
+
+### Creating an `IPSolver*` object from your `inst` object
+Once you have your formulation as an `inst` object `I`, you should create an object of the class `IPSolver*` (this is a dynamic object) through the following command:  
+
+```
+IPSolver* K = new IPSolver(I, print);
+```  
+
+(The boolean `print` refer to whether or not you want to print output of the function on screen for the remainder of the code.)
+
+### Analyzing your formulation
+Now that we have the `IPSolver*` object, we can start analyzing our formulation.  
+* For binary $X$-variables (dichotomous preferences), we can find out using Proposition 1 from the paper which variables are selected in all, none, or in some but not in all of the optimal solutions.
+* For non-binary $X$-variables (cardinal preferences), we can find out the largest and the smallest value of each of the $X$-variables in any of the optimal solutions.
+
+For both analyses, we can simply call the following function of our `IPSolver*` object `K`:  
+
+```
+K->analyze(print);
+```
+
+### Finding the distributions over the optimal solutions
+Lastly, we want to find distributions over the optimal solutions. This can be done easily by the following two commands:
+
+```
+LotteryDesigner* L = new LotteryDesigner(K, print);
+L->compare_methods(string, 10, interactive_display, print, 0);
+```
+
+* `string` is a string that contains information about which distributions you want to compute. The most relevant distributions are referred to by the following letters:
+     * `U`: Uniform
+     * `L`: Leximin
+     * `C`: Nash Maximum Welfare
+     * `R`: Random Serial Dictatorship (RSD)  
+  A string such as `LCR` will compute the leximin, Nash, and RSD distributions, for example.
+* `interactive_display` is a boolean variable. If entered as `true`, you can see the menu of possible distributions to choose from.
+
+The resulting output could look this, for example, where the uniform, leximin, Nash, and RSD distributions have been computed.
+![Example Output Distributions](https://github.com/DemeulemeesterT/Fair-Integer-Programming/assets/59369043/954b0065-070a-4991-a18c-f5221bfc5675)
+
+  
 
 
-
-Most parameters for the code can be modified from the `Source.cpp` file. In that file, you can also declare for which type of symmetric $\alpha$-hedonic game and for which parameter values you want to generate an instance, if it exists. 
-* `q_vector` contains the values of $q$-size core stability for which you want to generate an instance.
-* `c_vector` contains the values of $c$-improvement core stability for which you want to generate an instance (denoted by $k$ in the paper).
-* `n_vector` contains the sizes of the blocking coalition (denoted by $m$ in the paper).
-
-You can either use the function `alpha_hedonic_game()` and specify the $\alpha$-vector,or use the already existing functions for symmetric fraction hedonic games, symmetric modified fractional hedonic games, and symmetric additively separable hedonic games already exists.
-
-In the code, the default setting is that $u_i(\mathcal{C}) = 1$ for all agents $i$ in the blocking coalition, and that the utilities of the agents, which are denoted by the `X`-variables in the code, are real numbers greater than zero. However, both assumptions can be changed in the `alpha_hedonic_game.cpp` file (or the correct file for alternative subclasses of symmetric hedonic games).
-
-* To change $u_i(\mathcal{C})$, comment out the `model.addConstr(V[i] == 1);` line. To restrict the solution space, we recommend fixing `V[i]`, which represents $u_i(\mathcal{C})$, for at least one of the agents.
-* To restrict the utilities to be binary, for example, replace the line `X[i][j] = model.addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS, name_x);` by `X[i][j] = model.addVar(0.0, GRB_INFINITY, 0.0, GRB_BINARY, name_x);`. One could also impose alternative lower or upper bounds on the allowed utilities by modifying the first two values in the declaration of the `X`-variables.
