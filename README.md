@@ -20,8 +20,6 @@ The code uses the Gurobi optimization software (version 10.0.0), and calls it fr
 This is a minimal working example, which can simply be pasted into the `source.cpp` file:  
 
 ```
-#include "Run_configurations.h"
-
 using namespace std;
 
 int main()
