@@ -1113,7 +1113,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 				}
 				else if (letter == "C") {
 					SimplicalDecomposition* SD = new SimplicalDecomposition(K, false);
-					L.push_back(SD->Nash_CG(false));
+					L.push_back(SD->Nash_CG(true));
 					delete SD;
 				}
 			}

@@ -227,11 +227,14 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 	//model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
+	//model->write("Generated Formulations/SDNashMaster.lp");
+
 	if (print) {
 		printf("\n\n\n For Nash, it is very important that, for every agent in M,\nthere are at least two optimal solutions in which the utility of the agent differs that are included in the initial subset.\n");
 		printf(" Therefore, we will initiate the solution set with the optimal solutions found during the partitioning of the agents.\n\n");
 
-	}K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	}
+	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	int counter;
 
@@ -255,7 +258,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 		if (K->M[i] == 1) {
 			char name_log_p[13];
 			sprintf_s(name_log_p, "log_p_%i", i);
-			log_p[counter] = model->addVar(-GRB_INFINITY, 0.0, 1.0, GRB_CONTINUOUS, name_log_p);
+			log_p[counter] = model->addVar(-GRB_INFINITY, GRB_INFINITY, 1.0, GRB_CONTINUOUS, name_log_p);
 			// Note that each of the variables has objective coefficient 1, as we want to maximize the sum of the log_p variables
 			counter++;
 		}
@@ -295,8 +298,8 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 		for (int i = 0; i < K->I.n; i++) {
 			if (K->M[i] == 1) {
 				// It only makes sense to include the agents in 'M'
-				if (K->S[s].x[i] == 1) {
-					columns[s].addTerm(1, C_p[counter]);
+				if (K->S[s].x[i] > K->Xmin[i]) {
+					columns[s].addTerm(K->S[s].x[i], C_p[counter]);
 				}
 				counter++;
 			}
@@ -348,6 +351,12 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 			printf("ITERATION %i\n", iterations);
 		}
 		model->optimize();
+		int status = model->get(GRB_IntAttr_Status);
+		if (status == 3) {
+			model->computeIIS();
+			model->write("Generated Formulations/Nash_IIS.ilp");
+		}
+		
 		obj_val_master = model->get(GRB_DoubleAttr_ObjVal);
 
 		// Get the values of the p-variables
@@ -433,7 +442,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 					// This will block entire solution (including agents in Y and y-variables)
 
 				// Block the found solution
-				GRBLinExpr lin = 0;
+				/*GRBLinExpr lin = 0;
 				int counter = 0;
 				for (int i = 0; i < IP_R.s.x.size(); i++) {
 					if (K->M[i] == 1) { // If the agent is in M, that's the only case in which it matters
@@ -445,7 +454,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 				}
 				K->model->addConstr(lin <= (counter - 1));
 				//K->model->update();
-
+				*/
 			}
 		}
 		else {
@@ -503,8 +512,8 @@ void SimplicalDecomposition::addColumn(solution sol, bool print) {
 	for (int i = 0; i < K->I.n; i++) {
 		if (K->M[i] == 1) {
 			// It only makes sense to include the agents in 'M'
-			if (sol.x[i] == 1) {
-				col.addTerm(1, C_p[counter]);
+			if (sol.x[i] > K->Xmin[i]) {
+				col.addTerm(sol.x[i], C_p[counter]);
 			}
 			counter++;
 		}

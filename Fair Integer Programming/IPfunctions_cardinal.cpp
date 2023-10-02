@@ -221,11 +221,17 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 
 		if (obj_val >= opt - 0.00001) {
 			// Add the solution to S if it is not yet in there
-			solution s;
+			//solution s;
 
-			// Add solution to S
-			s.x = x;
-			s.y = y;
+			// Add solution to S (needs to be a deep copy)
+			for (int i = 0; i < I.n; i++) {
+				s.x[i] = x[i];
+			}
+			for (int i = 0; i < I.t; i++) {
+				s.y[i] = y[i];
+			}
+			//s.x = x;
+			//s.y = y;
 			s.ID = 0; // We won't use the binary represenation of a solution for cardinal solutions
 
 			found = false;
@@ -241,7 +247,14 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 
 	done_solve = true;
 
-	IP_R.s = s;
+
+	for (int i = 0; i < I.n; i++) {
+		IP_R.s.x[i] = s.x[i];
+	}
+	for (int i = 0; i < I.t; i++) {
+		IP_R.s.y[i] = s.y[i];
+	}
+	//IP_R.s = s;
 	IP_R.opt_obj_value = z;
 	IP_R.solution_already_in_S = found;
 	return IP_R;

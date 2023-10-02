@@ -1,0 +1,24 @@
+\ Model (null)_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Maximize
+  0 log_p_0 + 0 log_p_1 + 0 log_p_2
+Subject To
+ R0: w_0 + w_1 + w_2 = 1
+ R1: - p_0 + 2 w_1 = 0
+ R2: - p_1 + 4 w_2 = 0
+ R3: - p_2 + 8 w_0 = 0
+Bounds
+ p_0 free
+ p_1 free
+ p_2 free
+ -infinity <= log_p_0 <= 0
+ -infinity <= log_p_1 <= 0
+ -infinity <= log_p_2 <= 0
+ w_0 free
+ w_1 free
+ w_2 free
+General Constraints
+ GC0: log_p_0 = LOG ( p_0 )
+ GC1: log_p_1 = LOG ( p_1 )
+ GC2: log_p_2 = LOG ( p_2 )
+End
