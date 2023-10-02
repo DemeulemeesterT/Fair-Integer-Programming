@@ -30,6 +30,9 @@ public:
 	GRBVar* p;
 	// p[i] = Probability of being selected for agent 'dict[p]'
 	// P[i] variables are only created for agents i \in M (who are selected in some but not in all of the optimal solutions)
+		// CAREFUL! For non-binary X-variables, the variable p[i] will be equal to the expected
+		// value of the X[i]-variable in the resulting distribution
+		// MINUS the dystopia point of agent i, namely the minimal outcome she experiences in any of the optimal solutions.
 
 	std::vector<int> dict;
 	// dict[i] contains which agent is represented by variable p[i]
@@ -47,8 +50,8 @@ public:
 	lottery SD_Nash(bool print);
 		// Returns the lottery that maximizes the Nash Social Welfare solution using the simplical decomposition technique
 
-	lottery Nash_CG_Flanigan(bool print);
-		// Adopts the column generation procedure described by Flanigan et al. (2021) in Nature
+	lottery Nash_CG(bool print);
+		// Adopts the column generation procedure similar to Flanigan et al. (2021)
 		// Two differences with SD_Nash:
 			// Objective function of the pricing problem is simply the sum of the selected dual variables
 			// Stopping criterion is different: check if there's a solution that's already included

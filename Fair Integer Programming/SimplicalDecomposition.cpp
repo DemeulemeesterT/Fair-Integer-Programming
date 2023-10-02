@@ -223,13 +223,13 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 	return L;
 }
 
-lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
+lottery SimplicalDecomposition::Nash_CG(bool print) {
 	//model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	if (print) {
-		printf("\n\n\n For Nash, it is very important that every agent in M is at least selected in one of the optimal solutions that is used to initiate the Simplical Decomposition.\n");
-		printf(" Therefore, we will initiate the solution set with a greedy covering of the agents.\n\n");
+		printf("\n\n\n For Nash, it is very important that, for every agent in M,\nthere are at least two optimal solutions in which the utility of the agent differs that are included in the initial subset.\n");
+		printf(" Therefore, we will initiate the solution set with the optimal solutions found during the partitioning of the agents.\n\n");
 
 	}K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
@@ -242,13 +242,14 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 	L.S = std::vector<solution>();
 
 	// Check if greedy partition has been done, and do if needed.
-	if (K->done_greedy_partition == false) {
-		K->greedy_partition(false);
-	}
+	//if (K->done_greedy_partition == false) {
+	//	K->greedy_partition(false);
+	//}
+		// We used this when the X-variables were binary.
 
 	// INTRODUCE SPECIFIC VARIABLES AND CONSTRAINTS TO IMPLEMENT NASH
 	GRBVar* log_p = new GRBVar[K->M_size];
-	// The logarithms of 'p'
+	// The logarithms of 'p[i]' - Xmin[i]
 	counter = 0;
 	for (int i = 0; i < K->I.n; i++) {
 		if (K->M[i] == 1) {
@@ -288,13 +289,13 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 	//model->write("Generated Formulations/SDNashMaster.lp");
 
 	// Add the columns
-	columns.resize(K->S_greedy.size());
-	for (int s = 0; s < K->S_greedy.size(); s++) {
+	columns.resize(K->S.size());
+	for (int s = 0; s < K->S.size(); s++) {
 		counter = 0;
 		for (int i = 0; i < K->I.n; i++) {
 			if (K->M[i] == 1) {
 				// It only makes sense to include the agents in 'M'
-				if (K->S_greedy[s].x[i] == 1) {
+				if (K->S[s].x[i] == 1) {
 					columns[s].addTerm(1, C_p[counter]);
 				}
 				counter++;
@@ -303,15 +304,15 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 		// And for the constraint that forces the sum of the weights to be equal to one
 		columns[s].addTerm(1, C_Sum1);
 
-		K->block_solution(K->S_greedy[s]);
+		//K->block_solution(K->S_greedy[s]);
 
 		// Add the solution to the resulting lottery:
-		L.S.push_back(K->S_greedy[s]);
+		L.S.push_back(K->S[s]);
 	}
 
 	//model->write("Generated Formulations/SDNashMaster.lp");
 
-	for (int i = 0; i < K->S_greedy.size(); i++) {
+	for (int i = 0; i < K->S.size(); i++) {
 		char name_w[13];
 		sprintf_s(name_w, "w_%i", i);
 		w.push_back(model->addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, columns[i], name_w));
@@ -342,7 +343,7 @@ lottery SimplicalDecomposition::Nash_CG_Flanigan(bool print) {
 
 	bool finished = false;
 	while (finished == false) {
-		//model->write("Generated Formulations/SDNashMaster.lp");
+		model->write("Generated Formulations/SDNashMaster.lp");
 		if (print) {
 			printf("ITERATION %i\n", iterations);
 		}
@@ -528,6 +529,11 @@ SimplicalDecomposition::SimplicalDecomposition(IPSolver* K_in, bool print) {
 	model = new GRBModel(*env);
 	env->set(GRB_StringParam_LogFile, "Generated Log-files/SimplicalDecompositionMaster.log");
 
+	// Check if partitioning is done, and do if needed.
+	if (K->done_partition == false) {
+		K->partition(false);
+	}
+
 	// Create the P-variables
 	p = new GRBVar[K->M_size];
 	dict = std::vector<int>();
@@ -537,7 +543,9 @@ SimplicalDecomposition::SimplicalDecomposition(IPSolver* K_in, bool print) {
 			dict.push_back(i);
 			char name_p[13];
 			sprintf_s(name_p, "p_%i", i);
-			p[counter] = model->addVar(0.0, 1.0, 0.0, GRB_CONTINUOUS, name_p);
+			// This means we know the lowest and highest values of the X-variables in the optimal solutions
+			p[counter] = model->addVar(K->Xmin[i], K->Xmax[i], 0.0, GRB_CONTINUOUS, name_p);
+			
 			counter++;
 		}
 	}
@@ -550,7 +558,8 @@ SimplicalDecomposition::SimplicalDecomposition(IPSolver* K_in, bool print) {
 	C_p = new GRBConstr[K->M.size()];
 	counter = 0;
 	for (int i = 0; i < dict.size(); i++) {
-		C_p[counter] = model->addConstr(-p[i] == 0.0);
+		C_p[counter] = model->addConstr(-p[i] - K->Xmin[i] == 0.0);
+			// We compare to the 'dystopia point', the minimum value that agent i receives in any of the optimal solutions.
 		counter++;
 	}
 

@@ -26,7 +26,7 @@ int main()
 	//std::vector<reportGreedy> RG;
 	//RG = run_Kidney_exchange_all(true);
 
-	/*
+	
 	// INSTANCE TO TEST CARDINAL MODEL
 	inst I;
 	I.m = 1;
@@ -41,14 +41,14 @@ int main()
 	I.Y_integer = false;
 	I.X_bool = false;
 	I.X_integer = true;
-	*/
 	
 	
+	/*
 	KidneyExchange* KE = new KidneyExchange("40-instance-48", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
 	inst I = KE->generate_instance(true, false);
-	
+	*/
 	IPSolver* K = new IPSolver(I, true);
 	//K->compare_time_normal_vs_RSD_variants(50, true);
 	
@@ -63,7 +63,7 @@ int main()
 	//K->compare_time_normal_vs_RSD_without_partition(5, true);
 	LotteryDesigner* L = new LotteryDesigner(K, false);
 
-	L->compare_methods("ULRC", 1000, true, false, 0);
+	L->compare_methods("LC", 1000, true, false, 0);
 	
 	//SimplicalDecomposition* SD = new SimplicalDecomposition(K, true);
 	//SD->SD_Nash(true);

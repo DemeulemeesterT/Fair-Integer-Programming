@@ -1060,10 +1060,10 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 				printf("\t H = RSD heuristic\n");
 				printf("\t O = Re-index the variables randomly\n");
 				printf("\t P = Perturb the objective function randomly\n");
-				printf("\t N = Nash solution (maximizes the geometric mean) - HEURISTIC\n");
-				printf("\t S = Nash solution (maximizes the geometric mean) - SIMPLICAL DECOMPOSITION\n");
-				printf("\t Q = Nash solution (maximizes the geometric mean) - LP-relaxation\n");
-				printf("\t C = Nash solution (maximizes the geometric mean) - Column generation (Flanigan et al., 2021)\n");
+				//printf("\t N = Nash solution (maximizes the geometric mean) - HEURISTIC\n");
+				//printf("\t S = Nash solution (maximizes the geometric mean) - SIMPLICAL DECOMPOSITION\n");
+				//printf("\t Q = Nash solution (maximizes the geometric mean) - LP-relaxation\n");
+				printf("\t C = Nash solution (maximizes the geometric mean) - Column generation\n");
 				printf(" ****************************************************************************\n\n\t ");
 				std::cin >> s;				
 			}
@@ -1113,7 +1113,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 				}
 				else if (letter == "C") {
 					SimplicalDecomposition* SD = new SimplicalDecomposition(K, false);
-					L.push_back(SD->Nash_CG_Flanigan(false));
+					L.push_back(SD->Nash_CG(false));
 					delete SD;
 				}
 			}
