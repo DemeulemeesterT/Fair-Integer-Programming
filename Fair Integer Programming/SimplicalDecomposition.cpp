@@ -365,6 +365,12 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 			p_values.push_back(p[i].get(GRB_DoubleAttr_X));
 		}
 
+		// Get the values of the w-variables
+		std::vector<double> w_values;
+		for (int i = 0; i < L.S.size(); i++) {
+			w_values.push_back(w[i].get(GRB_DoubleAttr_X));
+		}
+
 		// Determine the value of the gradient evaluated at the solution
 		std::vector<double> gradient = gradientNash(p_values, print);
 
@@ -390,7 +396,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 
 		K->model->setObjective(obj, GRB_MAXIMIZE);
-		//K->model->write("Generated Formulations/IPModel.lp");
+		K->model->write("Generated Formulations/IPModel.lp");
 		IP_report IP_R = K->solve_return_solution_MENU(print);
 			// IP_report contains only the optimal objective function and an optimal solution (see definition IPSolver.h)
 
@@ -400,31 +406,34 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 		if (K->model->get(GRB_IntAttr_Status) != 3) { // If pricing problem not infeasible
 
 			// Check for all solutions that are already included in the master problem what their objective value for this gradient would be
+			// We only need to check for solutions with a positive weight w
 			double best_value = -1e30;
 			int j = 0;
 			while (j < L.S.size()) {
-				double sol_obj = 0.0;
-				counter = 0;
-				for (int k = 0; k < K->I.n; k++) {
-					if (K->M[k] == 1) {
-						if (L.S[j].x[k] == 1) {
-							sol_obj += gradient[counter];
-							if (print) {
-								printf("\t Existing solution obj: %.4f\n", sol_obj);
+				if (w_values[j] > 0) {
+					double sol_obj = 0.0;
+					counter = 0;
+					for (int k = 0; k < K->I.n; k++) {
+						if (K->M[k] == 1) {
+							if (L.S[j].x[k] > K->Xmin[k]) {
+								sol_obj += gradient[counter] * (L.S[j].x[k] - K->Xmin[k]);
+								if (print) {
+									printf("\t Existing solution obj: %.4f\n", sol_obj);
+								}
 							}
+							counter++;
 						}
-						counter++;
 					}
-				}
 
-				if (sol_obj > best_value) {
-					best_value = sol_obj;
-				}
-				if (best_value > obj_val_pricing - 0.0001) {
-					finished = true;
-					j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
-					if (print) {
-						printf("\n\n The optimal solution has been found.\n");
+					if (sol_obj > best_value) {
+						best_value = sol_obj;
+					}
+					if (best_value > obj_val_pricing - 0.0001) {
+						finished = true;
+						j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
+						if (print) {
+							printf("\n\n The optimal solution has been found.\n");
+						}
 					}
 				}
 

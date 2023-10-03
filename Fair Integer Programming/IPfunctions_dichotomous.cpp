@@ -1026,6 +1026,8 @@ void IPSolver::identical_cluster(bool print) {
 solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 	solution sol;
 	RSD_fixed = std::vector<GRBConstr>();
+	model->write("Generated Formulations/ModelRSD.lp");
+
 	
 	// We only want to permute the agents in 'M', because letting the agents in 'Y' or 'N' 
 	// choose among the optimal solutions will not have an impact.
@@ -1045,141 +1047,180 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 		sol.x = std::vector<double>(I.n, 0);
 		sol.y = std::vector<double>(I.t, 0);
 
-		// For the agents in 'Y' and 'N' we already know the solution values.
-		for (int i = 0; i < I.n; i++) {
-			if (Y[i] == 1) {
-				sol.x[i] = (bool) 1;
-			}
-			else if (N[i] == 1) {
-				sol.x[i] = (bool) 0;
-			}
-		}
-
-
-		// Taking into account the precision of the solver, we will perturb in different steps
-		// For a precision of 1e-6, we can perturb \floor(-log_2(1e-6)) = 19 agents at once
-			// This parameter is defined in the function 'InitializeVariables'
-		double z;
-		for (int j = 0; j < M_size; j=j+number_of_agents_at_once_RSD) {
-
-			obj = 0.0;
-
-			// Build the objective function 
+		// Fix the values of the agents not in 'M'
+		
+		if (I.X_bool == true) {
+			// For the agents in 'Y' and 'N' we already know the solution values
 			for (int i = 0; i < I.n; i++) {
-				obj += I.v[i] * X[i];
-			}
-
-			// Now we go through 'order' from the beginning, and shift the objective function accordingly.
-			for (int i = j; i < j+number_of_agents_at_once_RSD; i++) {
-				if (i < order.size()) {
-					counter++;
-					delta = delta * 0.5;
-					obj += (delta)*X[order[i]];
+				if (Y[i] == 1) {
+					sol.x[i] = (bool)1;
 				}
-				else {
-					i = j + number_of_agents_at_once_RSD;
+				else if (N[i] == 1) {
+					sol.x[i] = (bool)0;
 				}
 			}
-
-			// Lastly, add the objective coefficients of the Y-variables
-			for (int i = 0; i < I.t; i++) {
-				obj += I.v[I.n + i] * Y_var[i];
-			}
-
-			model->setObjective(obj, GRB_MAXIMIZE);
-			//model->write("Generated Formulations/ModelRSD.lp");
-
-			// Optimize
-			model->optimize();
-			int status = model->get(GRB_IntAttr_Status);
-			GRBLinExpr expr;
-			if (status != 3) { // If feasible
-				for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
-					if (i < order.size()) {
-						sol.x[order[i]] = (bool)X[order[i]].get(GRB_DoubleAttr_X);
-					}
-					else {
-						i = j + number_of_agents_at_once_RSD;
-					}
-				}
-				//for (int j = 0; j < I.n; j++) {
-					/*if (Y[j] == 1) { // Checking this saves us a bit of time on the expensive .get function
-						sol.x[j] = (bool)1;
-					}
-					else if (N[j] == 1) {
-						sol.x[j] = (bool)0;
-					}
-					else {
-						sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
-					}*/
-
-					//sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
-
-				//}
-				for (int i = 0; i < I.t; i++) {
-					sol.y[i] = Y_var[i].get(GRB_DoubleAttr_X);
-				}
-
-				z = model->get(GRB_DoubleAttr_ObjVal);
-
-				// Fix the variables by adding constraints:
-				for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
-					if (i < order.size()) {
-						expr = 0.0;
-						expr = X[order[i]];
-						//model->write("Generated Formulations/ModelRSD.lp");
-						RSD_fixed.push_back(model->addConstr(expr == (int)sol.x[order[i]]));
-						//model->write("Generated Formulations/ModelRSD.lp");
-					}
-					else {
-						i = j + number_of_agents_at_once_RSD;
-					}
-				}
-			}
-		}
-
-
-		// Compute the binary number represented by the solution.
-		int bin = 0;
-		int exponent = 0;
-		int exponent_sum = 0;
-		for (int i = I.n - 1; i > -1; i--) {
-			if (sol.x[i] == true) {
-				bin += pow(2, exponent);
-				exponent_sum += exponent;
-			}
-			exponent++;
-		}
-		if (exponent_sum <= 80) {
-			sol.ID = bin;
 		}
 		else {
-			sol.ID = -1;
-		}
-
-		// Delete the constraints that were added to fix the variables
-		for (int i = M_size - 1; i > -1; i--) {
-			//model->write("Generated Formulations/ModelRSD.lp");
-			model->remove(RSD_fixed[i]);
-			//model->write("Generated Formulations/ModelRSD.lp");
+			// We only know that Xmin[i] = Xmax[i] for the agents that are not in 'M'
+			for (int i = 0; i < I.n; i++) {
+				if (M[i] == 0) {
+					sol.x[i] = Xmin[i];
+				}
+			}
 
 		}
-		RSD_fixed.clear();
 
+		// The way in which we will execute RSD depends on the type of 'X'-variables
+			// For binary variables, we will perturb the objective function with inverse powers of 2
+			// For non-binary variables, we will simply, iteratively, maximize the next agent's
+			// variable in the original problem, fix its optimal value, and continue.
+		
+		if (I.X_bool == true) {
+			// Taking into account the precision of the solver, we will perturb in different steps
+			// For a precision of 1e-6, we can perturb \floor(-log_2(1e-6)) = 19 agents at once
+				// This parameter is defined in the function 'InitializeVariables'
+			double z;
+			for (int j = 0; j < M_size; j = j + number_of_agents_at_once_RSD) {
+
+				obj = 0.0;
+
+				// Build the objective function 
+				for (int i = 0; i < I.n; i++) {
+					obj += I.v[i] * X[i];
+				}
+
+				// Now we go through 'order' from the beginning, and shift the objective function accordingly.
+				for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
+					if (i < order.size()) {
+						counter++;
+						delta = delta * 0.5;
+						obj += (delta)*X[order[i]];
+					}
+					else {
+						i = j + number_of_agents_at_once_RSD;
+					}
+				}
+
+				// Lastly, add the objective coefficients of the Y-variables
+				for (int i = 0; i < I.t; i++) {
+					obj += I.v[I.n + i] * Y_var[i];
+				}
+
+				model->setObjective(obj, GRB_MAXIMIZE);
+				//model->write("Generated Formulations/ModelRSD.lp");
+
+				// Optimize
+				model->optimize();
+				int status = model->get(GRB_IntAttr_Status);
+				GRBLinExpr expr;
+				if (status != 3) { // If feasible
+					for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
+						if (i < order.size()) {
+							sol.x[order[i]] = (bool)X[order[i]].get(GRB_DoubleAttr_X);
+						}
+						else {
+							i = j + number_of_agents_at_once_RSD;
+						}
+					}
+					//for (int j = 0; j < I.n; j++) {
+						/*if (Y[j] == 1) { // Checking this saves us a bit of time on the expensive .get function
+							sol.x[j] = (bool)1;
+						}
+						else if (N[j] == 1) {
+							sol.x[j] = (bool)0;
+						}
+						else {
+							sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
+						}*/
+
+						//sol.x[j] = (bool)X[j].get(GRB_DoubleAttr_X);
+
+					//}
+					for (int i = 0; i < I.t; i++) {
+						sol.y[i] = Y_var[i].get(GRB_DoubleAttr_X);
+					}
+
+					z = model->get(GRB_DoubleAttr_ObjVal);
+
+					// Fix the variables by adding constraints:
+					for (int i = j; i < j + number_of_agents_at_once_RSD; i++) {
+						if (i < order.size()) {
+							expr = 0.0;
+							expr = X[order[i]];
+							//model->write("Generated Formulations/ModelRSD.lp");
+							RSD_fixed.push_back(model->addConstr(expr == (int)sol.x[order[i]]));
+							//model->write("Generated Formulations/ModelRSD.lp");
+						}
+						else {
+							i = j + number_of_agents_at_once_RSD;
+						}
+					}
+				}
+			}
+
+
+			// Compute the binary number represented by the solution.
+			int bin = 0;
+			int exponent = 0;
+			int exponent_sum = 0;
+			for (int i = I.n - 1; i > -1; i--) {
+				if (sol.x[i] == true) {
+					bin += pow(2, exponent);
+					exponent_sum += exponent;
+				}
+				exponent++;
+			}
+			if (exponent_sum <= 80) {
+				sol.ID = bin;
+			}
+			else {
+				sol.ID = -1;
+			}
+
+			// Delete the constraints that were added to fix the variables
+			for (int i = M_size - 1; i > -1; i--) {
+				//model->write("Generated Formulations/ModelRSD.lp");
+				model->remove(RSD_fixed[i]);
+				//model->write("Generated Formulations/ModelRSD.lp");
+
+			}
+			RSD_fixed.clear();
+		}
+
+		else {
+			// This is when the 'X'-variables are not binary
+			for (int j = 0; j < M_size; j++) {
+				// Maximize the value of the j-th agent in the order
+				obj = X[order[j]];
+				
+			}
+
+		}
 	}
 	else {
 		sol.x = std::vector<double>(I.n, 0);
 		sol.y = std::vector<double>(I.t, 0);
 
-		// We know for each agent whether they are selected or not
-		for (int i = 0; i < I.n; i++) {
-			if (Y[i] == 1) {
-				sol.x[i] = 1;
-				model->addConstr(X[i] == 1);
+		// For binary 'X'-variables
+		if (I.X_bool == true) {
+			// We know for each agent whether they are selected or not
+			for (int i = 0; i < I.n; i++) {
+				if (Y[i] == 1) {
+					sol.x[i] = 1;
+					model->addConstr(X[i] == 1);
+				}
+				else {
+					//sol.x[i] = 0; // Already true because of the initialization of sol.x
+					model->addConstr(X[i] == 0);
+				}
 			}
-			else {
-				//sol.x[i] = 0; // Already true because of the initialization of sol.x
-				model->addConstr(X[i] == 0);
+		}
+		else {
+			// For non-binary 'X'-variables
+				// Because no agent is in 'M', all agent values are equal to Xmin[i] = Xmax[i]
+			for (int i = 0; i < I.n; i++) {
+				sol.x[i] = Xmin[i];
+				model->addConstr(X[i] == Xmin[i]);
 			}
 		}
 
@@ -1197,20 +1238,25 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 		}
 
 		// Compute the binary number represented by the solution.
-		int bin = 0;
-		int exponent = 0;
-		int exponent_sum = 0;
-		for (int i = I.n - 1; i > -1; i--) {
-			if (sol.x[i] == true) {
-				bin += pow(2, exponent);
-				exponent_sum += exponent;
+		if (I.X_bool == true) {
+			int bin = 0;
+			int exponent = 0;
+			int exponent_sum = 0;
+			for (int i = I.n - 1; i > -1; i--) {
+				if (sol.x[i] == true) {
+					bin += pow(2, exponent);
+					exponent_sum += exponent;
+				}
+				exponent++;
 			}
-			exponent++;
+			if (exponent_sum <= 80) {
+				sol.ID = bin;
+			}
+			else {
+				sol.ID = -1;
+			}
 		}
-		if (exponent_sum <= 80) {
-			sol.ID = bin;
-		}
-		else {
+		else { // We don't use the ID for non-binary 'X'-variables.
 			sol.ID = -1;
 		}
 	}

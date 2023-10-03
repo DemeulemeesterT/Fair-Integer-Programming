@@ -60,13 +60,11 @@ int main()
 	//K->partition(true);
 	K->analyze(false);
 
-	//K->Xmin[2] = 4;
-
 	//K->compare_partition_vs_greedy(true);
 	//K->compare_time_normal_vs_RSD_without_partition(5, true);
 	LotteryDesigner* L = new LotteryDesigner(K, false);
 
-	L->compare_methods("LC", 1000, true, false, 0);
+	L->compare_methods("R", 1000, true, false, 0);
 	
 	//SimplicalDecomposition* SD = new SimplicalDecomposition(K, true);
 	//SD->SD_Nash(true);

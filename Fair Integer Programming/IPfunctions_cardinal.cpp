@@ -156,7 +156,10 @@ double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 	IP_report IP_R;
 	solution s;
-	bool found;
+	bool found = false;
+
+	std::vector<double> x(I.n, 0);
+	std::vector<double> y(I.t, 0);
 	
 	solver_times++;
 	//model->write("Generated Formulations/IPModel.lp");
@@ -167,7 +170,6 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 		z = model->get(GRB_DoubleAttr_ObjVal);
 
 		// Store solution
-		std::vector<double> x(I.n, 0);
 		if (I.X_integer == true) {
 			for (int j = 0; j < I.n; j++) {
 				x[j] = (int)X[j].get(GRB_DoubleAttr_X);
@@ -179,7 +181,6 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 			}
 		}
 
-		std::vector<double> y(I.t, 0);
 		if (I.Y_integer == true) {
 			for (int j = 0; j < I.t; j++) {
 				y[j] = (int)Y_var[j].get(GRB_DoubleAttr_X);
@@ -219,26 +220,19 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 			obj_val += I.v[I.n + i] * y[i];
 		}
 
-		if (obj_val >= opt - 0.00001) {
-			// Add the solution to S if it is not yet in there
-			//solution s;
+		// Add the solution to S if it is not yet in there
+		//solution s;
 
-			// Add solution to S (needs to be a deep copy)
-			for (int i = 0; i < I.n; i++) {
-				s.x[i] = x[i];
-			}
-			for (int i = 0; i < I.t; i++) {
-				s.y[i] = y[i];
-			}
-			//s.x = x;
-			//s.y = y;
-			s.ID = 0; // We won't use the binary represenation of a solution for cardinal solutions
+		// Add solution to solution report
+		IP_R.s.x = x;
+		IP_R.s.y = y;
+		IP_R.s.ID = 0; // We won't use the binary represenation of a solution for cardinal solutions
 
-			found = false;
-			if (done_partition == false) {
-				found = check_solution_in_S_cardinal(s, print);
-			}
+		found = false;
+		if (done_partition == false) {
+			found = check_solution_in_S_cardinal(s, print);
 		}
+
 	}
 	else {
 		z = 11223344;
@@ -247,13 +241,13 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 
 	done_solve = true;
 
-
+	/*
 	for (int i = 0; i < I.n; i++) {
 		IP_R.s.x[i] = s.x[i];
 	}
 	for (int i = 0; i < I.t; i++) {
 		IP_R.s.y[i] = s.y[i];
-	}
+	}*/
 	//IP_R.s = s;
 	IP_R.opt_obj_value = z;
 	IP_R.solution_already_in_S = found;
