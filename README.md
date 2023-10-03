@@ -34,7 +34,7 @@ int main()
 	
 	LotteryDesigner* L = new LotteryDesigner(K, false);
 
-	L->compare_methods("ULRC", 1000, true, false, 0);
+	std::vector<lottery> results = L->compare_methods("ULRC", 1000, true, false, 0);
 	
 	delete K;	
 }
@@ -100,6 +100,9 @@ The resulting output could look this for an instance with binary $X$-variables, 
 ![Example Output Distributions](https://github.com/DemeulemeesterT/Fair-Integer-Programming/assets/59369043/954b0065-070a-4991-a18c-f5221bfc5675)
 
 
-  
+### Extracting selection probabilities of optimal solutions
+To view the selection probabilities of the optimal solutions for the computed distributions, you can query information from the created vector of `lottery` objects that is returned by the function `compare_methods` in the object of the class `Lotterydesigner*`.
+
+
 
 
