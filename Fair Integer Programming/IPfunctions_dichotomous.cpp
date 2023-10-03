@@ -1026,8 +1026,6 @@ void IPSolver::identical_cluster(bool print) {
 solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 	solution sol;
 	RSD_fixed = std::vector<GRBConstr>();
-	model->write("Generated Formulations/ModelRSD.lp");
-
 	
 	// We only want to permute the agents in 'M', because letting the agents in 'Y' or 'N' 
 	// choose among the optimal solutions will not have an impact.
@@ -1189,12 +1187,57 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 
 		else {
 			// This is when the 'X'-variables are not binary
+
+			// First, we impose that the found solution should be optimal to the original objective value
+			// Enforce the model to find the optimal objective value
+			GRBLinExpr lin = 0.0;
+			for (int j = 0; j < I.n; j++) {
+				lin += I.v[j] * X[j];
+			}
+			for (int j = 0; j < I.t; j++) {
+				lin += I.v[I.n + j] * Y_var[j];
+			}
+			GRBConstr CON_OPT = model->addConstr(lin == opt);
+
+			// Go through all agents in 'M', which is the number of agents in the order by now
 			for (int j = 0; j < M_size; j++) {
 				// Maximize the value of the j-th agent in the order
 				obj = X[order[j]];
+				model->setObjective(obj, GRB_MAXIMIZE);
 				
+				model->optimize();
+				int status = model->get(GRB_IntAttr_Status);
+				GRBLinExpr expr;
+				if (status != 3) { // If feasible
+					// We only care about value of the variable that we maximized
+					double x_var_max = X[order[j]].get(GRB_DoubleAttr_X);
+
+					// We can already store this value in 'sol'
+					sol.x[order[j]] = x_var_max;
+
+					// If we are in the last step, we can also fix the values of the 'Y'-variables
+					if (j == M_size - 1) {
+						for (int i = 0; i < I.t; i++) {
+							sol.y[i] = Y_var[i].get(GRB_DoubleAttr_X);
+						}
+					}
+					
+					// Add constraint to enforce the value for the maximized 'X'-variable
+					expr = X[order[j]];
+					RSD_fixed.push_back(model->addConstr(expr == x_var_max));
+					//model->write("Generated Formulations/ModelRSD.lp");
+				}
 			}
 
+			// Remove constraints that were added during the process
+			model->remove(CON_OPT);;
+
+			// Delete the constraints that were added to fix the variables
+			for (int i = M_size - 1; i > -1; i--) {
+				//model->write("Generated Formulations/ModelRSD.lp");
+				model->remove(RSD_fixed[i]);
+				//model->write("Generated Formulations/ModelRSD.lp");
+			}
 		}
 	}
 	else {

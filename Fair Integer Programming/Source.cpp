@@ -64,7 +64,7 @@ int main()
 	//K->compare_time_normal_vs_RSD_without_partition(5, true);
 	LotteryDesigner* L = new LotteryDesigner(K, false);
 
-	L->compare_methods("R", 1000, true, false, 0);
+	L->compare_methods("RLC", 1000, true, false, 0);
 	
 	//SimplicalDecomposition* SD = new SimplicalDecomposition(K, true);
 	//SD->SD_Nash(true);

@@ -271,12 +271,14 @@ lottery LotteryDesigner::RSD(int iterations, bool print, unsigned seed) {
 	for (int i = 0; i < orders.size(); i++) {
 		solution sol = K->RSD_once(orders[i], print);
 
+
+
 		// Go through all solutions in S to see if another solution has this ID
 			// This method will not work for large numbers
 			// Largest number that can be stored in a double is 1.7e308
 			// Just add the solution if the ID is too large, don't perform check
-		bool found = false;
-		if (sol.ID != -1) { // This is the value we give the ID if exponents are too large
+
+			/*if (sol.ID != -1) { // This is the value we give the ID if exponents are too large
 			for (int i = 0; i < L.S.size(); i++) {
 				if (L.S[i].ID == sol.ID) {
 					found = true;
@@ -285,7 +287,11 @@ lottery LotteryDesigner::RSD(int iterations, bool print, unsigned seed) {
 					i = L.S.size();
 				}
 			}
-		}
+		}*/ 
+		// We don't use ID for non-binary 'X'-variables
+
+		bool found = false;
+		//found = K->check_solution_in_S_cardinal(sol, print);
 		// Now add this solution to 'L', with a selection probability equal to 1/orders.size()
 		if (found == false) {
 			L.S.push_back(sol);
@@ -1105,7 +1111,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 				}
 				else if (letter == "S") {
 					SimplicalDecomposition* SD = new SimplicalDecomposition(K, false);
-					L.push_back(SD->SD_Nash(true));
+					L.push_back(SD->SD_Nash(false));
 					delete SD;
 				}
 				else if (letter == "Q") {
