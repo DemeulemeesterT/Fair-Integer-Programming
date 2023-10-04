@@ -48,6 +48,9 @@
     <ClInclude Include="PartitionCallback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Ufl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KidneyExchange.cpp">
@@ -91,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="IPfunctions_cardinal.cpp">
       <Filter>Source Files\IPSolver</Filter>
+    </ClCompile>
+    <ClCompile Include="Ufl.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

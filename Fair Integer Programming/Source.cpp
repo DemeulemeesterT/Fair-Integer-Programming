@@ -26,9 +26,23 @@ int main()
 	//std::vector<reportGreedy> RG;
 	//RG = run_Kidney_exchange_all(true);
 
+
+	// Uncapacitated Facility Location
+	Ufl_parameters U;
+	U.m = 4;
+	U.n = 3;
+	U.f_min = 5;
+	U.f_max = 10;
+	U.c_min = 2;
+	U.c_max = 7;
+	U.filename = "Test";
+	U.seed = 125382;
+
+	Ufl myUFL(U, false);
+
 	
 	// INSTANCE TO TEST CARDINAL MODEL
-	inst I;
+	/*inst I;
 	I.m = 1;
 	I.n = 3;
 	I.t = 0;
@@ -41,14 +55,14 @@ int main()
 	I.Y_integer = false;
 	I.X_bool = false;
 	I.X_integer = true;
-	
+	*/
 	
 	/*
 	KidneyExchange* KE = new KidneyExchange("40-instance-48", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
 	inst I = KE->generate_instance(true, false);
-	*/
+	
 	IPSolver* K = new IPSolver(I, true);
 	//K->compare_time_normal_vs_RSD_variants(50, true);
 	
@@ -72,5 +86,5 @@ int main()
 	//delete SD;
 	delete K;
 	//delete KE;
-	
+	*/
 }

@@ -154,6 +154,7 @@
     <ClInclude Include="Run_configurations.h" />
     <ClInclude Include="SchedulingWeightTard.h" />
     <ClInclude Include="SimplicalDecomposition.h" />
+    <ClInclude Include="Ufl.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="compare_time_normal_RSD.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="SchedulingWeightTard.cpp" />
     <ClCompile Include="SimplicalDecomposition.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Ufl.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

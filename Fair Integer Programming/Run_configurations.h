@@ -4,6 +4,7 @@
 #include "LotteryDesigner.h"
 #include "SimplicalDecomposition.h"
 #include "ReportDistribution.h"
+#include "Ufl.h"
 
 // Contains a couple of different runs, like this we don't have to write everything in 'source.cpp'
 
