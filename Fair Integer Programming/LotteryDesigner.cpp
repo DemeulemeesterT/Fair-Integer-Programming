@@ -292,13 +292,17 @@ lottery LotteryDesigner::RSD(int iterations, bool print, unsigned seed) {
 
 		bool found = false;
 		//found = K->check_solution_in_S_cardinal(sol, print);
+			// You could use this function, but then you would have to go again through
+			// the solutions and add the weight of 1/orders.size() to that solution in the lottery.
+			// Very possible, but I decided not to do it.
+			// Main advantage of implementing this would be to have less solutions with a positive weight in the lottery
+			// as duplicates will be avoided.
+			
 		// Now add this solution to 'L', with a selection probability equal to 1/orders.size()
 		if (found == false) {
 			L.S.push_back(sol);
 			L.w.push_back(1 / (double)orders.size());
 		}
-
-
 	}
 
 	// Calculate the selection probabilities of the agents, based on the solutions
