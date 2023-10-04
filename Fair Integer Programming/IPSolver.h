@@ -192,6 +192,7 @@ public:
 	std::vector<time_report> compare_time_normal_vs_RSD_heuristic(int iterations, bool print);
 	std::vector<time_report> compare_time_normal_vs_RSD_without_partition(int iterations, bool print);
 
+
 	// (DE)CONSTRUCTORS
 
 	// There are four constructors in this class:

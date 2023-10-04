@@ -55,7 +55,7 @@ public:
 		// Using the Bilde-Krarup instance generator that is included in UflLib
 			// https://resources.mpi-inf.mpg.de/departments/d1/projects/benchmarks/UflLib/BildeKrarup.html
 
-
+	void export_to_dat(inst I, bool print);
 
 
 
@@ -74,6 +74,8 @@ public:
 
 	double c_alloc_max;
 		// Maximum of c_alloc, used to compute utility.
+
+	std::string filename;
 
 
 // CONSTRUCTOR AND DESTRUCTOR

@@ -158,6 +158,7 @@ inst read_data(std::string name) {
 		std::printf("\tWe assume the use of integer variables.\n\n");
 		I.Y_bool = false;
 	}
+
 	// weights of the objects
 	double dummy;
 	for (int i = 0; i < I.n_var; i++) {

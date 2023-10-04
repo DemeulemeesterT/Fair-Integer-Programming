@@ -50,6 +50,7 @@ void KidneyExchange::export_to_dat(inst I, bool print) {
 	else {
 		S << "I" << "\n";
 	}
+	
 	for (int i = 0; i < I.n_var; i++) {
 		S << I.v[i] << " ";
 	}
@@ -102,7 +103,6 @@ inst KidneyExchange::generate_instance(bool export_inst, bool print) {
 
 	I.n = n_pairs; // One X-variable for each pair
 	I.t = C.size(); // One Y-variable for each cycle
-	I.n_var = I.n + I.t;
 	I.n_var = I.n + I.t;
 	I.Y_bool = true;
 	I.Y_coeff_zero = true;

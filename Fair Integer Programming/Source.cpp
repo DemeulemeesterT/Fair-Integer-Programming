@@ -29,17 +29,18 @@ int main()
 
 	// Uncapacitated Facility Location
 	Ufl_parameters U;
-	U.m = 4;
-	U.n = 3;
-	U.f_min = 5;
-	U.f_max = 10;
-	U.c_min = 2;
-	U.c_max = 7;
+	U.m = 50;
+	U.n = 100;
+	U.f_min = 1000;
+	U.f_max = 10000;
+	U.c_min = 0;
+	U.c_max = 1000;
 	U.filename = "Test";
 	U.seed = 125382;
 
 	Ufl myUFL(U, false);
-
+	inst I = myUFL.generate_formulation(false, true);
+	
 	
 	// INSTANCE TO TEST CARDINAL MODEL
 	/*inst I;
@@ -62,8 +63,11 @@ int main()
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
 	inst I = KE->generate_instance(true, false);
-	
+	*/
+
 	IPSolver* K = new IPSolver(I, true);
+	K->model->write("Generated Formulations/IPModel.lp");
+	
 	//K->compare_time_normal_vs_RSD_variants(50, true);
 	
 
@@ -86,5 +90,5 @@ int main()
 	//delete SD;
 	delete K;
 	//delete KE;
-	*/
+	
 }
