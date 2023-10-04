@@ -26,10 +26,42 @@ void Ufl::generate_instance(Ufl_parameters U, bool print) {
 
 	for (i = 0; i < n_locations; i++) {
 		f[i] = distr_f(generator);
-		for (j = 0; j < m_customers; j++) {
-			c[i][j] = distr_c(generator);
+	}
+
+	// You can not have more indifference classes than the difference
+	if (U.nr_indiff_classes > U.c_max - U.c_min) {
+		U.nr_indiff_classes = U.c_max - U.c_min;
+	}
+
+	// Randomly sample integers
+	if (U.nr_indiff_classes == -1) {
+		for (i = 0; i < n_locations; i++) {
+			for (j = 0; j < m_customers; j++) {
+				c[i][j] = distr_c(generator);
+			}
 		}
 	}
+
+	else {
+		double step_size = (U.c_max - U.c_min) / U.nr_indiff_classes;
+
+		int generated_c;
+		for (i = 0; i < n_locations; i++) {
+			for (j = 0; j < m_customers; j++) {
+				generated_c = distr_c(generator);
+
+				double test_value = U.c_min;
+				while (test_value <= generated_c) {
+					test_value = test_value + step_size;
+					if (test_value > generated_c) {
+						c[i][j] = (int)test_value - step_size;
+					}
+				}
+			}
+		}
+	}
+	
+	
 }
 
 inst Ufl::generate_formulation(bool export_inst, bool print) {

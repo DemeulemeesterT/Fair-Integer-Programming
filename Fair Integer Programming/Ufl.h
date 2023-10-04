@@ -13,6 +13,11 @@ struct Ufl_parameters {
 	int c_min;
 	int c_max;
 
+	// To have a higher probability of having multiple optimal solutions, 
+		// we ensure that agents have indifference classes among the locations
+	int nr_indiff_classes;
+		// Set to -1 to just randomly sample integers betwee c_min and c_max
+
 	// The name of the file to which the data should be exported
 	std::string filename;
 

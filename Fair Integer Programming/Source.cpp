@@ -29,12 +29,13 @@ int main()
 
 	// Uncapacitated Facility Location
 	Ufl_parameters U;
-	U.m = 50;
-	U.n = 100;
-	U.f_min = 1000;
-	U.f_max = 10000;
-	U.c_min = 0;
+	U.m = 20;
+	U.n = 40;
+	U.f_min = 100;
+	U.f_max = 100;
+	U.c_min = 800;
 	U.c_max = 1000;
+	U.nr_indiff_classes = 3;
 	U.filename = "Test";
 	U.seed = 125382;
 
