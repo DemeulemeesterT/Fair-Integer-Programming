@@ -62,6 +62,10 @@ public:
 
 	void export_to_dat(inst I, bool print);
 
+	void read_data_OR_lib(std::string name, bool print);	
+		// Read one of the instances from the OR-library: http://people.brunel.ac.uk/~mastjjb/jeb/orlib/uncapinfo.html
+
+
 
 
 // GENERAL VARIABLES
@@ -84,7 +88,12 @@ public:
 
 
 // CONSTRUCTOR AND DESTRUCTOR
+	// Create Ufl object from Ufl_input structure
 	Ufl(Ufl_parameters Ufl_input, bool print);
+
+	// Create Ufl object from filename
+	Ufl(std::string filename, bool print);
+	
 	~Ufl();
 };
 

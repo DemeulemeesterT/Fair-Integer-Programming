@@ -188,6 +188,51 @@ inst Ufl::generate_formulation(bool export_inst, bool print) {
 	return I;
 }
 
+void Ufl::read_data_OR_lib(std::string name, bool print) {
+	std::ifstream StFile;
+	std::string full_name = "Uncapacitated Facility Location instances/" + name + ".txt";
+	StFile.open(full_name);
+
+	// If instance can't be found, generate it.
+	if (!StFile) {
+		std::cout << "\n\n This is embarrassing, I can't find that file...\n";
+		char stop;
+		std::cin >> stop;
+
+		return;
+	}
+
+	StFile >> n_locations;
+	StFile >> m_customers;
+
+	// Initialize vectors
+	c = std::vector<std::vector<double>>(n_locations, std::vector<double>(m_customers, 0));
+	f = std::vector<double>(n_locations, 0);
+
+	double cap, demand;
+
+	// Read info locations
+	for (int j = 0; j < n_locations; j++) {
+		StFile >> cap;
+		StFile >> f[j];
+	}
+
+	// Read info customers
+	int counter = 0;
+	for (int i = 0; i < m_customers; i++) {
+		StFile >> demand;
+		for (int j = 0; j < n_locations; j++) {
+			StFile >> c[j][i];
+		}
+		counter++;
+	}
+
+	filename = name;
+
+	StFile.close();
+
+}
+
 void Ufl::export_to_dat(inst I, bool print) {
 	std::ofstream S;
 	std::string export_name = "Data instances/UFL/" + I.data_name + ".dat";
@@ -222,9 +267,12 @@ void Ufl::export_to_dat(inst I, bool print) {
 
 Ufl::Ufl(Ufl_parameters Ufl_input, bool print) {
 	generate_instance(Ufl_input, print);
-
-
 }
+
+Ufl::Ufl(std::string filename, bool print) {
+	read_data_OR_lib(filename, print);
+}
+
 
 
 Ufl::~Ufl() {

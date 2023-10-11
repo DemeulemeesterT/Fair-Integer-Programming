@@ -28,19 +28,20 @@ int main()
 
 
 	// Uncapacitated Facility Location
-	Ufl_parameters U;
-	U.m = 20;
-	U.n = 40;
-	U.f_min = 100;
-	U.f_max = 100;
-	U.c_min = 800;
+	/*Ufl_parameters U;
+	U.m = 40;
+	U.n = 80;
+	U.f_min = 1000;
+	U.f_max = 1000;
+	U.c_min = 100;
 	U.c_max = 1000;
-	U.nr_indiff_classes = 3;
+	U.nr_indiff_classes = -1;
 	U.filename = "Test";
 	U.seed = 125382;
 
-	Ufl myUFL(U, false);
-	inst I = myUFL.generate_formulation(false, true);
+	Ufl myUFL(U, false);*/
+	Ufl myUfl("cap71", true);
+	inst I = myUfl.generate_formulation(false, true);
 	
 	
 	// INSTANCE TO TEST CARDINAL MODEL
