@@ -1,0 +1,14 @@
+\ Model (null)_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Maximize
+ 
+Subject To
+ R95: - y_47 - y_97 - y_147 - y_197 - y_247 - y_297 - y_347 - y_397 - y_447
+   - y_497 - y_547 - y_597 - y_647 - y_697 - y_747 - y_797 <= -1
+ R994: x_47 + y_47 + y_97 + y_147 + y_197 + y_247 + y_297 + y_347 + y_397
+   + y_447 + y_497 + y_547 + y_597 + y_647 + y_697 + y_747 + y_797 <= 0
+Bounds
+Binaries
+ y_47 y_97 y_147 y_197 y_247 y_297 y_347 y_397 y_447 y_497 y_547 y_597
+ y_647 y_697 y_747 y_797
+End

@@ -104,7 +104,7 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 	for (int i = 0; i < K->I.t; i++) {
 		expr += K->I.v[K->I.n + i] * K->Y_var[i];
 	}
-	K->model->addConstr(expr == K->opt);
+	K->model->addConstr(expr == (double) K->opt);
 
 	int iterations = 1;
 

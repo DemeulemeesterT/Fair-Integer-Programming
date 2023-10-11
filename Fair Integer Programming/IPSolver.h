@@ -85,7 +85,7 @@ public:
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 // GENERAL VARIABLES
-	int opt;
+	double opt;
 	
 	int solver_times;
 		// Counts the number of times the solver was called

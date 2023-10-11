@@ -94,16 +94,17 @@ inst Ufl::generate_formulation(bool export_inst, bool print) {
  		
 
 	// Objective coefficients
+		// Default is maximizing, so we add - coefficients
 	for (int i = 0; i < I.n; i++) {
 		I.v.push_back(0); // X-variables, utilities of the customers
 	}
 	for (int i = 0; i < n_locations; i++) {
 		for (int j = 0; j < m_customers; j++) {
-			I.v.push_back(c[i][j]); // One for each customer-location pair
+			I.v.push_back(-c[i][j]); // One for each customer-location pair
 		}
 	}
 	for (int i = 0; i < n_locations; i++) {
-		I.v.push_back(f[i]); // For each location
+		I.v.push_back(-f[i]); // For each location
 	}
 
 	// Capacities of the constraints (order of the constraints, see above)
@@ -218,11 +219,15 @@ void Ufl::read_data_OR_lib(std::string name, bool print) {
 	}
 
 	// Read info customers
+	c_alloc_max = 0;
 	int counter = 0;
 	for (int i = 0; i < m_customers; i++) {
 		StFile >> demand;
 		for (int j = 0; j < n_locations; j++) {
 			StFile >> c[j][i];
+			if (c[j][i] > c_alloc_max) {
+				c_alloc_max = c[j][i];
+			}
 		}
 		counter++;
 	}

@@ -8,6 +8,11 @@ double IPSolver::solve(bool print) {
 
 	model->optimize();
 	int status = model->get(GRB_IntAttr_Status);
+	//if (status == 3) {
+	//	model->computeIIS();
+	//	model->write("Generated Formulations/UFL_IIS.ilp");
+	//}
+
 	double z;
 	if (status != 3) { // If feasible
 		z = model->get(GRB_DoubleAttr_ObjVal);
@@ -1197,7 +1202,7 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 			for (int j = 0; j < I.t; j++) {
 				lin += I.v[I.n + j] * Y_var[j];
 			}
-			GRBConstr CON_OPT = model->addConstr(lin == opt);
+			GRBConstr CON_OPT = model->addConstr(lin == (double) opt);
 
 			// Go through all agents in 'M', which is the number of agents in the order by now
 			for (int j = 0; j < M_size; j++) {
