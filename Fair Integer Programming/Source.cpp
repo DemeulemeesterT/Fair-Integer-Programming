@@ -8,18 +8,19 @@ int main()
 	//run_distribution_all_SWT("H", 50, 3600.0, 1000, false);
 	//compare_time_normal_RSD_SWT(1000, 50, false);
 	
-	/*
-	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
-	inst I = SWT->generate_instanceLawlerMoore(0, false, true);
+	
+	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt3", false);
+	inst I = SWT->generate_instanceTIF_WT(0, false, true);
 	IPSolver* K = new IPSolver(I, true);
 	K->solve(true);
+	K->analyze(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("RLCU", 1000, true, false, 0);
+	L->compare_methods("RLC", 1000, true, false, 0);
 	delete K;
 	delete SWT;
-	*/
-	
 
+	
+	
 	
 	//compare_time_normal_RSD(50, false);
 
@@ -40,8 +41,8 @@ int main()
 	U.seed = 125382;
 
 	Ufl myUFL(U, false);*/
-	Ufl myUFL("cap134", true);
-	inst I = myUFL.generate_formulation(false, true);
+	//Ufl myUFL("cap134", true);
+	//inst I = myUFL.generate_formulation(false, true);
 	
 	
 	// INSTANCE TO TEST CARDINAL MODEL
@@ -67,8 +68,8 @@ int main()
 	inst I = KE->generate_instance(true, false);
 	*/
 
-	IPSolver* K = new IPSolver(I, true);
-	K->model->write("Generated Formulations/IPModel.lp");
+	//IPSolver* K = new IPSolver(I, true);
+	//K->model->write("Generated Formulations/IPModel.lp");
 	//K->model->set(GRB_IntParam_PoolSearchMode, 2);
 	//K->model->set(GRB_IntParam_PoolSolutions, 10);
 	//K->model->set(GRB_IntParam_OutputFlag, 1);
@@ -82,20 +83,20 @@ int main()
 
 	//IPSolver* K = new IPSolver(true);
 	//K->partition(true);
-	K->analyze(false);
+	//K->analyze(false);
 
 
 	//K->compare_partition_vs_greedy(true);
 	//K->compare_time_normal_vs_RSD_without_partition(5, true);
-	LotteryDesigner* L = new LotteryDesigner(K, false);
+	//LotteryDesigner* L = new LotteryDesigner(K, false);
 
-	std::vector<lottery> results = L->compare_methods("RLC", 1000, true, false, 0);
+	//std::vector<lottery> results = L->compare_methods("RLC", 1000, true, false, 0);
 	
 	//SimplicalDecomposition* SD = new SimplicalDecomposition(K, true);
 	//SD->SD_Nash(true);
 
 	//delete SD;
-	delete K;
+	//delete K;
 	//delete KE;
 	
 }
