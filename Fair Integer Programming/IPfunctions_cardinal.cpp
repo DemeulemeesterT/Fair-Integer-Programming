@@ -22,13 +22,13 @@ void IPSolver::partition_cardinal(bool print) {
 
 		// First, find the minimum value of X[i] in all optimal solutions
 		model->setObjective(obj, GRB_MINIMIZE);
-		model->write("Generated Formulations/IPModel.lp");
+		//model->write("Generated Formulations/IPModel.lp");
 
 		solve_partition_cardinal(i, true, print);
 
 		// Next, we find the maximum
 		model->setObjective(obj, GRB_MAXIMIZE);
-		model->write("Generated Formulations/IPModel.lp");
+		//model->write("Generated Formulations/IPModel.lp");
 
 		solve_partition_cardinal(i, false, print);
 	}
@@ -75,9 +75,6 @@ void IPSolver::partition_cardinal(bool print) {
 
 double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 	solver_times++;
-
-	model->getEnv().set(GRB_IntParam_OutputFlag, 1);   //comment to see the output of the solver
-
 
 	model->optimize();
 	int status = model->get(GRB_IntAttr_Status);

@@ -40,8 +40,8 @@ int main()
 	U.seed = 125382;
 
 	Ufl myUFL(U, false);*/
-	Ufl myUfl("cap71", true);
-	inst I = myUfl.generate_formulation(false, true);
+	Ufl myUFL("cap134", true);
+	inst I = myUFL.generate_formulation(false, true);
 	
 	
 	// INSTANCE TO TEST CARDINAL MODEL
@@ -69,6 +69,10 @@ int main()
 
 	IPSolver* K = new IPSolver(I, true);
 	K->model->write("Generated Formulations/IPModel.lp");
+	//K->model->set(GRB_IntParam_PoolSearchMode, 2);
+	//K->model->set(GRB_IntParam_PoolSolutions, 10);
+	//K->model->set(GRB_IntParam_OutputFlag, 1);
+	//K->model->optimize();
 	
 	//K->compare_time_normal_vs_RSD_variants(50, true);
 	
@@ -79,6 +83,7 @@ int main()
 	//IPSolver* K = new IPSolver(true);
 	//K->partition(true);
 	K->analyze(false);
+
 
 	//K->compare_partition_vs_greedy(true);
 	//K->compare_time_normal_vs_RSD_without_partition(5, true);
