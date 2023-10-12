@@ -14,6 +14,13 @@ struct SchedWT_inst {
 
 };
 
+struct SchedWT_param {
+	// Parameters to generate a WT instance using settings from paper by van den Akker et al. (2010)
+	int n_jobs;
+	int common_process_time;
+	unsigned seed = 0;
+	std::string name;
+};
 
 class SchedulingWeightTard
 {
@@ -46,6 +53,10 @@ public:
 	// Will create an instance object for the i-th instance
 	// The formulation that it will describe is a time-indexed formulation
 		// Similar to 'generate_instancesTIF()', but binary x_j variables are replaced by integer variables
+	inst generate_instanceTIF_WT(SchedWT_inst SI, bool export_inst, bool print);
+
+	inst generate_data_and_instance_TIF_WT(SchedWT_param param, bool export_inst, bool print);
+	// Generate data as in paper van den Akker et al. (2010), Section 9
 
 	// GENERAL VARIABLES
 	std::vector<SchedWT_inst> Sched_I;
@@ -66,6 +77,9 @@ public:
 	SchedulingWeightTard(std::string name, bool print);
 		// This constructor will read file 'name.txt'
 		// Instances are obtained from http://people.brunel.ac.uk/~mastjjb/jeb/orlib/wtinfo.html 
+
+	SchedulingWeightTard(bool print);
+		// Can be used to just create object and generate data later.
 
 	~SchedulingWeightTard();
 

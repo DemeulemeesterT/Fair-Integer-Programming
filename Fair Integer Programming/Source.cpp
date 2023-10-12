@@ -9,11 +9,19 @@ int main()
 	//compare_time_normal_RSD_SWT(1000, 50, false);
 	
 	
-	SchedulingWeightTard* SWT = new SchedulingWeightTard("wt3", false);
-	inst I = SWT->generate_instanceTIF_WT(0, false, true);
+	//SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
+	//inst I = SWT->generate_instanceTIF_WT(1, false, true);
+	SchedWT_param S;
+	S.common_process_time = 5;
+	S.n_jobs = 70;
+	S.seed = 0;
+
+	SchedulingWeightTard* SWT = new SchedulingWeightTard(false);
+	inst I = SWT->generate_data_and_instance_TIF_WT(S, false, true);
 	IPSolver* K = new IPSolver(I, true);
 	K->solve(true);
-	K->analyze(true);
+	K->model->write("Generated Formulations/IPModel.lp");
+		K->analyze(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
 	L->compare_methods("RLC", 1000, true, false, 0);
 	delete K;

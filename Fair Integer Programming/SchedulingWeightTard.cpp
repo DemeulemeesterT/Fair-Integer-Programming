@@ -168,13 +168,17 @@ inst SchedulingWeightTard::generate_instanceTIF(int nr, bool export_inst, bool p
 }
 
 inst SchedulingWeightTard::generate_instanceTIF_WT(int nr, bool export_inst, bool print) {
+	return generate_instanceTIF_WT(Sched_I[nr], export_inst, print);
+}
+
+inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool export_inst, bool print) {
 	inst I;
 
 	I.n = n; // One variable for each task to represent tardiness
 
 	int T = 0;
 	for (int i = 0; i < I.n; i++) {
-		T = T + Sched_I[nr].p[i];
+		T = T + SI.p[i];
 	}
 	I.t = T * n; // 'T' binary variables for each task, with T = \sum_j p_j
 		// y_jt = 1 if task j starts at time slot t.
@@ -184,7 +188,7 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(int nr, bool export_inst, boo
 	I.X_bool = false;
 	I.X_integer = true;
 
-	I.m = 3 * n + T;
+	I.m = 4 * n + T;
 
 	// Mixed integer programming formulations for single machine scheduling problems by Keha et al. (2009) 
 	// https://doi.org/10.1016/j.cie.2008.06.008
@@ -197,7 +201,7 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(int nr, bool export_inst, boo
 		// IPSolver class uses maximization function, so -w_j
 
 	for (int i = 0; i < I.n; i++) {
-		I.v.push_back(-Sched_I[nr].w[i]);
+		I.v.push_back(-SI.w[i]);
 	}
 	for (int i = 0; i < I.t; i++) {
 		I.v.push_back(0);
@@ -238,8 +242,8 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(int nr, bool export_inst, boo
 	for (int t = 0; t < T; t++) {
 		for (int j = 0; j < I.n; j++) {
 			int start_s = 0;
-			if (t - Sched_I[nr].p[j] + 1 > 0) {
-				start_s = t - Sched_I[nr].p[j] + 1;
+			if (t - SI.p[j] + 1 > 0) {
+				start_s = t - SI.p[j] + 1;
 			}
 			for (int s = start_s; s < t + 1; s++) {
 				I.A[ConNr][I.n + j * T + s] = 1;
@@ -254,20 +258,49 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(int nr, bool export_inst, boo
 	// \sum_t(t * y_jt) + p_j <= d_j + x_j
 	// \sum_t(t * y_jt) - x_j <= d_j - p_j
 
-	// CARFEFUL: because the indexing starts from zero in this code, but from 1 in the input files, we use d_j - 1 here!
 	for (int i = 0; i < I.n; i++) {
 		I.A[ConNr][i] = -1;
 		for (int t = 0; t < T; t++) {
 			I.A[ConNr][I.n + i * T + t] = t;
 		}
 		ConNr++;
-		I.C.push_back(Sched_I[nr].d[i] - 1 - Sched_I[nr].p[i]);
+		I.C.push_back(SI.d[i] - SI.p[i]);
+	}
+
+	// Last set: x_j >= 0
+	// -x_j <= 0
+	for (int i = 0; i < I.n; i++) {
+		I.A[ConNr][i] = -1;
+		I.C.push_back(0);
+		ConNr++;
 	}
 
 	I.data_name = data_name;
 
 	return I;
 }
+
+
+inst SchedulingWeightTard::generate_data_and_instance_TIF_WT(SchedWT_param param, bool export_inst, bool print) {
+	// Initate random generators
+	std::mt19937 generator((unsigned)param.seed);
+	std::uniform_int_distribution<int> distr(0, 1);
+
+	SchedWT_inst S;
+	n = param.n_jobs;
+	S.p = std::vector<int>(n, param.common_process_time); // All jobs the same processing time
+	S.d = std::vector<int>(n, 0);
+	S.w = std::vector<int>(n, 0);
+	data_name = param.name;
+
+	for (int i = 0; i < n; i++) {
+		S.w[i] = distr(generator) * 120;
+		S.d[i] = S.p[0] + (n - 6) * S.p[0] * distr(generator);
+	}
+
+	return generate_instanceTIF_WT(S, export_inst, print);
+}
+
 
 inst SchedulingWeightTard::generate_instanceLawlerMoore(int nr, bool export_inst, bool print) {
 	inst I;
@@ -357,6 +390,11 @@ SchedWT_inst SchedulingWeightTard::order_jobs(int nr, bool print) {
 SchedulingWeightTard::SchedulingWeightTard(std::string name, bool print) {
 	read_data(name, print);
 }
+
+SchedulingWeightTard::SchedulingWeightTard(bool print) {
+
+}
+
 
 
 SchedulingWeightTard::~SchedulingWeightTard() {
