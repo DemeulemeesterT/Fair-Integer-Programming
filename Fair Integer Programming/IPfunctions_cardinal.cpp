@@ -171,13 +171,18 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 	std::vector<double> y(I.t, 0);
 	
 	solver_times++;
-	//model->write("Generated Formulations/IPModel.lp");
+	model->write("Generated Formulations/IPModel.lp");
 	model->optimize();
 	int status = model->get(GRB_IntAttr_Status);
 	double z;
+	//printf("Status = %i\n", status);
+	if (status == 3) {
+		model->computeIIS();
+		model->write("Generated Formulations/UFL_IIS.ilp");
+	}
 	if (status != 3) { // If feasible
 		z = model->get(GRB_DoubleAttr_ObjVal);
-
+		printf("Optimal solution = %.2f\n", z);
 		// Store solution
 		if (I.X_integer == true) {
 			for (int j = 0; j < I.n; j++) {
@@ -203,7 +208,7 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 
 		if (print) {
 			for (int j = 0; j < I.n; j++) {
-				if (x[j] == 1) {
+				if (x[j] > 0) {
 					printf("\tX_%i = %.2f\n", j, (double)x[j]);
 				}
 			}

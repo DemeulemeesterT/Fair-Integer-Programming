@@ -284,7 +284,8 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool export_
 inst SchedulingWeightTard::generate_data_and_instance_TIF_WT(SchedWT_param param, bool export_inst, bool print) {
 	// Initate random generators
 	std::mt19937 generator((unsigned)param.seed);
-	std::uniform_int_distribution<int> distr(0, 1);
+	std::uniform_int_distribution<int> distr_w(0, 120);
+	std::uniform_int_distribution<int> distr_d(param.common_process_time, (param.n_jobs - 5) * param.common_process_time);
 
 	SchedWT_inst S;
 	n = param.n_jobs;
@@ -294,8 +295,9 @@ inst SchedulingWeightTard::generate_data_and_instance_TIF_WT(SchedWT_param param
 	data_name = param.name;
 
 	for (int i = 0; i < n; i++) {
-		S.w[i] = distr(generator) * 120;
-		S.d[i] = S.p[0] + (n - 6) * S.p[0] * distr(generator);
+		//S.w[i] = (int) distr_w(generator);
+		S.w[i] = 1;
+		S.d[i] = distr_d(generator);
 	}
 
 	return generate_instanceTIF_WT(S, export_inst, print);
