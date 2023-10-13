@@ -235,6 +235,8 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 	}
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+
 
 	int counter;
 
@@ -346,7 +348,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 	bool finished = false;
 	while (finished == false) {
-		model->write("Generated Formulations/SDNashMaster.lp");
+		//model->write("Generated Formulations/SDNashMaster.lp");
 		if (print) {
 			printf("ITERATION %i\n", iterations);
 		}
@@ -371,14 +373,14 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 			w_values.push_back(w[i].get(GRB_DoubleAttr_X));
 		}
 
-		double sum_check = 0;
+		/*double sum_check = 0;
 		for (int i = 0; i < w_values.size(); i++) {
 			if (w_values[i] > 0) {
 				printf("Solution %i\t%.2f\n", i, w_values[i]);
 				sum_check += w_values[i];
 			}
 		}
-		printf("Sum = %.4f\n\n", sum_check);
+		printf("Sum = %.4f\n\n", sum_check);*/
 
 		// Determine the value of the gradient evaluated at the solution
 		std::vector<double> gradient = gradientNash(p_values, print);
@@ -405,7 +407,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 
 		K->model->setObjective(obj, GRB_MAXIMIZE);
-		K->model->write("Generated Formulations/IPModel.lp");
+		//K->model->write("Generated Formulations/IPModel.lp");
 		IP_report IP_R = K->solve_return_solution_MENU(print);
 			// IP_report contains only the optimal objective function and an optimal solution (see definition IPSolver.h)
 
@@ -437,11 +439,27 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 					if (sol_obj > best_value) {
 						best_value = sol_obj;
 					}
-					if (best_value > obj_val_pricing - 0.0001) {
-						finished = true;
-						j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
-						if (print) {
-							printf("\n\n The optimal solution has been found.\n");
+
+					// This code will only use a linear approximation of the objective functions
+					// That's why small inprecisions could happen
+					// For non-binary X-variables, these differences could have a very big effect on the evaluation of the gradient function
+					// We adopt different treshold values for binary and non-binary X-variables
+					if (K->I.X_bool == true) {
+						if (best_value > obj_val_pricing - 0.0001) {
+							finished = true;
+							j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
+							if (print) {
+								printf("\n\n The optimal solution has been found.\n");
+							}
+						}
+					}
+					else {
+						if ((best_value - obj_val_pricing)/obj_val_pricing > - 0.01) {
+							finished = true;
+							j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
+							if (print) {
+								printf("\n\n The optimal solution has been found.\n");
+							}
 						}
 					}
 				}

@@ -13,7 +13,7 @@ int main()
 	//inst I = SWT->generate_instanceTIF_WT(1, false, true);
 	SchedWT_param S;
 	S.common_process_time = 1;
-	S.n_jobs = 40;
+	S.n_jobs = 53;
 	S.seed = 1;
 
 	SchedulingWeightTard* SWT = new SchedulingWeightTard(false);
@@ -23,7 +23,7 @@ int main()
 	//K->model->write("Generated Formulations/IPModel.lp");
 	K->analyze(false);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("C", 1000, true, false, 0);
+	L->compare_methods("LC", 1000, true, false, 0);
 	delete K;
 	delete SWT;
 
