@@ -4,7 +4,7 @@ double IPSolver::solve(bool print) {
 
 	solver_times++;
 
-	model->getEnv().set(GRB_IntParam_OutputFlag, 1);
+	//model->getEnv().set(GRB_IntParam_OutputFlag, 1);
 
 	//model->write("Generated Formulations/IPModel.lp");
 

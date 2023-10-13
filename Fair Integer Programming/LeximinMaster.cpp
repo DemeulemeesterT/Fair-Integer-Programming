@@ -56,7 +56,7 @@ lottery LeximinMaster::solve(bool print) {
 			//model->write("Generated Formulations/LeximinModel.lp");
 
 			model->optimize();
-			model->write("Generated Formulations/LeximinMaster.lp");
+			//model->write("Generated Formulations/LeximinMaster.lp");
 			obj_val_master = model->get(GRB_DoubleAttr_ObjVal);
 			getDualValues(false, print);
 
@@ -65,7 +65,7 @@ lottery LeximinMaster::solve(bool print) {
 				// This means that we divide the X-variables by (Xmax[i] - Xmin[i]) for the agents in that were not yet fixed.
 			obj = 0.0;
 
-			
+			/*
 			// CHECK: which variables selected with positive weight?
 			std::vector<double> w_check(w.size(), 0.0);
 			for (int i = 0; i < w.size(); i++) {
@@ -80,7 +80,7 @@ lottery LeximinMaster::solve(bool print) {
 				}
 			}
 			printf("Sum = %.4f\n\n", sum_check);
-			
+			*/
 
 			int counter = 0;
 			for (int i = 0; i < K->I.n; i++) {

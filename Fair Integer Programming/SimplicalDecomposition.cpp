@@ -298,9 +298,9 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 		for (int i = 0; i < K->I.n; i++) {
 			if (K->M[i] == 1) {
 				// It only makes sense to include the agents in 'M'
-				if (K->S[s].x[i] > K->Xmin[i]) {
+				//if (K->S[s].x[i] > K->Xmin[i]) {
 					columns[s].addTerm(K->S[s].x[i], C_p[counter]);
-				}
+				//}
 				counter++;
 			}
 		}
@@ -371,6 +371,15 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 			w_values.push_back(w[i].get(GRB_DoubleAttr_X));
 		}
 
+		double sum_check = 0;
+		for (int i = 0; i < w_values.size(); i++) {
+			if (w_values[i] > 0) {
+				printf("Solution %i\t%.2f\n", i, w_values[i]);
+				sum_check += w_values[i];
+			}
+		}
+		printf("Sum = %.4f\n\n", sum_check);
+
 		// Determine the value of the gradient evaluated at the solution
 		std::vector<double> gradient = gradientNash(p_values, print);
 
@@ -415,12 +424,12 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 					counter = 0;
 					for (int k = 0; k < K->I.n; k++) {
 						if (K->M[k] == 1) {
-							if (L.S[j].x[k] > K->Xmin[k]) {
+							//if (L.S[j].x[k] > K->Xmin[k]) {
 								sol_obj += gradient[counter] * (L.S[j].x[k] - K->Xmin[k]);
 								if (print) {
 									printf("\t Existing solution obj: %.4f\n", sol_obj);
 								}
-							}
+							//}
 							counter++;
 						}
 					}
