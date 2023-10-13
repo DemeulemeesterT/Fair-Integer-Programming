@@ -229,6 +229,9 @@ lottery LotteryDesigner::leximin(bool print) {
 
 
 	LeximinMaster* M = new LeximinMaster(K, print);
+	M->model->write("Generated Formulations/LeximinMaster.lp");
+
+	
 	//M->K->model->write("Generated Formulations/IPModel.lp");
 
 	lottery L = M->solve(print);

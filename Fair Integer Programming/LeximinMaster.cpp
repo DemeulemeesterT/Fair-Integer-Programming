@@ -56,7 +56,7 @@ lottery LeximinMaster::solve(bool print) {
 			//model->write("Generated Formulations/LeximinModel.lp");
 
 			model->optimize();
-			//model->write("Generated Formulations/LeximinMaster.lp");
+			model->write("Generated Formulations/LeximinMaster.lp");
 			obj_val_master = model->get(GRB_DoubleAttr_ObjVal);
 			getDualValues(false, print);
 
@@ -65,7 +65,7 @@ lottery LeximinMaster::solve(bool print) {
 				// This means that we divide the X-variables by (Xmax[i] - Xmin[i]) for the agents in that were not yet fixed.
 			obj = 0.0;
 
-			/*
+			
 			// CHECK: which variables selected with positive weight?
 			std::vector<double> w_check(w.size(), 0.0);
 			for (int i = 0; i < w.size(); i++) {
@@ -80,7 +80,7 @@ lottery LeximinMaster::solve(bool print) {
 				}
 			}
 			printf("Sum = %.4f\n\n", sum_check);
-			*/
+			
 
 			int counter = 0;
 			for (int i = 0; i < K->I.n; i++) {
@@ -98,7 +98,7 @@ lottery LeximinMaster::solve(bool print) {
 			K->model->setObjective(obj, GRB_MINIMIZE);
 			//K->model->write("Generated Formulations/IPModel.lp");
 
-			//bool correct_master = check_reduced_cost_S_zero(M_remaining, print);
+			bool correct_master = check_reduced_cost_S_zero(M_remaining, print);
 
 
 			IP_report IP_R_pricing = K->solve_return_solution_MENU(false);
@@ -354,14 +354,14 @@ void LeximinMaster::addColumn(solution sol, bool print) {
 	for (int i = 0; i < K->I.n; i++) {
 		if (K->M[i] == 1) {
 			// It only makes sense to include the agents in 'M'
-			if (sol.x[i] == 1) {
+			//if (sol.x[i] == 1) {
 				col.addTerm(sol.x[i]/(K->Xmax[i] - K->Xmin[i]), C_bound[counter]);
 				// Formulated like this, the leximin formulation can also be used for
 					// non-binary X-variables.
 					// For binary X-variables, the coefficient was simply 1.
 					// And for agents in M, this will still be the case for binary X-variables,
 					// as 1/(1-0) = 1.
-			}
+			//}
 			counter++;
 		}
 	}
@@ -373,7 +373,7 @@ void LeximinMaster::addColumn(solution sol, bool print) {
 	K->block_solution(sol);
 
 	// Block the found solution (only the X-variables)
-	GRBLinExpr lin = 0;
+	/*GRBLinExpr lin = 0;
 	counter = 0;
 	for (int i = 0; i < K->S.back().x.size(); i++) {
 		if (K->M[i] == 1) { // If the agent is in M, that's the only case in which it matters
@@ -384,7 +384,7 @@ void LeximinMaster::addColumn(solution sol, bool print) {
 		}
 	}
 	K->model->addConstr(lin <= (counter - 1));
-
+	*/
 	// Add variable for this
 	char name_w[13];
 	sprintf_s(name_w, "w_%i", (int)K->S.size() - 1);
@@ -489,7 +489,7 @@ void LeximinMaster::defineModelConVar(bool print) {
 			if (K->M[i] == 1) {
 				// It only makes sense to include the agents in 'M'
 				//if (K->S[s].x[i] == 1) {
-				double test_value = K->S[s].x[i] / (K->Xmax[i] - K->Xmin[i]);
+				double test_value =(double)  (K->S[s].x[i] / ((double) K->Xmax[i] - (double) K->Xmin[i]));
 					columns[s].addTerm(K->S[s].x[i] / (K->Xmax[i] - K->Xmin[i]), C_bound[counter]);
 					// Formulated like this, the leximin formulation can also be used for
 						// non-binary X-variables.

@@ -246,6 +246,9 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 		if (done_partition == false) {
 			found = check_solution_in_S_cardinal(s, print);
 		}
+		if (found == false) {
+			S.push_back(IP_R.s);
+		}
 
 	}
 	else {
