@@ -444,6 +444,8 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 					// That's why small inprecisions could happen
 					// For non-binary X-variables, these differences could have a very big effect on the evaluation of the gradient function
 					// We adopt different treshold values for binary and non-binary X-variables
+						// For more information about paramters to control the piecewise linear approximation of the functions:
+						// https://www.gurobi.com/documentation/current/refman/constraints.html
 					if (K->I.X_bool == true) {
 						if (best_value > obj_val_pricing - 0.0001) {
 							finished = true;

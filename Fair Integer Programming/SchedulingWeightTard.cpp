@@ -35,6 +35,7 @@ void SchedulingWeightTard::read_data(std::string name, bool print) {
 		SWT.d = std::vector<int>();
 		SWT.p = std::vector<int>();
 		SWT.w = std::vector<int>();
+		SWT.r = std::vector<int>(n, 0);
 
 		int value;
 		for (int j = 0; j < n; j++) {
@@ -188,7 +189,17 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool export_
 	I.X_bool = false;
 	I.X_integer = true;
 
-	I.m = 4 * n + T;
+	// Count how many y-variables are before the release dates;
+	int y_counter = 0;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < T; j++) {
+			if (j < SI.r[i]) {
+				y_counter++;
+			}
+		}
+	}
+
+	I.m = 4 * n + T + y_counter;
 
 	// Mixed integer programming formulations for single machine scheduling problems by Keha et al. (2009) 
 	// https://doi.org/10.1016/j.cie.2008.06.008
@@ -266,13 +277,28 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool export_
 		ConNr++;
 		I.C.push_back(SI.d[i] - SI.p[i]);
 	}
-
-	// Last set: x_j >= 0
+	
+	// BOUNDS
+	// For each job set: x_j >= 0
 	// -x_j <= 0
 	for (int i = 0; i < I.n; i++) {
 		I.A[ConNr][i] = -1;
 		I.C.push_back(0);
 		ConNr++;
+	}
+
+	// And fix that job cannot start before its release date
+	// y_jt = <= 0 if t <= r_j - 1
+	for (int i = 0; i < I.n; i++) {
+		for (int t = 0; t < T; t++) {
+			if (t < SI.r[i]) {
+				// Before release date, so cannot start
+				int index = I.n + T * i + t;
+				I.A[ConNr][index] = 1;
+				I.C.push_back(0);
+				ConNr++;
+			}
+		}
 	}
 
 	I.data_name = data_name;
@@ -285,19 +311,32 @@ inst SchedulingWeightTard::generate_data_and_instance_TIF_WT(SchedWT_param param
 	// Initate random generators
 	std::mt19937 generator((unsigned)param.seed);
 	std::uniform_int_distribution<int> distr_w(0, 120);
+	std::uniform_int_distribution<int> distr_r(0, (param.n_jobs - 6) * param.common_process_time);
 	std::uniform_int_distribution<int> distr_d(param.common_process_time, (param.n_jobs - 5) * param.common_process_time);
+
 
 	SchedWT_inst S;
 	n = param.n_jobs;
 	S.p = std::vector<int>(n, param.common_process_time); // All jobs the same processing time
 	S.d = std::vector<int>(n, 0);
 	S.w = std::vector<int>(n, 0);
+	S.r = std::vector<int>(n, 0);
 	data_name = param.name;
 
-	for (int i = 0; i < n; i++) {
+	// ALL SAME STARTING TIME AT 0
+	/*for (int i = 0; i < n; i++) {
 		//S.w[i] = (int) distr_w(generator);
 		S.w[i] = 1;
 		S.d[i] = distr_d(generator);
+		S.r[i] = 0;
+	}*/
+
+	// ALL SAME STARTING TIME AT GENERATED RELEASE TIME
+	for (int i = 0; i < n; i++) {
+		//S.w[i] = (int) distr_w(generator);
+		S.w[i] = 1;
+		S.r[i] = distr_r(generator);
+		S.d[i] = distr_d(generator) + S.r[i];
 	}
 
 	return generate_instanceTIF_WT(S, export_inst, print);

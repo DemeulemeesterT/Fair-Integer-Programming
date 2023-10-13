@@ -12,6 +12,9 @@ struct SchedWT_inst {
 	std::vector<int> p;
 	// The processing times of the jobs
 
+	std::vector<int> r;
+	// Release dates of the jobs
+
 };
 
 struct SchedWT_param {
