@@ -348,7 +348,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 	bool finished = false;
 	while (finished == false) {
-		model->write("Generated Formulations/SDNashMaster.lp");
+		//model->write("Generated Formulations/SDNashMaster.lp");
 		if (print) {
 			printf("ITERATION %i\n", iterations);
 		}
@@ -372,7 +372,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 		for (int i = 0; i < L.S.size(); i++) {
 			w_values.push_back(w[i].get(GRB_DoubleAttr_X));
 		}
-
+		/*
 		double sum_check = 0;
 		for (int i = 0; i < w_values.size(); i++) {
 			if (w_values[i] > 0) {
@@ -380,7 +380,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 				sum_check += w_values[i];
 			}
 		}
-		printf("Sum = %.4f\n\n", sum_check);
+		printf("Sum = %.4f\n\n", sum_check);*/
 
 		// Determine the value of the gradient evaluated at the solution
 		std::vector<double> gradient = gradientNash(p_values, print);
@@ -415,85 +415,90 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 		// Store solution
 		if (K->model->get(GRB_IntAttr_Status) != 3) { // If pricing problem not infeasible
-
-			// Check for all solutions that are already included in the master problem what their objective value for this gradient would be
-			// We only need to check for solutions with a positive weight w
-			double best_value = -1e30;
-			int j = 0;
-			while (j < L.S.size()) {
-				if (w_values[j] > 0) {
-					double sol_obj = 0.0;
-					counter = 0;
-					for (int k = 0; k < K->I.n; k++) {
-						if (K->M[k] == 1) {
-							//if (L.S[j].x[k] > K->Xmin[k]) {
+			if (IP_R.solution_already_in_S == false) {
+				// Check for one of the solutions that is already included in the master problem what its objective value for this gradient would be
+				double best_value = -1e30;
+				int j = 0;
+				while (j < L.S.size()) {
+					if (w_values[j] > 0) {
+						double sol_obj = 0.0;
+						counter = 0;
+						for (int k = 0; k < K->I.n; k++) {
+							if (K->M[k] == 1) {
+								//if (L.S[j].x[k] > K->Xmin[k]) {
 								sol_obj += gradient[counter] * (L.S[j].x[k]);
 								if (print) {
 									printf("\t Existing solution obj: %.4f\n", sol_obj);
 								}
-							//}
-							counter++;
-						}
-					}
-
-					if (sol_obj > best_value) {
-						best_value = sol_obj;
-					}
-
-					// This code will only use a linear approximation of the objective functions
-					// That's why small inprecisions could happen
-					// For non-binary X-variables, these differences could have a very big effect on the evaluation of the gradient function
-					// We adopt different treshold values for binary and non-binary X-variables
-						// For more information about paramters to control the piecewise linear approximation of the functions:
-						// https://www.gurobi.com/documentation/current/refman/constraints.html
-					if (K->I.X_bool == true) {
-						if (best_value > obj_val_pricing - 0.0001) {
-							finished = true;
-							j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
-							if (print) {
-								printf("\n\n The optimal solution has been found.\n");
+								//}
+								counter++;
 							}
 						}
-					}
-					else {
-						//if ((best_value - obj_val_pricing)/obj_val_pricing > - 0.0001) {
- 						if (best_value > obj_val_pricing - 0.0001) {
-							finished = true;
-							j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
-							if (print) {
-								printf("\n\n The optimal solution has been found.\n");
+
+						if (sol_obj > best_value) {
+							best_value = sol_obj;
+						}
+
+						// This code will only use a linear approximation of the objective functions
+						// That's why small inprecisions could happen
+						// For non-binary X-variables, these differences could have a very big effect on the evaluation of the gradient function
+						// We adopt different treshold values for binary and non-binary X-variables
+							// For more information about paramters to control the piecewise linear approximation of the functions:
+							// https://www.gurobi.com/documentation/current/refman/constraints.html
+						if (K->I.X_bool == true) {
+							if (best_value > obj_val_pricing - 0.0001) {
+								finished = true;
+								j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
+								if (print) {
+									printf("\n\n The optimal solution has been found.\n");
+								}
 							}
 						}
+						else {
+							if ((best_value - obj_val_pricing) / obj_val_pricing > -0.005) {
+								//if (best_value > obj_val_pricing - 0.0001) {
+								finished = true;
+								j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
+								if (print) {
+									printf("\n\n The optimal solution has been found.\n");
+								}
+							}
+						}
+						//j = L.S.size();
+							// We don't do this because the issues with the precision of the solver
 					}
+
+					j++;
 				}
 
-				j++;
+				// Add a new column to the master if the reduced cost is non-negative
+				if (finished == false) {
+					addColumn(IP_R.s, print);
+					L.S.push_back(IP_R.s);
+					//addColumn(K->S.back(), print);
+					//L.S.push_back(K->S.back());
+
+					//K->block_solution(K->S.back());
+						// This will block entire solution (including agents in Y and y-variables)
+
+					// Block the found solution
+					/*GRBLinExpr lin = 0;
+					int counter = 0;
+					for (int i = 0; i < IP_R.s.x.size(); i++) {
+						if (K->M[i] == 1) { // If the agent is in M, that's the only case in which it matters
+							if (IP_R.s.x[i] == 1) {// If the agent is selected
+								lin += K->X[i];
+								counter++;
+							}
+						}
+					}
+					K->model->addConstr(lin <= (counter - 1));
+					//K->model->update();
+					*/
+				}
 			}
-
-			// Add a new column to the master if the reduced cost is non-negative
-			if (finished == false) {
-				addColumn(IP_R.s, print);
-				L.S.push_back(IP_R.s);
-				//addColumn(K->S.back(), print);
-				//L.S.push_back(K->S.back());
-
-				//K->block_solution(K->S.back());
-					// This will block entire solution (including agents in Y and y-variables)
-
-				// Block the found solution
-				/*GRBLinExpr lin = 0;
-				int counter = 0;
-				for (int i = 0; i < IP_R.s.x.size(); i++) {
-					if (K->M[i] == 1) { // If the agent is in M, that's the only case in which it matters
-						if (IP_R.s.x[i] == 1) {// If the agent is selected
-							lin += K->X[i];
-							counter++;
-						}
-					}
-				}
-				K->model->addConstr(lin <= (counter - 1));
-				//K->model->update();
-				*/
+			else {
+				finished = true;
 			}
 		}
 		else {

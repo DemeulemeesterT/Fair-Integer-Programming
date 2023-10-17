@@ -424,7 +424,7 @@ IP_report IPSolver::solve_return_solution(bool print) {
 			s.ID = -1; // We no longer use ID, because it was not working for larger numbers...
 			found = false;
 			if (done_partition == false) {
-				found = check_solution_in_S_cardinal(s, print);
+			found = check_solution_in_S_cardinal(s, print);
 			}
 			if (found == false) {
 				S.push_back(s);

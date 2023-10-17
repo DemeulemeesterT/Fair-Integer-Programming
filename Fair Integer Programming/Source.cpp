@@ -11,13 +11,13 @@ int main()
 	
 	//SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
 	//inst I = SWT->generate_instanceTIF_WT(1, false, true);
-	SchedWT_param S;
+	/*SchedWT_param S;
 	S.common_process_time = 1;
-	S.n_jobs = 15;
+	S.n_jobs = 30;
 	S.seed = 2;
 	S.name = "test";
 	bool release_dates = false;
-	double beta = 0.5;
+	double beta = 0.05;
 
 	SchedulingWeightTard* SWT = new SchedulingWeightTard(false);
 	inst I = SWT->generate_data_and_instance_TIF_WT(S, beta, release_dates, true, true);
@@ -29,7 +29,7 @@ int main()
 	L->compare_methods("LC", 1000, true, false, 0);
 	delete K;
 	delete SWT;
-
+	*/
 	
 	
 	
@@ -72,14 +72,14 @@ int main()
 	I.X_integer = true;
 	*/
 	
-	/*
-	KidneyExchange* KE = new KidneyExchange("40-instance-48", true);
+	
+	KidneyExchange* KE = new KidneyExchange("30-instance-32", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
 	inst I = KE->generate_instance(true, false);
-	*/
+	
 
-	//IPSolver* K = new IPSolver(I, true);
+	IPSolver* K = new IPSolver(I, true);
 	//K->model->write("Generated Formulations/IPModel.lp");
 	//K->model->set(GRB_IntParam_PoolSearchMode, 2);
 	//K->model->set(GRB_IntParam_PoolSolutions, 10);
@@ -94,14 +94,14 @@ int main()
 
 	//IPSolver* K = new IPSolver(true);
 	//K->partition(true);
-	//K->analyze(false);
+	K->analyze(false);
 
 
 	//K->compare_partition_vs_greedy(true);
 	//K->compare_time_normal_vs_RSD_without_partition(5, true);
-	//LotteryDesigner* L = new LotteryDesigner(K, false);
+	LotteryDesigner* L = new LotteryDesigner(K, false);
 
-	//std::vector<lottery> results = L->compare_methods("RLC", 1000, true, false, 0);
+	std::vector<lottery> results = L->compare_methods("LR", 100, true, false, 0);
 	
 	//SimplicalDecomposition* SD = new SimplicalDecomposition(K, true);
 	//SD->SD_Nash(true);

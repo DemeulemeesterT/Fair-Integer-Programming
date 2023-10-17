@@ -56,7 +56,7 @@ lottery LeximinMaster::solve(bool print) {
 			//model->write("Generated Formulations/LeximinModel.lp");
 
 			model->optimize();
-			model->write("Generated Formulations/LeximinMaster.lp");
+			//model->write("Generated Formulations/LeximinMaster.lp");
 			int status = model->get(GRB_IntAttr_Status);
 			if (status == 3) {
 				model->computeIIS();
@@ -94,7 +94,7 @@ lottery LeximinMaster::solve(bool print) {
 						obj += dual_C_bound[counter] * K->X[i] / (K->Xmax[i] - K->Xmin[i]);
 					}
 					else {
-						obj += dual_C_bound[counter] * K->X[i];
+						obj += dual_C_bound[counter] * K->X[i] / (K->Xmax[i] - K->Xmin[i]);
 					}
 					counter++;
 				}
@@ -137,7 +137,8 @@ lottery LeximinMaster::solve(bool print) {
 			if (print) {
 				// If the model was not infeasible
 				if (K->model->get(GRB_IntAttr_Status) != 3) {
-					printf("\t Reduced cost = %.5f\n\n", obj_val_pricing);
+					printf("\t Reduced cost = %.5f\n", obj_val_pricing);
+					printf("\t Objective primal = %.5f\n\n", obj_val_master);
 				}
 				else {
 					printf("\t Pricing problem INFEASIBLE\n\n");
@@ -197,7 +198,7 @@ lottery LeximinMaster::solve(bool print) {
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
-					model->write("Generated Formulations/LeximinModel.lp");
+					//model->write("Generated Formulations/LeximinModel.lp");
 					model->optimize();
 
 					// If optimal solution of Epsilon = 0
@@ -233,7 +234,7 @@ lottery LeximinMaster::solve(bool print) {
 							}
 							obj += dual_C_Sum1[0];
 							K->model->setObjective(obj, GRB_MINIMIZE);
-							K->model->write("Generated Formulations/IPModel.lp");
+							//K->model->write("Generated Formulations/IPModel.lp");
 
 							//bool correct_epsilon = check_reduced_cost_S_zero(M_remaining, print);
 
@@ -261,7 +262,7 @@ lottery LeximinMaster::solve(bool print) {
 
 								// And by setting the coefficient of MIN_M in that constraint to zero
 								model->chgCoeff(C_bound[counter], MIN_M, 0.0);
-								//model->write("Generated Formulations/LeximinModel.lp");
+								model->write("Generated Formulations/LeximinModel.lp");
 
 								M_remaining[i] = 0;
 							}
@@ -290,15 +291,15 @@ lottery LeximinMaster::solve(bool print) {
 
 									// And by setting the coefficient of MIN_M in that constraint to zero
 									model->chgCoeff(C_bound[counter], MIN_M, 0.0);
-									//model->write("Generated Formulations/LeximinModel.lp");
+									model->write("Generated Formulations/LeximinModel.lp");
 
 									M_remaining[i] = 0;
 
-									if (IP_R.solution_already_in_S == false) {
+									//if (IP_R.solution_already_in_S == false) {
 										// Lastly, we remove the last added solution to K->S, because the K->solve() function will automatically store it
 										// while we will not create a variable for this solution
-										K->S.pop_back();
-									}
+									//	K->S.pop_back();
+									//}
 								}
 							}
 						
@@ -547,7 +548,7 @@ void LeximinMaster::defineModelConVar(bool print) {
 	}
 
 	//if (print) {
-		//model->write("Generated Formulations/LeximinMaster.lp");
+	//model->write("Generated Formulations/LeximinMaster.lp");
 	//}
 }
 
