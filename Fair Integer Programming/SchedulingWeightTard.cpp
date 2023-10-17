@@ -168,11 +168,11 @@ inst SchedulingWeightTard::generate_instanceTIF(int nr, bool export_inst, bool p
 	return I;
 }
 
-inst SchedulingWeightTard::generate_instanceTIF_WT(int nr, bool export_inst, bool print) {
-	return generate_instanceTIF_WT(Sched_I[nr], export_inst, print);
+inst SchedulingWeightTard::generate_instanceTIF_WT(int nr, bool release_dates, bool export_inst, bool print) {
+	return generate_instanceTIF_WT(Sched_I[nr], release_dates, export_inst, print);
 }
 
-inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool export_inst, bool print) {
+inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool release_dates, bool export_inst, bool print) {
 	inst I;
 
 	I.n = n; // One variable for each task to represent tardiness
@@ -181,6 +181,22 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool export_
 	for (int i = 0; i < I.n; i++) {
 		T = T + SI.p[i];
 	}
+
+	if (release_dates == true) {
+		// This means we have to take into account release dates
+		// Find largest release date
+		int r_max = 0;
+		for (int i = 0; i < I.n; i++) {
+			if (SI.r[i] > r_max) {
+				r_max = SI.r[i];
+			}
+		}
+
+		// Easy estimate of the maximum possible value of T:
+			// Plan all jobs from the largest release time
+		T = r_max + T;
+	}
+
 	I.t = T * n; // 'T' binary variables for each task, with T = \sum_j p_j
 		// y_jt = 1 if task j starts at time slot t.
 	I.n_var = I.n + I.t;
@@ -195,6 +211,9 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool export_
 		for (int j = 0; j < T; j++) {
 			if (j < SI.r[i]) {
 				y_counter++;
+			}
+			else {
+				j = T;
 			}
 		}
 	}
@@ -298,6 +317,9 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool export_
 				I.C.push_back(0);
 				ConNr++;
 			}
+			else {
+				t = T;
+			}
 		}
 	}
 
@@ -307,12 +329,18 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool export_
 }
 
 
-inst SchedulingWeightTard::generate_data_and_instance_TIF_WT(SchedWT_param param, bool export_inst, bool print) {
+inst SchedulingWeightTard::generate_data_and_instance_TIF_WT(SchedWT_param param, double beta, bool release_dates, bool export_inst, bool print) {
 	// Initate random generators
 	std::mt19937 generator((unsigned)param.seed);
-	std::uniform_int_distribution<int> distr_w(0, 120);
+	//std::uniform_int_distribution<int> distr_w(0, 120);
 	std::uniform_int_distribution<int> distr_r(0, (param.n_jobs - 6) * param.common_process_time);
 	std::uniform_int_distribution<int> distr_d(param.common_process_time, (param.n_jobs - 5) * param.common_process_time);
+	
+	// Baptiste et al. (2004)
+	double T = 0;
+	std::uniform_int_distribution<int> distr_w(1, 1);
+	std::uniform_int_distribution<int> distr_p(1, 10);
+	
 
 
 	SchedWT_inst S;
@@ -323,23 +351,39 @@ inst SchedulingWeightTard::generate_data_and_instance_TIF_WT(SchedWT_param param
 	S.r = std::vector<int>(n, 0);
 	data_name = param.name;
 
-	// ALL SAME STARTING TIME AT 0
-	/*for (int i = 0; i < n; i++) {
-		//S.w[i] = (int) distr_w(generator);
-		S.w[i] = 1;
-		S.d[i] = distr_d(generator);
-		S.r[i] = 0;
-	}*/
+	if (release_dates == false) {
+		for (int i = 0; i < n; i++) {
+			//S.w[i] = (int) distr_w(generator);
+			S.w[i] = 1;
+			//S.d[i] = distr_d(generator);
+			S.r[i] = 0;
 
-	// ALL SAME STARTING TIME AT GENERATED RELEASE TIME
-	for (int i = 0; i < n; i++) {
-		//S.w[i] = (int) distr_w(generator);
-		S.w[i] = 1;
-		S.r[i] = distr_r(generator);
-		S.d[i] = distr_d(generator) + S.r[i];
+			// Baptiste et al. (2004)
+			S.p[i] = distr_p(generator);
+			
+		}
+		T = 0;
+		for (int i = 0; i < n; i++) {
+			T += S.p[i];
+		}
+		std::uniform_int_distribution<int> distr_d(0, beta * T);
+		for (int i = 0; i < n; i++) {
+			S.d[i] = S.p[i] + distr_d(generator);
+		}
+
 	}
 
-	return generate_instanceTIF_WT(S, export_inst, print);
+	else {
+		// ALL SAME STARTING TIME AT GENERATED RELEASE TIME
+		for (int i = 0; i < n; i++) {
+			//S.w[i] = (int) distr_w(generator);
+			S.w[i] = 1;
+			S.r[i] = distr_r(generator);
+			S.d[i] = distr_d(generator) + S.r[i];
+		}
+	}
+
+	return generate_instanceTIF_WT(S, release_dates, export_inst, print);
 }
 
 

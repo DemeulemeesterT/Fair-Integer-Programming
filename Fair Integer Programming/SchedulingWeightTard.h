@@ -52,14 +52,16 @@ public:
 
 
 // FUNCTIONS FOR MINIMIZING THE WEIGHTED TARDINESS
-	inst generate_instanceTIF_WT(int nr, bool export_inst, bool print);
+	inst generate_instanceTIF_WT(int nr, bool release_dates, bool export_inst, bool print);
 	// Will create an instance object for the i-th instance
 	// The formulation that it will describe is a time-indexed formulation
 		// Similar to 'generate_instancesTIF()', but binary x_j variables are replaced by integer variables
-	inst generate_instanceTIF_WT(SchedWT_inst SI, bool export_inst, bool print);
+	// 'release_dates' is true if we have release dates different from zero (will increase the number of time periods)
 
-	inst generate_data_and_instance_TIF_WT(SchedWT_param param, bool export_inst, bool print);
-	// Generate data as in paper van den Akker et al. (2010), Section 9
+	inst generate_instanceTIF_WT(SchedWT_inst SI, bool release_dates, bool export_inst, bool print);
+
+	inst generate_data_and_instance_TIF_WT(SchedWT_param param, double beta, bool release_dates, bool export_inst, bool print);
+	// Generate data as in paper Baptiste, Carlier & Jouglet (2004), Section 5
 
 	// GENERAL VARIABLES
 	std::vector<SchedWT_inst> Sched_I;

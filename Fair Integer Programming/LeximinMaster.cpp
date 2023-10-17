@@ -56,7 +56,12 @@ lottery LeximinMaster::solve(bool print) {
 			//model->write("Generated Formulations/LeximinModel.lp");
 
 			model->optimize();
-			//model->write("Generated Formulations/LeximinMaster.lp");
+			model->write("Generated Formulations/LeximinMaster.lp");
+			int status = model->get(GRB_IntAttr_Status);
+			if (status == 3) {
+				model->computeIIS();
+				model->write("Generated Formulations/Leximin_IIS.ilp");
+			}
 			obj_val_master = model->get(GRB_DoubleAttr_ObjVal);
 			getDualValues(false, print);
 
@@ -192,7 +197,7 @@ lottery LeximinMaster::solve(bool print) {
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
-					//model->write("Generated Formulations/LeximinModel.lp");
+					model->write("Generated Formulations/LeximinModel.lp");
 					model->optimize();
 
 					// If optimal solution of Epsilon = 0
@@ -228,14 +233,14 @@ lottery LeximinMaster::solve(bool print) {
 							}
 							obj += dual_C_Sum1[0];
 							K->model->setObjective(obj, GRB_MINIMIZE);
-							//K->model->write("Generated Formulations/IPModel.lp");
+							K->model->write("Generated Formulations/IPModel.lp");
 
 							//bool correct_epsilon = check_reduced_cost_S_zero(M_remaining, print);
 
 							IP_report IP_R = K->solve_return_solution_MENU(false);
 							obj_val_pricing_epsilon = IP_R.opt_obj_value;
 							//obj_val_pricing_epsilon = K->solve(true);
-
+							int status = K->model->get(GRB_IntAttr_Status);
 							// If the model was infeasible
 							if (K->model->get(GRB_IntAttr_Status) == 3) {
 								all_solutions_in_S = true;
@@ -250,7 +255,8 @@ lottery LeximinMaster::solve(bool print) {
 										// to the obtained value of MIN_M
 
 								// We can simply do this by bounding the RHS of the bounding inequality to the optimal objective value of MIN_M...
-								C_bound[counter].set(GRB_DoubleAttr_RHS, obj_val_master);
+								double value = obj_val_master + K->Xmin[i] / (K->Xmax[i] - K->Xmin[i]);
+								C_bound[counter].set(GRB_DoubleAttr_RHS, value);
 								C_bound[counter].set(GRB_CharAttr_Sense, '=');
 
 								// And by setting the coefficient of MIN_M in that constraint to zero
@@ -278,7 +284,8 @@ lottery LeximinMaster::solve(bool print) {
 										// to the obtained value of MIN_M
 
 									// We can simply do this by bounding the RHS of the bounding inequality to the optimal objective value of MIN_M...
-									C_bound[counter].set(GRB_DoubleAttr_RHS, obj_val_master);
+									double value = obj_val_master + K->Xmin[i] / (K->Xmax[i] - K->Xmin[i]);
+									C_bound[counter].set(GRB_DoubleAttr_RHS, value);
 									C_bound[counter].set(GRB_CharAttr_Sense, '=');
 
 									// And by setting the coefficient of MIN_M in that constraint to zero
@@ -362,6 +369,7 @@ void LeximinMaster::addColumn(solution sol, bool print) {
 					// And for agents in M, this will still be the case for binary X-variables,
 					// as 1/(1-0) = 1.
 			//}
+
 			counter++;
 		}
 	}
@@ -458,15 +466,16 @@ void LeximinMaster::defineModelConVar(bool print) {
 	// To allow us to use our model for non-binary X-variables, we will add the following constant term to each of these constraints
 		// This term will be zero for binary X-variables.
 	double RHS_constant = 0;
-	for (int i = 0; i < K->I.n; i++) {
+	/*for (int i = 0; i < K->I.n; i++) {
 		if (K->M[i] == 1) {
 
 			RHS_constant += K->Xmin[i] / (K->Xmax[i] - K->Xmin[i]);
 		}
-	}
+	}*/
 	int counter = 0;
 	for (int i = 0; i < K->I.n; i++) {
 		if (K->M[i] == 1) {
+			RHS_constant = K->Xmin[i] / (K->Xmax[i] - K->Xmin[i]);
 			sprintf_s(name, "C_bound_%i", i);
 			C_bound[counter] = model->addConstr(-MIN_M - RHS_constant >= 0.0, name);
 			counter++;
@@ -497,6 +506,7 @@ void LeximinMaster::defineModelConVar(bool print) {
 						// And for agents in M, this will still be the case for binary X-variables,
 						// as 1/(1-0) = 1.
 				//}
+
 				counter++;
 			}
 		}

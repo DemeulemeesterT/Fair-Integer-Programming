@@ -1,0 +1,18 @@
+\ Model (null)_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Maximize
+ 
+Subject To
+ C_bound_3: - MIN_M + 2.692307692307693 w_0 + 3.692307692307693 w_1
+   + 2.692307692307693 w_2 + 3.692307692307693 w_3 + 2.692307692307693 w_4
+   + 3.692307692307693 w_5 + 3.692307692307693 w_6 >= 18.84615384615385
+ R5: w_0 + w_1 + w_2 + w_3 + w_4 + w_5 + w_6 = 1
+Bounds
+ w_0 free
+ -infinity <= w_1 <= 1
+ w_2 free
+ -infinity <= w_3 <= 1
+ w_4 free
+ -infinity <= w_5 <= 1
+ -infinity <= w_6 <= 1
+End
