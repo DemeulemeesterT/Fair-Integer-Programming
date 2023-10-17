@@ -383,6 +383,12 @@ inst SchedulingWeightTard::generate_data_and_instance_TIF_WT(SchedWT_param param
 		}
 	}
 
+	Sched_I.push_back(S);
+
+	if (export_inst) {
+		export_data(S, print);
+	}
+
 	return generate_instanceTIF_WT(S, release_dates, export_inst, print);
 }
 
@@ -471,6 +477,26 @@ SchedWT_inst SchedulingWeightTard::order_jobs(int nr, bool print) {
 	return S;
 }
 
+
+void SchedulingWeightTard::export_data(SchedWT_inst S_in, bool print) {
+	std::ofstream S;
+ 	std::string export_name = "Scheduling instances/Generated/" + data_name + ".dat";
+	S.open(export_name);
+	S << n << "\n";
+	// First, list the processing times
+	for (int i = 0; i < n; i++) {
+		S << S_in.p[i] << " ";
+	}
+	S << "\n";
+
+	// Then, list the due dates
+	for (int i = 0; i < n; i++) {
+		S << S_in.d[i] << " ";
+	}
+	S << "\n";
+
+	S.close();
+}
 
 SchedulingWeightTard::SchedulingWeightTard(std::string name, bool print) {
 	read_data(name, print);

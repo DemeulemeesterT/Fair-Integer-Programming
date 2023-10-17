@@ -32,6 +32,8 @@ public:
 	void read_data(std::string name, bool print);
 		// Will fill the 'I'-vector, which contains the instances
 
+	void export_data(SchedWT_inst S_in, bool print);
+
 // FUNCTIONS FOR MINIMIZING THE NUMBER OF TARDY JOBS //
 	inst generate_instanceTIF(int nr, bool export_inst, bool print);
 		// Will create an instance object for the i-th instance

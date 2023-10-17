@@ -14,12 +14,13 @@ int main()
 	SchedWT_param S;
 	S.common_process_time = 1;
 	S.n_jobs = 15;
-	S.seed = 1;
+	S.seed = 2;
+	S.name = "test";
 	bool release_dates = false;
 	double beta = 0.5;
 
 	SchedulingWeightTard* SWT = new SchedulingWeightTard(false);
-	inst I = SWT->generate_data_and_instance_TIF_WT(S, beta, release_dates, false, true);
+	inst I = SWT->generate_data_and_instance_TIF_WT(S, beta, release_dates, true, true);
 	IPSolver* K = new IPSolver(I, true);
 	K->solve(true);
 	K->model->write("Generated Formulations/IPModel.lp");

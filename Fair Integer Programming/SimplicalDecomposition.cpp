@@ -348,7 +348,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 	bool finished = false;
 	while (finished == false) {
-		//model->write("Generated Formulations/SDNashMaster.lp");
+		model->write("Generated Formulations/SDNashMaster.lp");
 		if (print) {
 			printf("ITERATION %i\n", iterations);
 		}
@@ -373,14 +373,14 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 			w_values.push_back(w[i].get(GRB_DoubleAttr_X));
 		}
 
-		/*double sum_check = 0;
+		double sum_check = 0;
 		for (int i = 0; i < w_values.size(); i++) {
 			if (w_values[i] > 0) {
 				printf("Solution %i\t%.2f\n", i, w_values[i]);
 				sum_check += w_values[i];
 			}
 		}
-		printf("Sum = %.4f\n\n", sum_check);*/
+		printf("Sum = %.4f\n\n", sum_check);
 
 		// Determine the value of the gradient evaluated at the solution
 		std::vector<double> gradient = gradientNash(p_values, print);
@@ -427,7 +427,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 					for (int k = 0; k < K->I.n; k++) {
 						if (K->M[k] == 1) {
 							//if (L.S[j].x[k] > K->Xmin[k]) {
-								sol_obj += gradient[counter] * (L.S[j].x[k] - K->Xmin[k]);
+								sol_obj += gradient[counter] * (L.S[j].x[k]);
 								if (print) {
 									printf("\t Existing solution obj: %.4f\n", sol_obj);
 								}
@@ -456,7 +456,8 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 						}
 					}
 					else {
-						if ((best_value - obj_val_pricing)/obj_val_pricing > - 0.01) {
+						//if ((best_value - obj_val_pricing)/obj_val_pricing > - 0.0001) {
+ 						if (best_value > obj_val_pricing - 0.0001) {
 							finished = true;
 							j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
 							if (print) {
@@ -591,7 +592,7 @@ SimplicalDecomposition::SimplicalDecomposition(IPSolver* K_in, bool print) {
 			char name_p[13];
 			sprintf_s(name_p, "p_%i", i);
 			// This means we know the lowest and highest values of the X-variables in the optimal solutions
-			p[counter] = model->addVar(K->Xmin[i], K->Xmax[i], 0.0, GRB_CONTINUOUS, name_p);
+			p[counter] = model->addVar(0, K->Xmax[i]- K->Xmin[i], 0.0, GRB_CONTINUOUS, name_p);
 			
 			counter++;
 		}
@@ -604,10 +605,12 @@ SimplicalDecomposition::SimplicalDecomposition(IPSolver* K_in, bool print) {
 
 	C_p = new GRBConstr[K->M.size()];
 	counter = 0;
-	for (int i = 0; i < dict.size(); i++) {
-		C_p[counter] = model->addConstr(-p[i] - K->Xmin[i] == 0.0);
+	for (int i = 0; i < K_in->I.n; i++) {
+		if (K_in->M[i] == 1) {
+			C_p[counter] = model->addConstr(-p[counter] - K->Xmin[i] == 0.0);
 			// We compare to the 'dystopia point', the minimum value that agent i receives in any of the optimal solutions.
-		counter++;
+			counter++;
+		}
 	}
 
 	// Now define the columns
