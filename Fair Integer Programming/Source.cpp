@@ -11,7 +11,7 @@ int main()
 	
 	//SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
 	//inst I = SWT->generate_instanceTIF_WT(1, false, true);
-	/*SchedWT_param S;
+	SchedWT_param S;
 	S.common_process_time = 1;
 	S.n_jobs = 30;
 	S.seed = 2;
@@ -26,10 +26,10 @@ int main()
 	K->model->write("Generated Formulations/IPModel.lp");
 	K->analyze(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("LC", 1000, true, false, 0);
+	L->compare_methods("C", 500, true, false, 0);
 	delete K;
 	delete SWT;
-	*/
+	
 	
 	
 	
@@ -73,7 +73,7 @@ int main()
 	*/
 	
 	
-	KidneyExchange* KE = new KidneyExchange("30-instance-32", true);
+	/*KidneyExchange* KE = new KidneyExchange("30-instance-32", true);
 	//KidneyExchange* KE = new KidneyExchange("70-instance-3", true);
 
 	inst I = KE->generate_instance(true, false);
@@ -109,5 +109,5 @@ int main()
 	//delete SD;
 	//delete K;
 	//delete KE;
-	
+	*/
 }

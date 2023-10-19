@@ -189,9 +189,9 @@ double IPSolver::solve(bool print) {
 				s.y = y;
 				s.ID = 0; // We won't use the binary represenation of a solution for cardinal solutions
 
-				if (done_partition == false) {
+				//if (done_partition == false) {
 					check_solution_in_S_cardinal(s, print);
-				}
+				//}
 			}
 		}
 	}

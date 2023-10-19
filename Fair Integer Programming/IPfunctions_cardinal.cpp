@@ -245,12 +245,12 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 		IP_R.s.ID = 0; // We won't use the binary represenation of a solution for cardinal solutions
 
 		found = false;
-		if (done_partition == false) {
-			found = check_solution_in_S_cardinal(s, print);
-		}
-		if (found == false) {
-			S.push_back(IP_R.s);
-		}
+		//if (done_partition == false) {
+			found = check_solution_in_S_cardinal(IP_R.s, print);
+		//}
+		//if (found == false) {
+		//	S.push_back(IP_R.s);
+		//}
 
 	}
 	else {
