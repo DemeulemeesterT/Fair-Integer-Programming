@@ -28,6 +28,10 @@ std::vector<ReportDistribution*> run_distribution_all_KE(std::string s, double t
 	// Note 22/02/2023: the time_limit parameter is not implemented yet
 		// The choice of the instances to be run can be controlled at the beginning of 'Run_distribution_all_KE.cpp'
 
+std::vector<ReportDistribution*> run_distribution_all_TotalTard(std::string s, int inst_generated, unsigned seed, double time_limit, int iterations, bool print);
+// Can be used to find distributions for total tardiness instances, generated
+// Note 22/02/2023: the time_limit parameter is not implemented yet
+
 std::vector<ReportDistribution*> run_distribution_all_SWT(std::string s, int nr_instances, double time_limit, int iterations, bool print);
 	// Can be used to find distributions for multiple Scheduling Weighted Tardiness instances sequentially
 	// Note 22/02/2023: the time_limit parameter is not implemented yet

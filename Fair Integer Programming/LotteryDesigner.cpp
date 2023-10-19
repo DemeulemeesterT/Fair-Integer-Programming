@@ -1096,7 +1096,7 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 					L.push_back(uniform(iterations, false));
 				}
 				else if (letter == "L") {
-					L.push_back(leximin(true));
+					L.push_back(leximin(false));
 				}
 				else if (letter == "R") {
 					L.push_back(RSD(iterations, false, seed));
