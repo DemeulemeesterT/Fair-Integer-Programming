@@ -127,10 +127,10 @@ lottery LeximinMaster::solve(bool print) {
 				}
 				else {
 					// This means that the solution to the primal problem is optimal
-					//if (IP_R_pricing.solution_already_in_S == false) {
+					if (IP_R_pricing.solution_already_in_S == false) {
 						// Remove the last added solution to K->S, because we will not create a variable for this
-					//	K->S.pop_back();
-					//}
+						K->S.pop_back();
+					}
 				}
 			}
 
@@ -251,6 +251,28 @@ lottery LeximinMaster::solve(bool print) {
 								// Stop the master-pricing iterations for the epsilon problems
 								obj_val_pricing_epsilon = 0;
 
+								std::vector<double> w_store(w.size(), 0.0);
+								for (int i = 0; i < w.size(); i++) {
+									w_store[i] = (w[i].get(GRB_DoubleAttr_X));
+								}
+
+
+								// Store the solution in 'L'
+								L.p = std::vector<double>(K->I.n, 0);
+								L.w = std::vector<double>();
+								L.S = std::vector<solution>();
+								for (int i = 0; i < w.size(); i++) {
+									L.S.push_back(K->S[i]);
+									L.w.push_back(w[i].get(GRB_DoubleAttr_X));
+								}
+
+								// Now calculate the selection probabilities of the agents
+								for (int i = 0; i < w.size(); i++) {
+									for (int j = 0; j < K->I.n; j++) {
+										L.p[j] += L.w[i] * K->S[i].x[j];
+									}
+								}
+
 								// Epsilon*=0 is the optimal solution
 									// This means that we have to fix the selection probabilty of agent i
 										// to the obtained value of MIN_M
@@ -262,7 +284,7 @@ lottery LeximinMaster::solve(bool print) {
 
 								// And by setting the coefficient of MIN_M in that constraint to zero
 								model->chgCoeff(C_bound[counter], MIN_M, 0.0);
-								model->write("Generated Formulations/LeximinModel.lp");
+								//model->write("Generated Formulations/LeximinModel.lp");
 
 								M_remaining[i] = 0;
 							}
@@ -280,6 +302,30 @@ lottery LeximinMaster::solve(bool print) {
 								}
 
 								else {
+									std::vector<double> w_store(w.size(), 0.0);
+									for (int i = 0; i < w.size(); i++) {
+										w_store[i] = (w[i].get(GRB_DoubleAttr_X));
+									}
+
+
+									// Store the solution in 'L'
+									L.p = std::vector<double>(K->I.n, 0);
+									L.w = std::vector<double>();
+									L.S = std::vector<solution>();
+									for (int i = 0; i < w.size(); i++) {
+										L.S.push_back(K->S[i]);
+										L.w.push_back(w[i].get(GRB_DoubleAttr_X));
+									}
+
+									// Now calculate the selection probabilities of the agents
+									for (int i = 0; i < w.size(); i++) {
+										for (int j = 0; j < K->I.n; j++) {
+											L.p[j] += L.w[i] * K->S[i].x[j];
+										}
+									}
+
+									//printf("P[22] = %.2f\n\n", L.p[22]);
+									
 									// Epsilon*=0 is the optimal solution
 									// This means that we have to fix the selection probabilty of agent i
 										// to the obtained value of MIN_M
@@ -291,15 +337,15 @@ lottery LeximinMaster::solve(bool print) {
 
 									// And by setting the coefficient of MIN_M in that constraint to zero
 									model->chgCoeff(C_bound[counter], MIN_M, 0.0);
-									model->write("Generated Formulations/LeximinModel.lp");
+									//model->write("Generated Formulations/LeximinModel.lp");
 
 									M_remaining[i] = 0;
 
-									//if (IP_R.solution_already_in_S == false) {
+									if (IP_R.solution_already_in_S == false) {
 										// Lastly, we remove the last added solution to K->S, because the K->solve() function will automatically store it
 										// while we will not create a variable for this solution
-									//	K->S.pop_back();
-									//}
+										K->S.pop_back();
+									}
 								}
 							}
 						
