@@ -1,0 +1,4 @@
+For instances 10,15,20,25,30 with beta = 0.05, 0.25,0.5:
+
+run_distribution_all_TotalTard("LC", 20, 0, 3600.0, 1, false);
+ (percentage wise difference treshold in Nash was set to 0.005)
