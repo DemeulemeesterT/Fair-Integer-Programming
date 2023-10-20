@@ -206,20 +206,6 @@ lottery LeximinMaster::solve(bool print) {
 					//model->write("Generated Formulations/LeximinModel.lp");
 					model->optimize();
 
-					// CHECK: which variables selected with positive weight?
-					std::vector<double> w_check(w.size(), 0.0);
-					for (int t = 0; t < w.size(); t++) {
-						w_check[t] = (w[t].get(GRB_DoubleAttr_X));
-					}
-
-					double sum_check = 0;
-					for (int t = 0; t < w.size(); t++) {
-						if (w_check[t] > 0) {
-							printf("Solution %i\t%.2f\n", t, w_check[t]);
-							sum_check += w_check[t];
-						}
-					}
-					printf("Sum = %.4f\n\n", sum_check);
 
 					// If optimal solution of Epsilon = 0
 						// The leximin selection probability of agent i should be equal to MIN_M
