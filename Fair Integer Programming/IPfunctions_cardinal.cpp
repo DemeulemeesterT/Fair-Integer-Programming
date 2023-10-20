@@ -89,7 +89,7 @@ double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 	std::vector<double> x(I.n, 0);
 	if (I.X_integer == true) {
 		for (int j = 0; j < I.n; j++) {
-			x[j] = (int) X[j].get(GRB_DoubleAttr_X);
+			x[j] = (int) (X[j].get(GRB_DoubleAttr_X) + 0.0001);
 		}
 	}
 	else {
@@ -101,7 +101,7 @@ double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 	std::vector<double> y(I.t, 0);
 	if (I.Y_integer == true) {
 		for (int j = 0; j < I.t; j++) {
-			y[j] = (int) Y_var[j].get(GRB_DoubleAttr_X);
+			y[j] = (int) (Y_var[j].get(GRB_DoubleAttr_X) + 0.0001);
 		}
 	}
 	else {
@@ -177,6 +177,10 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 	double z;
 	//printf("Status = %i\n", status);
 	if (status == 3) {
+		model->computeIIS();
+		model->write("Generated Formulations/UFL_IIS.ilp");
+	}
+	if (status == 4) {
 		model->computeIIS();
 		model->write("Generated Formulations/UFL_IIS.ilp");
 	}

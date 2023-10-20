@@ -14,7 +14,12 @@ lottery LeximinMaster::solve(bool print) {
 		expr += K->I.v[K->I.n + i] * K->Y_var[i];
 	}
 
-	K->model->addConstr(expr == K->opt);
+	if (K->I.X_integer == true) {
+		K->model->addConstr(expr == (int)(round(K->opt)));
+	} 
+	else {
+		K->model->addConstr(expr == K->opt);
+	}
 	//K->model->write("Generated Formulations/IPModel.lp");
 	int iterations = 1;
 
@@ -101,7 +106,7 @@ lottery LeximinMaster::solve(bool print) {
 			}
 			obj += dual_C_Sum1[0];
 			K->model->setObjective(obj, GRB_MINIMIZE);
-			//K->model->write("Generated Formulations/IPModel.lp");
+			K->model->write("Generated Formulations/IPModel.lp");
 
 			bool correct_master = check_reduced_cost_S_zero(M_remaining, print);
 
@@ -198,8 +203,23 @@ lottery LeximinMaster::solve(bool print) {
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
-					//model->write("Generated Formulations/LeximinModel.lp");
+					model->write("Generated Formulations/LeximinModel.lp");
 					model->optimize();
+
+					// CHECK: which variables selected with positive weight?
+					std::vector<double> w_check(w.size(), 0.0);
+					for (int t = 0; t < w.size(); t++) {
+						w_check[t] = (w[t].get(GRB_DoubleAttr_X));
+					}
+
+					double sum_check = 0;
+					for (int t = 0; t < w.size(); t++) {
+						if (w_check[t] > 0) {
+							printf("Solution %i\t%.2f\n", t, w_check[t]);
+							sum_check += w_check[t];
+						}
+					}
+					printf("Sum = %.4f\n\n", sum_check);
 
 					// If optimal solution of Epsilon = 0
 						// The leximin selection probability of agent i should be equal to MIN_M
@@ -252,8 +272,8 @@ lottery LeximinMaster::solve(bool print) {
 								obj_val_pricing_epsilon = 0;
 
 								std::vector<double> w_store(w.size(), 0.0);
-								for (int i = 0; i < w.size(); i++) {
-									w_store[i] = (w[i].get(GRB_DoubleAttr_X));
+								for (int t = 0; t < w.size(); t++) {
+									w_store[t] = (w[t].get(GRB_DoubleAttr_X));
 								}
 
 
@@ -261,15 +281,15 @@ lottery LeximinMaster::solve(bool print) {
 								L.p = std::vector<double>(K->I.n, 0);
 								L.w = std::vector<double>();
 								L.S = std::vector<solution>();
-								for (int i = 0; i < w.size(); i++) {
-									L.S.push_back(K->S[i]);
-									L.w.push_back(w[i].get(GRB_DoubleAttr_X));
+								for (int t = 0; t < w.size(); t++) {
+									L.S.push_back(K->S[t]);
+									L.w.push_back(w[t].get(GRB_DoubleAttr_X));
 								}
 
 								// Now calculate the selection probabilities of the agents
-								for (int i = 0; i < w.size(); i++) {
+								for (int t = 0; t < w.size(); t++) {
 									for (int j = 0; j < K->I.n; j++) {
-										L.p[j] += L.w[i] * K->S[i].x[j];
+										L.p[j] += L.w[t] * K->S[t].x[j];
 									}
 								}
 
@@ -303,8 +323,8 @@ lottery LeximinMaster::solve(bool print) {
 
 								else {
 									std::vector<double> w_store(w.size(), 0.0);
-									for (int i = 0; i < w.size(); i++) {
-										w_store[i] = (w[i].get(GRB_DoubleAttr_X));
+									for (int t = 0; t < w.size(); t++) {
+										w_store[t] = (w[t].get(GRB_DoubleAttr_X));
 									}
 
 
@@ -312,15 +332,15 @@ lottery LeximinMaster::solve(bool print) {
 									L.p = std::vector<double>(K->I.n, 0);
 									L.w = std::vector<double>();
 									L.S = std::vector<solution>();
-									for (int i = 0; i < w.size(); i++) {
-										L.S.push_back(K->S[i]);
-										L.w.push_back(w[i].get(GRB_DoubleAttr_X));
+									for (int t = 0; t < w.size(); t++) {
+										L.S.push_back(K->S[t]);
+										L.w.push_back(w[t].get(GRB_DoubleAttr_X));
 									}
 
 									// Now calculate the selection probabilities of the agents
-									for (int i = 0; i < w.size(); i++) {
+									for (int t = 0; t < w.size(); t++) {
 										for (int j = 0; j < K->I.n; j++) {
-											L.p[j] += L.w[i] * K->S[i].x[j];
+											L.p[j] += L.w[t] * K->S[t].x[j];
 										}
 									}
 
