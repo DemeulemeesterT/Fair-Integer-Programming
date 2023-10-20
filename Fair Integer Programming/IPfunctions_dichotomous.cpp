@@ -1279,7 +1279,14 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 			for (int j = 0; j < I.t; j++) {
 				lin += I.v[I.n + j] * Y_var[j];
 			}
-			GRBConstr CON_OPT = model->addConstr(lin == (double) opt);
+			
+			GRBConstr CON_OPT;
+			if (I.X_integer == true) {
+				CON_OPT = model->addConstr(lin == (int) (round(opt)));
+			}
+			else {
+				CON_OPT = model->addConstr(lin == (double)opt);
+			}
 
 			// Go through all agents in 'M', which is the number of agents in the order by now
 			for (int j = 0; j < M_size; j++) {

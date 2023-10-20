@@ -11,7 +11,13 @@ void IPSolver::partition_cardinal(bool print) {
 	for (int j = 0; j < I.t; j++) {
 		lin += I.v[I.n + j] * Y_var[j];
 	}
-	GRBConstr OPT_CONSTRAINT = model->addConstr(lin == (double) opt);
+	GRBConstr OPT_CONSTRAINT;
+	if (I.X_integer == true) {
+		OPT_CONSTRAINT = model->addConstr(lin == (int) (round(opt)));
+	}
+	else {
+		OPT_CONSTRAINT = model->addConstr(lin == (double)opt);
+	}
 	//model->write("Generated Formulations/IPModel.lp");
 
 
@@ -89,7 +95,7 @@ double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 	std::vector<double> x(I.n, 0);
 	if (I.X_integer == true) {
 		for (int j = 0; j < I.n; j++) {
-			x[j] = (int) (X[j].get(GRB_DoubleAttr_X) + 0.0001);
+			x[j] = (int) (round(X[j].get(GRB_DoubleAttr_X)));
 		}
 	}
 	else {
@@ -101,7 +107,7 @@ double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 	std::vector<double> y(I.t, 0);
 	if (I.Y_integer == true) {
 		for (int j = 0; j < I.t; j++) {
-			y[j] = (int) (Y_var[j].get(GRB_DoubleAttr_X) + 0.0001);
+			y[j] = (int) (round(Y_var[j].get(GRB_DoubleAttr_X)));
 		}
 	}
 	else {

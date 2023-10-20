@@ -106,7 +106,7 @@ lottery LeximinMaster::solve(bool print) {
 			}
 			obj += dual_C_Sum1[0];
 			K->model->setObjective(obj, GRB_MINIMIZE);
-			K->model->write("Generated Formulations/IPModel.lp");
+			//K->model->write("Generated Formulations/IPModel.lp");
 
 			bool correct_master = check_reduced_cost_S_zero(M_remaining, print);
 
@@ -203,7 +203,7 @@ lottery LeximinMaster::solve(bool print) {
 					}
 
 					model->chgCoeff(C_bound[counter], Epsilon, -1.0);
-					model->write("Generated Formulations/LeximinModel.lp");
+					//model->write("Generated Formulations/LeximinModel.lp");
 					model->optimize();
 
 					// CHECK: which variables selected with positive weight?

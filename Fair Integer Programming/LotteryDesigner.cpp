@@ -155,7 +155,12 @@ lottery LotteryDesigner::uniform(int iterations, bool print) {
 	for (int j = 0; j < K->I.t; j++) {
 		lin += K->I.v[K->I.n + j] * K->Y_var[j];
 	}
-	K->model->addConstr(lin == K->opt);
+	if (K->I.X_integer == true) {
+		K->model->addConstr(lin == (int)(round(K->opt)));
+	}
+	else {
+		K->model->addConstr(lin == K->opt);
+	}
 	//K->model->write("Generated formulations/IPModel.lp");
 
 	clock_t start_time = clock();
