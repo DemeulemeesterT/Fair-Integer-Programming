@@ -175,7 +175,10 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(int nr, bool release_dates, b
 inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool release_dates, bool export_inst, bool print) {
 	inst I;
 
-	I.n = n; // One variable for each task to represent tardiness
+	I.n = n; // One variable for each task to represent the utiliy an agent receives from that job:
+		// This utility is the inverse of the tardiness.
+		// Job before deadline: utility = 0
+		// Job after deadline: utility = minus tardiness
 
 	int T = 0;
 	for (int i = 0; i < I.n; i++) {
@@ -226,12 +229,13 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool release
 	// Based on their results, we chose to implement formulation using Time index variables [F2]
 
 	// Objective coefficients
-		// Minimizing the weights of the tasks that are planned after the due date would result in objective function
-		// min \sum_j (w_j * x_j)
-		// IPSolver class uses maximization function, so -w_j
+		// Maximizing the weighted utility here is equivalent to minimizing the total weighted tardiness
+		// min \sum_j (-w_j * x_j)
+		// OR: max \sum_j (w_j * x_j)
+		// IPSolver class uses maximization function, so w_j
 
 	for (int i = 0; i < I.n; i++) {
-		I.v.push_back(-SI.w[i]);
+		I.v.push_back(SI.w[i]);
 	}
 	for (int i = 0; i < I.t; i++) {
 		I.v.push_back(0);
@@ -285,11 +289,11 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool release
 
 
 	// For each task we add the following constraint:
-	// \sum_t(t * y_jt) + p_j <= d_j + x_j
-	// \sum_t(t * y_jt) - x_j <= d_j - p_j
+	// \sum_t(t * y_jt) + p_j <= d_j - x_j
+	// \sum_t(t * y_jt) + x_j <= d_j - p_j
 
 	for (int i = 0; i < I.n; i++) {
-		I.A[ConNr][i] = -1;
+		I.A[ConNr][i] = 1;
 		for (int t = 0; t < T; t++) {
 			I.A[ConNr][I.n + i * T + t] = t;
 		}
@@ -298,10 +302,9 @@ inst SchedulingWeightTard::generate_instanceTIF_WT(SchedWT_inst SI, bool release
 	}
 	
 	// BOUNDS
-	// For each job set: x_j >= 0
-	// -x_j <= 0
+	// For each job set: x_j <= 0
 	for (int i = 0; i < I.n; i++) {
-		I.A[ConNr][i] = -1;
+		I.A[ConNr][i] = 1;
 		I.C.push_back(0);
 		ConNr++;
 	}
