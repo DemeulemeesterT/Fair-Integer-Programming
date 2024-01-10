@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	run_distribution_all_TotalTard("LC", 20, 0, 3600.0, 1, false);
+	run_distribution_all_TotalTard("R", 20, 0, 3600.0, 100, false);
 	//run_distribution_all_KE("L", 3600.0, 1, false);
 	//run_distribution_all_SWT("H", 50, 3600.0, 1000, false);
 	//compare_time_normal_RSD_SWT(1000, 50, false);
