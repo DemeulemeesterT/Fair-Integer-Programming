@@ -336,8 +336,6 @@ inst SchedulingWeightTard::generate_data_and_instance_TIF_WT(SchedWT_param param
 	// Initate random generators
 	std::mt19937 generator((unsigned)param.seed);
 	//std::uniform_int_distribution<int> distr_w(0, 120);
-	std::uniform_int_distribution<int> distr_r(0, (param.n_jobs - 6) * param.common_process_time);
-	std::uniform_int_distribution<int> distr_d(param.common_process_time, (param.n_jobs - 5) * param.common_process_time);
 	
 	// Baptiste et al. (2004)
 	double T = 0;
@@ -378,6 +376,10 @@ inst SchedulingWeightTard::generate_data_and_instance_TIF_WT(SchedWT_param param
 
 	else {
 		// ALL SAME STARTING TIME AT GENERATED RELEASE TIME
+
+		std::uniform_int_distribution<int> distr_r(0, (param.n_jobs - 6) * param.common_process_time);
+		std::uniform_int_distribution<int> distr_d(param.common_process_time, (param.n_jobs - 5) * param.common_process_time);
+
 		for (int i = 0; i < n; i++) {
 			//S.w[i] = (int) distr_w(generator);
 			S.w[i] = 1;

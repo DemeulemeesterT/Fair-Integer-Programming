@@ -4,16 +4,16 @@ double IPSolver::solve(bool print) {
 
 	solver_times++;
 
-	//model->getEnv().set(GRB_IntParam_OutputFlag, 1);
+	model->getEnv().set(GRB_IntParam_OutputFlag, 1);
 
-	//model->write("Generated Formulations/IPModel.lp");
+	model->write("Generated Formulations/IPModel.lp");
 
 	model->optimize();
 	int status = model->get(GRB_IntAttr_Status);
-	//if (status == 3) {
-	//	model->computeIIS();
-	//	model->write("Generated Formulations/UFL_IIS.ilp");
-	//}
+	if (status == 4) {
+		model->computeIIS();
+		model->write("Generated Formulations/UFL_IIS.ilp");
+	}
 
 	double z;
 	if (status != 3) { // If feasible

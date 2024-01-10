@@ -243,10 +243,10 @@ void IPSolver::initializeGurobi(bool print) {
 			}
 			else {
 				if (I.X_integer == true) {
-					X[i] = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_INTEGER, name_x);
+					X[i] = model->addVar(-GRB_INFINITY, GRB_INFINITY, 0.0, GRB_INTEGER, name_x);
 				}
 				else {
-					X[i] = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS, name_x);
+					X[i] = model->addVar(-GRB_INFINITY, GRB_INFINITY, 0.0, GRB_CONTINUOUS, name_x);
 				}
 			}
 		}
