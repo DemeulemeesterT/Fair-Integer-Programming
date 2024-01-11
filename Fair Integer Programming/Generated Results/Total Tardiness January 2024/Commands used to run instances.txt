@@ -1,0 +1,13 @@
+For Nash and Leximin, and for between 10 and 30 jobs (with steps of 5), we used:
+ 	run_distribution_all_TotalTard("LC", 50, 0, 3600.0, 100, false);
+
+and in the run_distribution, the first lines were:
+	// Prepare to go through all instances
+	std::vector<int> N_vector;
+	std::vector<double> beta_vector;
+	N_vector = { 10,15,20,25,30 };
+	beta_vector = { 0.05, 0.25, 0.5 };
+
+	// Create vector with seeds, and export it
+	std::mt19937 generator((unsigned)seed);
+	std::uniform_int_distribution<int> distr(-100000000, 100000000);
