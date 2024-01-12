@@ -82,6 +82,8 @@ void IPSolver::partition_cardinal(bool print) {
 double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 	solver_times++;
 
+	//model->getEnv().set(GRB_IntParam_OutputFlag, 1);
+
 	model->optimize();
 	int status = model->get(GRB_IntAttr_Status);
 	if (status == 3) {

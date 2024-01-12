@@ -15,8 +15,8 @@ int main()
 	/*SchedWT_param S;
 	//S.common_process_time = 1;
 	S.n_jobs = 30;
-	S.seed = -52666736;
-	S.name = "test";
+	S.seed = -96278939;
+	S.name = "test_TT_50_0.50_6";
 	bool release_dates = false;
 	double beta = 0.5;
 

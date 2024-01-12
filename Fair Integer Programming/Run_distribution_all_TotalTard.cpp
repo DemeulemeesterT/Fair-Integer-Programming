@@ -6,8 +6,8 @@ std::vector<ReportDistribution*> run_distribution_all_TotalTard(std::string s, i
 	// Prepare to go through all instances
 	std::vector<int> N_vector;
 	std::vector<double> beta_vector;
-	N_vector = { 10,15,20,25,30 };
-	beta_vector = { 0.05, 0.25, 0.5 };
+	N_vector = { 30 };
+	beta_vector = { 0.5 };
 
 	// Create vector with seeds, and export it
 	std::mt19937 generator((unsigned)seed);
