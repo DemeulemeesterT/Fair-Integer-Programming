@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	run_distribution_all_TotalTard("LC", 20, 0, 3600.0, 1, false);
+	run_distribution_all_TotalTard("LC", 50, 0, 3600.0, 100, false);
 	//run_distribution_all_KE("L", 3600.0, 1, false);
 	//run_distribution_all_SWT("H", 50, 3600.0, 1000, false);
 	//compare_time_normal_RSD_SWT(1000, 50, false);
@@ -14,9 +14,9 @@ int main()
 	//inst I = SWT->generate_instanceTIF_WT(1, false, true);
 	/*SchedWT_param S;
 	//S.common_process_time = 1;
-	S.n_jobs = 20;
-	S.seed = -52666736;
-	S.name = "test";
+	S.n_jobs = 30;
+	S.seed = -96278939;
+	S.name = "test_TT_50_0.50_6";
 	bool release_dates = false;
 	double beta = 0.5;
 

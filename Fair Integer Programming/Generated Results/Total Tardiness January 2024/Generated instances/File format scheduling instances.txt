@@ -1,0 +1,6 @@
+First line contains number of jobs, n
+Second line contains the processing times p of the jobs
+Third line contains the due dates of the jobs
+
+Data was generated according to paper Baptiste, Carlier, Jouglet (2004).
+https://doi.org/10.1016/S0377-2217(03)00378-3
