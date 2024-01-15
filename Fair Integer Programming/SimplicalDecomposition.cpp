@@ -234,8 +234,8 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 	// Control precision of piecewise-linear approximation of log functions
 	// See: https://www.gurobi.com/documentation/current/refman/general_constraints.html
-	model->getEnv().set(GRB_IntParam_FuncPieces, -2);
-	model->getEnv().set(GRB_DoubleParam_FuncPieceError, 0.000001);
+	//model->getEnv().set(GRB_IntParam_FuncPieces, -2);
+	//model->getEnv().set(GRB_DoubleParam_FuncPieceError, 0.000001);
 
 
 	//model->write("Generated Formulations/SDNashMaster.lp");
@@ -417,7 +417,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 				// and  Larsson T, Patriksson M, Rydergren C (1997) Applications
 				//of simplicial decomposition with nonlinear column generation to nonlinear network flows.In: Pardalos PM, Hager
 				//	WW, Hearn DW(eds) Network Qptimization.Lecture Notes
-				//	Economicsand Math Systems.Springer, Berlin, pp 346–373
+				//	Economic sand Math Systems.Springer, Berlin, pp 346–373
 			}
 		}
 

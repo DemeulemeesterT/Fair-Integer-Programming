@@ -1288,7 +1288,19 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 				printf("\n");
 				for (int i = 0; i < K->I.n; i++) {
 					for (int s = 0; s < L[0].S.size(); s++) {
-						printf("\t%i", (int)L[0].S[s].x[i]);
+						if (L[0].w[s] > 0) {
+							printf("\t%i", (int)L[0].S[s].x[i]);
+						}
+					}
+					printf("\n");
+				}
+
+				printf("\n\n");
+				for (int i = 0; i < K->I.n; i++) {
+					for (int s = 0; s < L[1].S.size(); s++) {
+						if (L[1].w[s] > 0) {
+							printf("\t%i", (int)L[1].S[s].x[i]);
+						}
 					}
 					printf("\n");
 				}
