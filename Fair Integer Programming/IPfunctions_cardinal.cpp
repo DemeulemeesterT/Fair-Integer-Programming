@@ -37,6 +37,12 @@ void IPSolver::partition_cardinal(bool print) {
 		//model->write("Generated Formulations/IPModel.lp");
 
 		solve_partition_cardinal(i, false, print);
+		//printf(".");
+		//if (i > 0) {
+		//	if (i % 10 == 0) {
+		//		printf("\n");
+		//	}
+		//}
 	}
 
 	double length = ((double)(clock() - start_time) / CLK_TCK);
@@ -75,6 +81,8 @@ void IPSolver::partition_cardinal(bool print) {
 	time_partition = length;
 
 	done_partition = true;
+
+	printf("Partition finished.\n");
 }
 
 
@@ -171,6 +179,8 @@ double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 }
 
 IP_report IPSolver::solve_return_solution_cardinal(bool print) {
+	model->getEnv().set(GRB_IntParam_OutputFlag, 1);      //comment to see the output of the solver
+
 	IP_report IP_R;
 	solution s;
 	bool found = false;
@@ -179,7 +189,7 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 	std::vector<double> y(I.t, 0);
 	
 	solver_times++;
-	//model->write("Generated Formulations/IPModel.lp");
+	model->write("Generated Formulations/IPModel.lp");
 	model->optimize();
 	int status = model->get(GRB_IntAttr_Status);
 	double z;
