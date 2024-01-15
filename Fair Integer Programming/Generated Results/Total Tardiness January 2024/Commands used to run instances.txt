@@ -1,7 +1,7 @@
-For Nash and Leximin, and for between 10 and 30 jobs (with steps of 5), we used:
+1. For Nash and Leximin, and for between 10 and 30 jobs (with steps of 5), we used:
  	run_distribution_all_TotalTard("LC", 50, 0, 3600.0, 100, false);
 
-and in the run_distribution, the first lines were:
+   and in the run_distribution, the first lines were:
 	// Prepare to go through all instances
 	std::vector<int> N_vector;
 	std::vector<double> beta_vector;
@@ -11,3 +11,22 @@ and in the run_distribution, the first lines were:
 	// Create vector with seeds, and export it
 	std::mt19937 generator((unsigned)seed);
 	std::uniform_int_distribution<int> distr(-100000000, 100000000);
+
+
+   However, for 30 jobs and beta = 0.50, solving the partition proved to be a tedious job.
+   There were several instances for which the partition couldn't be found in multiple hours.
+
+2. To run the RSD, we used:
+	run_distribution_all_TotalTard("R", 50, 0, 3600.0, 1000, false);
+   
+   and in the run_distribution file, the first lines were: 
+	std::vector<int> N_vector;
+	std::vector<double> beta_vector;
+	N_vector = { 10, 15, 20, 25, 30 };
+	beta_vector = { 0.05, 0.25, 0.50 };
+
+	// Create vector with seeds, and export it
+	std::mt19937 generator((unsigned)seed);
+	std::uniform_int_distribution<int> distr(-100000000, 100000000);
+
+

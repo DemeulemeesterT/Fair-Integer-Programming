@@ -229,7 +229,7 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 }
 
 lottery SimplicalDecomposition::Nash_CG(bool print) {
-	//model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
+	//model->getEnv().set(GRB_IntParam_OutputFlag, 1);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	//model->write("Generated Formulations/SDNashMaster.lp");
@@ -240,7 +240,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 	}
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
-	model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+	model->getEnv().set(GRB_IntParam_OutputFlag, 1);   //comment to see the output of the solver
 
 
 	int counter;
@@ -296,7 +296,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 	}
 	model->setObjective(obj, GRB_MAXIMIZE);
 
-	//model->write("Generated Formulations/SDNashMaster.lp");
+	model->write("Generated Formulations/SDNashMaster.lp");
 
 	// Add the columns
 	columns.resize(K->S.size());
@@ -358,7 +358,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 	bool finished = false;
 	while (finished == false) {
-		//model->write("Generated Formulations/SDNashMaster.lp");
+		model->write("Generated Formulations/SDNashMaster.lp");
 		if (print) {
 			printf("ITERATION %i\n", iterations);
 		}
@@ -425,7 +425,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 		// Store solution
 		if (K->model->get(GRB_IntAttr_Status) != 3) { // If pricing problem not infeasible
-			if (IP_R.solution_already_in_S == false) {
+			//if (IP_R.solution_already_in_S == false) {
 				// Check for one of the solutions that is already included in the master problem what its objective value for this gradient would be
 				double best_value = -1e30;
 				int j = 0;
@@ -444,6 +444,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 								counter++;
 							}
 						}
+
 
 						if (sol_obj > best_value) {
 							best_value = sol_obj;
@@ -465,8 +466,8 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 							}
 						}
 						else {
-							if ((best_value - obj_val_pricing) / obj_val_pricing > -0.005) {
-								//if (best_value > obj_val_pricing - 0.0001) {
+							//if ((best_value - obj_val_pricing) / obj_val_pricing > -0.005) {
+							if (best_value > obj_val_pricing - 0.005) {
 								finished = true;
 								j = L.S.size(); // Finish the while loop and the search for additional solutions, the optimal solution has been found
 								if (print) {
@@ -506,10 +507,10 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 					//K->model->update();
 					*/
 				}
-			}
-			else {
-				finished = true;
-			}
+			//}
+			//else {
+			//	finished = true;
+			//}
 		}
 		else {
 			finished = true;
