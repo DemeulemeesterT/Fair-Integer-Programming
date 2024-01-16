@@ -229,8 +229,14 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 }
 
 lottery SimplicalDecomposition::Nash_CG(bool print) {
-	//model->getEnv().set(GRB_IntParam_OutputFlag, 1);      //comment to see the output of the solver
+	model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
+
+	// Control precision of piecewise-linear approximation of log functions
+	// See: https://www.gurobi.com/documentation/current/refman/general_constraints.html
+	//model->getEnv().set(GRB_IntParam_FuncPieces, -2);
+	//model->getEnv().set(GRB_DoubleParam_FuncPieceError, 0.000001);
+
 
 	//model->write("Generated Formulations/SDNashMaster.lp");
 
@@ -240,7 +246,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 	}
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
-	model->getEnv().set(GRB_IntParam_OutputFlag, 1);   //comment to see the output of the solver
+	model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 
 	int counter;
@@ -296,7 +302,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 	}
 	model->setObjective(obj, GRB_MAXIMIZE);
 
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 
 	// Add the columns
 	columns.resize(K->S.size());
@@ -358,7 +364,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 	bool finished = false;
 	while (finished == false) {
-		model->write("Generated Formulations/SDNashMaster.lp");
+		//model->write("Generated Formulations/SDNashMaster.lp");
 		if (print) {
 			printf("ITERATION %i\n", iterations);
 		}
@@ -377,12 +383,42 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 			p_values.push_back(p[i].get(GRB_DoubleAttr_X));
 		}
 
+		//for (int i = 0; i < dict.size(); i++) {
+		//	printf("p[%i] = %.2f\n", dict[i], p_values[i]);
+		//}
+
 		// Get the values of the w-variables
 		std::vector<double> w_values;
 		for (int i = 0; i < L.S.size(); i++) {
 			w_values.push_back(w[i].get(GRB_DoubleAttr_X));
 		}
-		/*
+
+		/*// CHECK:
+		std::vector<double> p_values_check(dict.size(), 0);
+		for (int i = 0; i < w_values.size(); i++) {
+			if (w_values[i] > 0) {
+				int counter_check = 0;
+				for (int j = 0; j < K->I.n; j++) {
+					if (K->M[j] == 1) {
+						p_values_check[counter_check] += w_values[i] * K->S[i].x[j];
+						counter_check++;
+					}
+				}
+			}
+		}
+		int counter_check = 0;
+		for (int j = 0; j < K->I.n; j++) {
+			if (K->M[j] == 1) {
+				p_values_check[counter_check] -=  K->Xmin[j];
+				counter_check++;
+			}
+		}
+
+		printf("CHECK:\n");
+		for (int i = 0; i < dict.size(); i++) {
+			printf("p[%i] = %.2f\n", dict[i], p_values_check[i]);
+		}
+		
 		double sum_check = 0;
 		for (int i = 0; i < w_values.size(); i++) {
 			if (w_values[i] > 0) {
@@ -411,7 +447,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 				// and  Larsson T, Patriksson M, Rydergren C (1997) Applications
 				//of simplicial decomposition with nonlinear column generation to nonlinear network flows.In: Pardalos PM, Hager
 				//	WW, Hearn DW(eds) Network Qptimization.Lecture Notes
-				//	Economicsand Math Systems.Springer, Berlin, pp 346–373
+				//	Economic sand Math Systems.Springer, Berlin, pp 346–373
 			}
 		}
 
@@ -425,7 +461,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 		// Store solution
 		if (K->model->get(GRB_IntAttr_Status) != 3) { // If pricing problem not infeasible
-			//if (IP_R.solution_already_in_S == false) {
+			if (IP_R.solution_already_in_S == false) {
 				// Check for one of the solutions that is already included in the master problem what its objective value for this gradient would be
 				double best_value = -1e30;
 				int j = 0;
@@ -445,6 +481,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 							}
 						}
 
+						j = L.S.size();
 
 						if (sol_obj > best_value) {
 							best_value = sol_obj;
@@ -489,6 +526,23 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 					//addColumn(K->S.back(), print);
 					//L.S.push_back(K->S.back());
 
+					if (K->I.X_integer == true) {
+						GRBLinExpr lin = 0;
+						int counter_block = 0;
+						if (K->I.Y_bool == true) {
+							
+							for (int i = 0; i < IP_R.s.y.size(); i++) {
+								if (IP_R.s.y[i] == 1) {
+									lin += K->Y_var[i];
+									counter_block++;
+								}
+							}
+						}
+						K->model->addConstr(lin <= (counter_block - 1));
+						K->model->update();
+					}
+				}
+
 					//K->block_solution(K->S.back());
 						// This will block entire solution (including agents in Y and y-variables)
 
@@ -506,11 +560,10 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 					K->model->addConstr(lin <= (counter - 1));
 					//K->model->update();
 					*/
-				}
-			//}
-			//else {
-			//	finished = true;
-			//}
+			}
+			else {
+				finished = true;
+			}
 		}
 		else {
 			finished = true;
@@ -567,9 +620,9 @@ void SimplicalDecomposition::addColumn(solution sol, bool print) {
 	for (int i = 0; i < K->I.n; i++) {
 		if (K->M[i] == 1) {
 			// It only makes sense to include the agents in 'M'
-			if (sol.x[i] > K->Xmin[i]) {
+			//if (sol.x[i] > K->Xmin[i]) {
 				col.addTerm(sol.x[i], C_p[counter]);
-			}
+			//}
 			counter++;
 		}
 	}

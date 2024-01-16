@@ -248,7 +248,7 @@ lottery LotteryDesigner::leximin(bool print) {
 
 	// Reset 'K', so that we don't "cheat" by making it easier for the other methods.
 	reset_K(print);
-	
+
 	return L;
 }
 
@@ -1288,12 +1288,13 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 				printf("\n");
 				for (int i = 0; i < K->I.n; i++) {
 					for (int s = 0; s < L[0].S.size(); s++) {
-						printf("\t%i", (int)L[0].S[s].x[i]);
+						if (L[0].w[s] > 0) {
+							printf("\t%i", (int)L[0].S[s].x[i]);
+						}
 					}
 					printf("\n");
 				}
 
-				printf("\n\n");
 			}
 		}
 
