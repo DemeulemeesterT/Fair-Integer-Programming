@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	//run_distribution_all_TotalTard("R", 50, 0, 3600.0, 1000, false);
+	//run_distribution_all_TotalTard("C", 50, 0, 3600.0, 1000, false);
 	//run_distribution_all_KE("L", 3600.0, 1, false);
 	//run_distribution_all_SWT("H", 50, 3600.0, 1000, false);
 	//compare_time_normal_RSD_SWT(1000, 50, false);
@@ -14,11 +14,11 @@ int main()
 	//inst I = SWT->generate_instanceTIF_WT(1, false, true);
 	SchedWT_param S;
 	//S.common_process_time = 1;
-	S.n_jobs = 25;
-	S.seed = 10220515;
-	S.name = "test_TT_25_0.05_6";
+	S.n_jobs = 10;
+	S.seed = 80757630;
+	S.name = "test_TT_10_0.25_16";
 	bool release_dates = false;
-	double beta = 0.05;
+	double beta = 0.25;
 
 	SchedulingWeightTard* SWT = new SchedulingWeightTard(false);
 	inst I = SWT->generate_data_and_instance_TIF_WT(S, beta, release_dates, true, true);
@@ -27,7 +27,7 @@ int main()
 	K->model->write("Generated Formulations/IPModel.lp");
 	K->analyze(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("CL", 1000, true, false, 0);
+	L->compare_methods("CLR", 100, true, false, 0);
 	delete K;
 	delete SWT;
 	

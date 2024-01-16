@@ -532,7 +532,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 						if (K->I.Y_bool == true) {
 							
 							for (int i = 0; i < IP_R.s.y.size(); i++) {
-								if (IP_R.s.y[i] == 1) {
+								if (round(IP_R.s.y[i]) == 1) {
 									lin += K->Y_var[i];
 									counter_block++;
 								}
