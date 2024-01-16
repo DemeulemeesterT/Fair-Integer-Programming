@@ -14,9 +14,9 @@ int main()
 	//inst I = SWT->generate_instanceTIF_WT(1, false, true);
 	SchedWT_param S;
 	//S.common_process_time = 1;
-	S.n_jobs = 15;
-	S.seed = 92792145;
-	S.name = "test_TT_15_0.05_25";
+	S.n_jobs = 25;
+	S.seed = 10220515;
+	S.name = "test_TT_25_0.05_6";
 	bool release_dates = false;
 	double beta = 0.05;
 
@@ -27,7 +27,7 @@ int main()
 	K->model->write("Generated Formulations/IPModel.lp");
 	K->analyze(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("C", 1000, true, false, 0);
+	L->compare_methods("CL", 1000, true, false, 0);
 	delete K;
 	delete SWT;
 	

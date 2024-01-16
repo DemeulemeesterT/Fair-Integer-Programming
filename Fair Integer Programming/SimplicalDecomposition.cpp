@@ -229,7 +229,7 @@ lottery SimplicalDecomposition::SD_Nash(bool print) {
 }
 
 lottery SimplicalDecomposition::Nash_CG(bool print) {
-	//model->getEnv().set(GRB_IntParam_OutputFlag, 1);      //comment to see the output of the solver
+	model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 	// Control precision of piecewise-linear approximation of log functions
@@ -246,7 +246,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 	}
 	K->model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
-	model->getEnv().set(GRB_IntParam_OutputFlag, 1);   //comment to see the output of the solver
+	model->getEnv().set(GRB_IntParam_OutputFlag, 0);   //comment to see the output of the solver
 
 
 	int counter;
@@ -302,7 +302,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 	}
 	model->setObjective(obj, GRB_MAXIMIZE);
 
-	model->write("Generated Formulations/SDNashMaster.lp");
+	//model->write("Generated Formulations/SDNashMaster.lp");
 
 	// Add the columns
 	columns.resize(K->S.size());
@@ -364,7 +364,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 	bool finished = false;
 	while (finished == false) {
-		model->write("Generated Formulations/SDNashMaster.lp");
+		//model->write("Generated Formulations/SDNashMaster.lp");
 		if (print) {
 			printf("ITERATION %i\n", iterations);
 		}
@@ -383,9 +383,9 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 			p_values.push_back(p[i].get(GRB_DoubleAttr_X));
 		}
 
-		for (int i = 0; i < dict.size(); i++) {
-			printf("p[%i] = %.2f\n", dict[i], p_values[i]);
-		}
+		//for (int i = 0; i < dict.size(); i++) {
+		//	printf("p[%i] = %.2f\n", dict[i], p_values[i]);
+		//}
 
 		// Get the values of the w-variables
 		std::vector<double> w_values;
@@ -393,7 +393,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 			w_values.push_back(w[i].get(GRB_DoubleAttr_X));
 		}
 
-		// CHECK:
+		/*// CHECK:
 		std::vector<double> p_values_check(dict.size(), 0);
 		for (int i = 0; i < w_values.size(); i++) {
 			if (w_values[i] > 0) {
@@ -418,7 +418,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 		for (int i = 0; i < dict.size(); i++) {
 			printf("p[%i] = %.2f\n", dict[i], p_values_check[i]);
 		}
-		/*
+		
 		double sum_check = 0;
 		for (int i = 0; i < w_values.size(); i++) {
 			if (w_values[i] > 0) {
@@ -427,19 +427,6 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 			}
 		}
 		printf("Sum = %.4f\n\n", sum_check);*/
-
-		for (int i = 0; i < w_values.size(); i++) {
-			if (w_values[i] > 0) {
-				int counter_check = 0;
-				for (int j = 0; j < K->I.n; j++) {
-					if (K->M[j] == 1) {
-						if (K->S[i].x[j] != L.S[i].x[j]) {
-							printf("ERROR, different solutions stored!\n");
-						}
-					}
-				}
-			}
-		}
 
 		// Determine the value of the gradient evaluated at the solution
 		std::vector<double> gradient = gradientNash(p_values, print);
@@ -466,7 +453,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 
 		K->model->setObjective(obj, GRB_MAXIMIZE);
-		K->model->write("Generated Formulations/IPModel.lp");
+		//K->model->write("Generated Formulations/IPModel.lp");
 		IP_report IP_R = K->solve_return_solution_MENU(print);
 			// IP_report contains only the optimal objective function and an optimal solution (see definition IPSolver.h)
 

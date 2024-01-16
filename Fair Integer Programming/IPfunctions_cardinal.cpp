@@ -179,7 +179,7 @@ double IPSolver::solve_partition_cardinal(int k, bool fill_Xmin, bool print) {
 }
 
 IP_report IPSolver::solve_return_solution_cardinal(bool print) {
-	model->getEnv().set(GRB_IntParam_OutputFlag, 1);      //comment to see the output of the solver
+	model->getEnv().set(GRB_IntParam_OutputFlag, 0);      //comment to see the output of the solver
 
 	IP_report IP_R;
 	solution s;
@@ -189,7 +189,7 @@ IP_report IPSolver::solve_return_solution_cardinal(bool print) {
 	std::vector<double> y(I.t, 0);
 	
 	solver_times++;
-	model->write("Generated Formulations/IPModel.lp");
+	//model->write("Generated Formulations/IPModel.lp");
 	model->optimize();
 	int status = model->get(GRB_IntAttr_Status);
 	double z;
