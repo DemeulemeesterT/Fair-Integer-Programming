@@ -27,7 +27,7 @@ int main()
 	K->model->write("Generated Formulations/IPModel.lp");
 	K->analyze(true);
 	LotteryDesigner* L = new LotteryDesigner(K, true);
-	L->compare_methods("CL", 1000, true, false, 0);
+	L->compare_methods("C", 1000, true, false, 0);
 	delete K;
 	delete SWT;
 	

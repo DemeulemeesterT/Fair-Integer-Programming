@@ -248,7 +248,7 @@ lottery LotteryDesigner::leximin(bool print) {
 
 	// Reset 'K', so that we don't "cheat" by making it easier for the other methods.
 	reset_K(print);
-	
+
 	return L;
 }
 

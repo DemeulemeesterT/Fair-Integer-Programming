@@ -383,10 +383,40 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 			p_values.push_back(p[i].get(GRB_DoubleAttr_X));
 		}
 
+		for (int i = 0; i < dict.size(); i++) {
+			printf("p[%i] = %.2f\n", dict[i], p_values[i]);
+		}
+
 		// Get the values of the w-variables
 		std::vector<double> w_values;
 		for (int i = 0; i < L.S.size(); i++) {
 			w_values.push_back(w[i].get(GRB_DoubleAttr_X));
+		}
+
+		// CHECK:
+		std::vector<double> p_values_check(dict.size(), 0);
+		for (int i = 0; i < w_values.size(); i++) {
+			if (w_values[i] > 0) {
+				int counter_check = 0;
+				for (int j = 0; j < K->I.n; j++) {
+					if (K->M[j] == 1) {
+						p_values_check[counter_check] += w_values[i] * K->S[i].x[j];
+						counter_check++;
+					}
+				}
+			}
+		}
+		int counter_check = 0;
+		for (int j = 0; j < K->I.n; j++) {
+			if (K->M[j] == 1) {
+				p_values_check[counter_check] -=  K->Xmin[j];
+				counter_check++;
+			}
+		}
+
+		printf("CHECK:\n");
+		for (int i = 0; i < dict.size(); i++) {
+			printf("p[%i] = %.2f\n", dict[i], p_values_check[i]);
 		}
 		/*
 		double sum_check = 0;
@@ -397,6 +427,19 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 			}
 		}
 		printf("Sum = %.4f\n\n", sum_check);*/
+
+		for (int i = 0; i < w_values.size(); i++) {
+			if (w_values[i] > 0) {
+				int counter_check = 0;
+				for (int j = 0; j < K->I.n; j++) {
+					if (K->M[j] == 1) {
+						if (K->S[i].x[j] != L.S[i].x[j]) {
+							printf("ERROR, different solutions stored!\n");
+						}
+					}
+				}
+			}
+		}
 
 		// Determine the value of the gradient evaluated at the solution
 		std::vector<double> gradient = gradientNash(p_values, print);
@@ -431,7 +474,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 		// Store solution
 		if (K->model->get(GRB_IntAttr_Status) != 3) { // If pricing problem not infeasible
-			//if (IP_R.solution_already_in_S == false) {
+			if (IP_R.solution_already_in_S == false) {
 				// Check for one of the solutions that is already included in the master problem what its objective value for this gradient would be
 				double best_value = -1e30;
 				int j = 0;
@@ -451,6 +494,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 							}
 						}
 
+						j = L.S.size();
 
 						if (sol_obj > best_value) {
 							best_value = sol_obj;
@@ -529,10 +573,10 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 					K->model->addConstr(lin <= (counter - 1));
 					//K->model->update();
 					*/
-			//}
-			//else {
-			//	finished = true;
-			//}
+			}
+			else {
+				finished = true;
+			}
 		}
 		else {
 			finished = true;
@@ -589,9 +633,9 @@ void SimplicalDecomposition::addColumn(solution sol, bool print) {
 	for (int i = 0; i < K->I.n; i++) {
 		if (K->M[i] == 1) {
 			// It only makes sense to include the agents in 'M'
-			if (sol.x[i] > K->Xmin[i]) {
+			//if (sol.x[i] > K->Xmin[i]) {
 				col.addTerm(sol.x[i], C_p[counter]);
-			}
+			//}
 			counter++;
 		}
 	}
