@@ -242,6 +242,13 @@ std::vector<ReportDistribution*> run_distribution_all_TotalTard(std::string s, i
 						// For relative
 						for (int t = 0; t < K->I.n; t++) {
 							if (K->M[t] == 1) {
+								// For some distributions, there might be some precision erros (e.g., L_vector[k].p[t] - L->K->Xmin[t] = -1e-15).
+								// We will round these values to zero
+								if ((L_vector[k].p[t] - L->K->Xmin[t]) < 0) {
+									if (-1e-7 <= (L_vector[k].p[t] - L->K->Xmin[t])) {
+										L_vector[k].p[t] = round(L_vector[k].p[t]); // Will set this value to zero. Otherwise problems computing geometric mean.
+									}
+								}
 								Nash_product_rel = Nash_product_rel * (L_vector[k].p[t] - L->K->Xmin[t]) / (L->K->Xmax[t] - L->K->Xmin[t]);
 								mean_rel += (L_vector[k].p[t] - L->K->Xmin[t]) / (L->K->Xmax[t] - L->K->Xmin[t]);
 								if ((L_vector[k].p[t] - L->K->Xmin[t]) / (L->K->Xmax[t] - L->K->Xmin[t]) < min_selection_prob_rel) {
