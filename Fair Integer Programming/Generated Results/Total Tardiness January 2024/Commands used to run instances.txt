@@ -16,6 +16,8 @@
    However, for 30 jobs and beta = 0.50, solving the partition proved to be a tedious job.
    There were several instances for which the partition couldn't be found in multiple hours.
 
+   Nash couldn't run through TT_30_0.05_18.
+
 2. To run the RSD, we used:
 	run_distribution_all_TotalTard("R", 50, 0, 3600.0, 1000, false);
    
@@ -29,6 +31,6 @@
 	std::mt19937 generator((unsigned)seed);
 	std::uniform_int_distribution<int> distr(-100000000, 100000000);
 
-3. There was a problem during TT_15_0.25_12
+   There was a problem during TT_15_0.25_12
 
 
