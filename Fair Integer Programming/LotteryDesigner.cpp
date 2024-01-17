@@ -497,25 +497,41 @@ lottery LotteryDesigner::rename_variables(int iterations, bool print, unsigned s
 		//model->getEnv().set(GRB_IntParam_Presolve, 0);
 
 		GRBVar* X = new GRBVar[K->I.n];
+
 		// Build
 		for (int i = 0; i < K->I.n; i++) {
 			char name_x[13];
 			sprintf_s(name_x, "x_%i", i);
-			X[i] = model->addVar(0.0, 1.0, 0.0, GRB_BINARY, name_x);
+			if (K->I.X_bool == true) {
+				X[i] = model->addVar(0.0, 1.0, 0.0, GRB_BINARY, name_x);
+			}
+			else {
+				if (K->I.X_integer == true) {
+					X[i] = model->addVar(-GRB_INFINITY, GRB_INFINITY, 0.0, GRB_INTEGER, name_x);
+				}
+				else {
+					X[i] = model->addVar(-GRB_INFINITY, GRB_INFINITY, 0.0, GRB_CONTINUOUS, name_x);
+				}
+			}
 		}
 
 		GRBVar* Y_var = new GRBVar[K->I.t];
-		// Build
 		for (int i = 0; i < K->I.t; i++) {
 			char name_y[13];
 			sprintf_s(name_y, "y_%i", i);
-			if (K->I.Y_bool == 1) {
+			if (K->I.Y_bool == true) {
 				Y_var[i] = model->addVar(0.0, 1.0, 0.0, GRB_BINARY, name_y);
 			}
 			else {
-				Y_var[i] = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_INTEGER, name_y);
+				if (K->I.Y_integer == true) {
+					Y_var[i] = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_INTEGER, name_y);
+				}
+				else {
+					Y_var[i] = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS, name_y);
+				}
 			}
 		}
+
 
 		GRBLinExpr obj;
 		obj = 0.0;
@@ -553,49 +569,79 @@ lottery LotteryDesigner::rename_variables(int iterations, bool print, unsigned s
 		// Store solution
 		solution sol;
 		sol.x = std::vector<double>(K->I.n, 0);
-		for (int i = 0; i < K->I.n; i++) {
-			// Now we have to assign this solution value again to the agent that is represented by this variable
-			agent = orders[j][i];
-			sol.x[agent] = (bool)X[i].get(GRB_DoubleAttr_X);
-		}
 		sol.y = std::vector<double>(K->I.t, 0);
-		for (int i = 0; i < K->I.t; i++) {
-			sol.y[i] = Y_var[i].get(GRB_DoubleAttr_X);
-		}
-
-		// Compute the binary number represented by the solution.
-		int bin = 0;
-		int exponent = 0;
-		int exponent_sum = 0;
-		for (int i = K->I.n - 1; i > -1; i--) {
-			if (sol.x[i] == true) {
-				bin += pow(2, exponent);
-				exponent_sum += exponent;
+		if (K->I.X_bool == true) {
+			for (int i = 0; i < K->I.n; i++) {
+				// Now we have to assign this solution value again to the agent that is represented by this variable
+				agent = orders[j][i];
+				sol.x[agent] = (bool)X[i].get(GRB_DoubleAttr_X);
 			}
-			exponent++;
+			sol.y = std::vector<double>(K->I.t, 0);
+			for (int i = 0; i < K->I.t; i++) {
+				sol.y[i] = Y_var[i].get(GRB_DoubleAttr_X);
+			}
 		}
+		else {
+			if (K->I.X_integer == true) {
+				for (int k = 0; k < K->I.n; k++) {
+					agent = orders[j][k];
+					sol.x[agent] = (int)X[k].get(GRB_DoubleAttr_X);
+				}
+			}
+			else {
+				for (int k = 0; k < K->I.n; k++) {
+					agent = orders[j][k];
+					sol.x[k] = X[k].get(GRB_DoubleAttr_X);
+				}
+			}
 
-		// This method will not work for large numbers
-		// Largest number that can be stored in a double is 1.7e308
-		// Just add the solution if the ID is too large, don't perform check
-		bool found = false;
-		if (exponent_sum <= 80) {
-			// Go through all solutions in S to see if another solution has this ID
-			for (int i = 0; i < L.S.size(); i++) {
-				if (L.S[i].ID == bin) {
-					found = true;
-					L.w[i] += 1 / (double)orders.size();
-					// Increase the selection weight of this solution
-					i = L.S.size();
+			if (K->I.Y_integer == true) {
+				for (int k = 0; k < K->I.t; k++) {
+					sol.y[k] = (int)Y_var[k].get(GRB_DoubleAttr_X);
+				}
+			}
+			else {
+				for (int k = 0; k < K->I.t; k++) {
+					sol.y[k] = Y_var[k].get(GRB_DoubleAttr_X);
 				}
 			}
 		}
 
+		/*if (K->I.X_bool == true) {
+			// Compute the binary number represented by the solution.
+			int bin = 0;
+			int exponent = 0;
+			int exponent_sum = 0;
+			for (int i = K->I.n - 1; i > -1; i--) {
+				if (sol.x[i] == true) {
+					bin += pow(2, exponent);
+					exponent_sum += exponent;
+				}
+				exponent++;
+			}
+
+			// This method will not work for large numbers
+			// Largest number that can be stored in a double is 1.7e308
+			// Just add the solution if the ID is too large, don't perform check
+			bool found = false;
+			if (exponent_sum <= 80) {
+				// Go through all solutions in S to see if another solution has this ID
+				for (int i = 0; i < L.S.size(); i++) {
+					if (L.S[i].ID == bin) {
+						found = true;
+						L.w[i] += 1 / (double)orders.size();
+						// Increase the selection weight of this solution
+						i = L.S.size();
+					}
+				}
+			}
+		}*/
+
 		// Now add this solution to 'L', with a selection probability equal to 1/orders.size()
-		if (found == false) {
+		//if (found == false) {
 			L.S.push_back(sol);
 			L.w.push_back(1 / (double)orders.size());
-		}
+		//}
 
 		delete[] X;
 		delete[] Y_var;
@@ -668,37 +714,47 @@ lottery LotteryDesigner::perturb_objective(int iterations, bool print, unsigned 
 		// Store solution
 		solution sol;
 		sol.x = std::vector<double>(K->I.n, 0);
-		for (int i = 0; i < K->I.n; i++) {
-			sol.x[i] = (bool)K->X[i].get(GRB_DoubleAttr_X);
-		}
-
-		// Compute the binary number represented by the solution.
-		int bin = 0;
-		int exponent = 0;
-		for (int i = K->I.n - 1; i > -1; i--) {
-			if (sol.x[i] == true) {
-				bin += pow(2, exponent);
+		// Store solution
+		if (K->I.X_integer == true) {
+			for (int j = 0; j < K->I.n; j++) {
+				sol.x[j] = (int)K->X[j].get(GRB_DoubleAttr_X);
 			}
-			exponent++;
 		}
-		sol.ID = bin;
+		else {
+			for (int j = 0; j < K->I.n; j++) {
+				sol.x[j] = K->X[j].get(GRB_DoubleAttr_X);
+			}
+		}
 
-		// Go through all solutions in S to see if another solution has this ID
-		bool found = false;
-		for (int i = 0; i < L.S.size(); i++) {
-			if (L.S[i].ID == bin) {
-				found = true;
-				L.w[i] += 1 / (double)iterations;
-				// Increase the selection weight of this solution
-				i = L.S.size();
+		if (K->I.X_bool == true) {
+			// Compute the binary number represented by the solution.
+			int bin = 0;
+			int exponent = 0;
+			for (int i = K->I.n - 1; i > -1; i--) {
+				if (sol.x[i] == true) {
+					bin += pow(2, exponent);
+				}
+				exponent++;
+			}
+			sol.ID = bin;
+
+			// Go through all solutions in S to see if another solution has this ID
+			bool found = false;
+			for (int i = 0; i < L.S.size(); i++) {
+				if (L.S[i].ID == bin) {
+					found = true;
+					L.w[i] += 1 / (double)iterations;
+					// Increase the selection weight of this solution
+					i = L.S.size();
+				}
 			}
 		}
 
 		// Now add this solution to 'L', with a selection probability equal to 1/orders.size()
-		if (found == false) {
+		//if (found == false) {
 			L.S.push_back(sol);
 			L.w.push_back(1 / (double)iterations);
-		}
+		//}
 	}
 
 	// Calculate the selection probabilities of the agents, based on the solutions
