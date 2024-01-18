@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	//run_distribution_all_TotalTard("ROP", 50, 0, 3600.0, 1000, false);
+	run_distribution_all_TotalTard("ROP", 50, 0, 3600.0, 1000, false);
 	//run_distribution_all_KE("L", 3600.0, 1, false);
 	//run_distribution_all_SWT("H", 50, 3600.0, 1000, false);
 	//compare_time_normal_RSD_SWT(1000, 50, false);
@@ -12,7 +12,7 @@ int main()
 	
 	//SchedulingWeightTard* SWT = new SchedulingWeightTard("wt40", false);
 	//inst I = SWT->generate_instanceTIF_WT(1, false, true);
-	SchedWT_param S;
+	/*SchedWT_param S;
 	//S.common_process_time = 1;
 	S.n_jobs = 15;
 	S.seed = -5658298;
@@ -30,7 +30,7 @@ int main()
 	L->compare_methods("R", 1000, true, false, 0);
 	delete K;
 	delete SWT;
-	
+	*/
 	
 	
 	

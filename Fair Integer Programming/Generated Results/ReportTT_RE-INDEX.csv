@@ -1,1 +1,6 @@
 Name, n, |M|, time solution, time partition, time distribution, generated solutions, used solutions, geometric mean (rel.), arithmetic mean (rel.), minimum selection probability (rel.), geometric mean (abs.), arithmetic mean (abs.), minimum selection probability (abs.)
+TT_15_0.25_35, 15, 6, 0.087,2.357,101.822,31,1000,0,0.5,0,0,4.16667,0,
+TT_15_0.25_36, 15, 3, 0.148,1.583,185.126,31,1000,0,0.5,0,0,8,0,
+TT_15_0.25_37, 15, 8, 0.351,6.366,475.905,31,1000,0,0.5625,0,0,8.375,0,
+TT_15_0.25_38, 15, 10, 0.068,3.786,104.191,31,1000,0,0.420833,0,0,3.8,0,
+TT_15_0.25_39, 15, 7, 0.035,1.108,63.03,31,1000,0,0.5,0,0,2.85714,0,

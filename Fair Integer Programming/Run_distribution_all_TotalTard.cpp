@@ -23,13 +23,18 @@ std::vector<ReportDistribution*> run_distribution_all_TotalTard(std::string s, i
 	}
 
 	// Create boolean vector to decide which instances should be run
-	/*std::vector<std::vector<std::vector<bool>>> run_vector(N_vector.size(), std::vector<std::vector<bool>>(beta_vector.size(), std::vector<bool>(inst_generated, 0)));
+	std::vector<std::vector<std::vector<bool>>> run_vector(N_vector.size(), std::vector<std::vector<bool>>(beta_vector.size(), std::vector<bool>(inst_generated, 0)));
 	
 	for (int p = 0; p < N_vector.size(); p++) {
 		for (int b = 0; b < beta_vector.size(); b++) {
 			for (int i = 0; i < inst_generated; i++) {
 				if (p == 1) {
-					if (b >= 1) {
+					if (b == 1) {
+						if (i >= 35) {
+							run_vector[p][b][i] = true;
+						}
+					}
+					else if (b == 2) {
 						run_vector[p][b][i] = true;
 					}
 				}
@@ -39,7 +44,7 @@ std::vector<ReportDistribution*> run_distribution_all_TotalTard(std::string s, i
 			}
 		}
 	}
-	*/
+	
 
 	// Change this conditional on the name of the distribution you're looking for.
 	char filename_front[50];
@@ -136,7 +141,7 @@ std::vector<ReportDistribution*> run_distribution_all_TotalTard(std::string s, i
 	for (int p = 0; p < N_vector.size(); p++) {
 		for (int b = 0; b < beta_vector.size(); b++) {
 			for (int i = 0; i < inst_generated; i++) {
-				//if (run_vector[p][b][i] == true) {
+				if (run_vector[p][b][i] == true) {
 					sprintf_s(numstr1, "%i", N_vector[p]);
 					sprintf_s(numstr2, "%.2f", beta_vector[b]);
 					sprintf_s(numstr3, "%i", i);
@@ -336,7 +341,7 @@ std::vector<ReportDistribution*> run_distribution_all_TotalTard(std::string s, i
 					delete K;
 					delete SWT;
 					L_vector.clear();
-				//}
+				}
 			}
 		}
 	}

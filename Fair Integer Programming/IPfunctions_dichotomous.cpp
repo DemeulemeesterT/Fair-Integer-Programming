@@ -1288,8 +1288,8 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 				CON_OPT = model->addConstr(lin == (double)opt);
 			}
 
-			model->write("Generated Formulations/ModelRSD.lp");
-			model->getEnv().set(GRB_IntParam_OutputFlag, 1);
+			//model->write("Generated Formulations/ModelRSD.lp");
+			//model->getEnv().set(GRB_IntParam_OutputFlag, 1);
 			
 
 
