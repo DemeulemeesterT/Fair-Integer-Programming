@@ -1288,6 +1288,11 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 				CON_OPT = model->addConstr(lin == (double)opt);
 			}
 
+			model->write("Generated Formulations/ModelRSD.lp");
+			model->getEnv().set(GRB_IntParam_OutputFlag, 1);
+			
+
+
 			// Go through all agents in 'M', which is the number of agents in the order by now
 			for (int j = 0; j < M_size; j++) {
 				// Maximize the value of the j-th agent in the order
@@ -1297,6 +1302,10 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 				model->optimize();
 				int status = model->get(GRB_IntAttr_Status);
 				GRBLinExpr expr;
+				if (status == 4) {
+					model->computeIIS();
+					model->write("Generated Formulations/RSD_IIS.ilp");
+				}
 				if (status != 3) { // If feasible
 					// We only care about value of the variable that we maximized
 					double x_var_max = X[order[j]].get(GRB_DoubleAttr_X);
@@ -1313,7 +1322,14 @@ solution IPSolver::RSD_once(std::vector<int> order, bool print) {
 					
 					// Add constraint to enforce the value for the maximized 'X'-variable
 					expr = X[order[j]];
-					RSD_fixed.push_back(model->addConstr(expr == x_var_max));
+
+					if (I.X_integer == true) {
+						RSD_fixed.push_back(model->addConstr(expr == (int) round(x_var_max)));
+					}
+					else {
+						RSD_fixed.push_back(model->addConstr(expr == x_var_max));
+					}
+
 					//model->write("Generated Formulations/ModelRSD.lp");
 				}
 			}

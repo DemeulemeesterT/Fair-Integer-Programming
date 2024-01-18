@@ -1,0 +1,11 @@
+\ Model (null)_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Maximize
+ 
+Subject To
+ R150: x_3 = -25.99999200016871
+Bounds
+ x_3 free
+Generals
+ x_3
+End

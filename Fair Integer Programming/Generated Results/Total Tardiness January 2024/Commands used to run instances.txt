@@ -18,8 +18,9 @@
 
    Nash couldn't run through TT_30_0.05_18.
 
-2. To run the RSD, we used:
-	run_distribution_all_TotalTard("R", 50, 0, 3600.0, 1000, false);
+2. To run the RSD, re-order, and perturb we used:
+	run_distribution_all_TotalTard("ROP", 50, 0, 3600.0, 1000, false);
+
    
    and in the run_distribution file, the first lines were: 
 	std::vector<int> N_vector;
@@ -31,6 +32,6 @@
 	std::mt19937 generator((unsigned)seed);
 	std::uniform_int_distribution<int> distr(-100000000, 100000000);
 
-   There was a problem during TT_15_0.25_12
+   There was a problem during TT_15_0.25_22. Voor random order i = 658, voor student j = 6 in de order.
 
 

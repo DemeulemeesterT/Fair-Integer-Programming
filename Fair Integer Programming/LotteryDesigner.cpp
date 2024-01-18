@@ -295,7 +295,7 @@ lottery LotteryDesigner::RSD(int iterations, bool print, unsigned seed) {
 					i = L.S.size();
 				}
 			}
-		}*/ 
+		}*/
 		// We don't use ID for non-binary 'X'-variables
 
 		bool found = false;
@@ -305,12 +305,13 @@ lottery LotteryDesigner::RSD(int iterations, bool print, unsigned seed) {
 			// Very possible, but I decided not to do it.
 			// Main advantage of implementing this would be to have less solutions with a positive weight in the lottery
 			// as duplicates will be avoided.
-			
+
 		// Now add this solution to 'L', with a selection probability equal to 1/orders.size()
 		if (found == false) {
 			L.S.push_back(sol);
 			L.w.push_back(1 / (double)orders.size());
 		}
+
 	}
 
 	// Calculate the selection probabilities of the agents, based on the solutions
