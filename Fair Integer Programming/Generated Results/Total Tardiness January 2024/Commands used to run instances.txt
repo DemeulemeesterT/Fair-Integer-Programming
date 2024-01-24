@@ -62,3 +62,6 @@
 	}
 
 
+4. From TT_20_0.50_35, we realised that running Perturb might find solutions that are not
+optimal to the original problem instance. From here, we only ran RSD and Re-index.
+	run_distribution_all_TotalTard("RO", 50, 0, 3600.0, 1000, false);

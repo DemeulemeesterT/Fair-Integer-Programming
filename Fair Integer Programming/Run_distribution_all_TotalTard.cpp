@@ -29,16 +29,13 @@ std::vector<ReportDistribution*> run_distribution_all_TotalTard(std::string s, i
 		for (int b = 0; b < beta_vector.size(); b++) {
 			for (int i = 0; i < inst_generated; i++) {
 				if (p == 2) {
-					if (b == 0) {
-						if (i >= 18) {
+					if (b == 2) {
+						if (i >= 35) {
 							run_vector[p][b][i] = true;
 						}
 					}
-					else if (b >= 1) {
-						run_vector[p][b][i] = true;
-					}
 				}
-				else if (p >= 2) {
+				else if (p >= 3) {
 					run_vector[p][b][i] = true;
 				}
 			}
