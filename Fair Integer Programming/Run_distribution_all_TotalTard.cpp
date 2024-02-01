@@ -30,7 +30,7 @@ std::vector<ReportDistribution*> run_distribution_all_TotalTard(std::string s, i
 			for (int i = 0; i < inst_generated; i++) {
 				if (p == 3) {
 					if (b == 2) {
-						if (i >= 29) {
+						if (i == 35) {
 							run_vector[p][b][i] = true;
 						}
 					}
