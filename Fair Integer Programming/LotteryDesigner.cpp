@@ -1346,10 +1346,10 @@ std::vector<lottery> LotteryDesigner::compare_methods(std::string s, int iterati
 				for (int i = 0; i < K->I.n; i++) {
 					for (int s = 0; s < L[0].S.size(); s++) {
 						if (L[0].w[s] > 0) {
-							printf("\t%i", (int)L[0].S[s].x[i]);
+							//printf("\t%i", (int)L[0].S[s].x[i]);
 						}
 					}
-					printf("\n");
+					//printf("\n");
 				}
 
 			}

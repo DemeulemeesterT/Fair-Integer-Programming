@@ -453,7 +453,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 
 		K->model->setObjective(obj, GRB_MAXIMIZE);
-		//K->model->write("Generated Formulations/IPModel.lp");
+		K->model->write("Generated Formulations/IPModel.lp");
 		IP_report IP_R = K->solve_return_solution_MENU(print);
 			// IP_report contains only the optimal objective function and an optimal solution (see definition IPSolver.h)
 
@@ -530,7 +530,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 						GRBLinExpr lin = 0;
 						int counter_block = 0;
 						if (K->I.Y_bool == true) {
-							
+
 							for (int i = 0; i < IP_R.s.y.size(); i++) {
 								if (round(IP_R.s.y[i]) == 1) {
 									lin += K->Y_var[i];
@@ -541,25 +541,27 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 						K->model->addConstr(lin <= (counter_block - 1));
 						K->model->update();
 					}
-				}
+
 
 					//K->block_solution(K->S.back());
 						// This will block entire solution (including agents in Y and y-variables)
 
-					// Block the found solution
-					/*GRBLinExpr lin = 0;
-					int counter = 0;
-					for (int i = 0; i < IP_R.s.x.size(); i++) {
-						if (K->M[i] == 1) { // If the agent is in M, that's the only case in which it matters
-							if (IP_R.s.x[i] == 1) {// If the agent is selected
-								lin += K->X[i];
-								counter++;
+					if (K->I.X_integer == false) {
+						// Block the found solution
+						GRBLinExpr lin = 0;
+						int counter = 0;
+						for (int i = 0; i < IP_R.s.x.size(); i++) {
+							if (K->M[i] == 1) { // If the agent is in M, that's the only case in which it matters
+								if (IP_R.s.x[i] == 1) {// If the agent is selected
+									lin += K->X[i];
+									counter++;
+								}
 							}
 						}
+						K->model->addConstr(lin <= (counter - 1));
+						//K->model->update();
 					}
-					K->model->addConstr(lin <= (counter - 1));
-					//K->model->update();
-					*/
+				}
 			}
 			else {
 				finished = true;
