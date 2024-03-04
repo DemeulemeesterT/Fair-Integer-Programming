@@ -453,7 +453,7 @@ lottery SimplicalDecomposition::Nash_CG(bool print) {
 
 
 		K->model->setObjective(obj, GRB_MAXIMIZE);
-		K->model->write("Generated Formulations/IPModel.lp");
+		//K->model->write("Generated Formulations/IPModel.lp");
 		IP_report IP_R = K->solve_return_solution_MENU(print);
 			// IP_report contains only the optimal objective function and an optimal solution (see definition IPSolver.h)
 
