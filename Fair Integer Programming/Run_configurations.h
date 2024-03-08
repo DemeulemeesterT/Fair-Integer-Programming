@@ -45,5 +45,10 @@ void compare_time_normal_RSD_SWT(int iter, int nr_instances, bool print);
 	// Compare time solving one instance, solving RSD, and solving RSDheuristic for MINIMIZING THE WEIGHTED NUMBER OF TARDY JOBS
 
 
+void Method_simulations(int iter, int n_per_method, std::string s, bool print);
+	// Evaluates for different random samples of the orderings how the resulting assignments from different methods (method 's') differ.
+	// 'iter' is number of times we check the method 's'
+	// 'n_per_method' is number of samples for each run of the method 's'
+	// Method 's' could be uniform (U), perturb (P), re-index (O), RSD (R)
 
 

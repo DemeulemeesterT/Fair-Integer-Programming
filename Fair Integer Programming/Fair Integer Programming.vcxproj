@@ -165,6 +165,7 @@
     <ClCompile Include="LeximinMaster.cpp" />
     <ClCompile Include="LotteryDesigner.cpp" />
     <ClCompile Include="ReportDistribution.cpp" />
+    <ClCompile Include="Method simulations.cpp" />
     <ClCompile Include="Run_distribution_all_KE.cpp" />
     <ClCompile Include="Run_distribution_all_SWT.cpp" />
     <ClCompile Include="Run_distribution_all_TotalTard.cpp" />

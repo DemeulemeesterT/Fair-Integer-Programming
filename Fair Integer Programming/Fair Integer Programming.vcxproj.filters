@@ -101,5 +101,8 @@
     <ClCompile Include="Run_distribution_all_TotalTard.cpp">
       <Filter>Source Files\RunConfigurations</Filter>
     </ClCompile>
+    <ClCompile Include="Method simulations.cpp">
+      <Filter>Source Files\RunConfigurations</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
