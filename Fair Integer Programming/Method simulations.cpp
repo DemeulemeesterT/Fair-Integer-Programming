@@ -1,7 +1,7 @@
 #include"Run_configurations.h"
 
 void Method_simulations(int iter, int n_per_method, std::string s, bool print) {
-	std::mt19937 generator((unsigned)0);
+	std::mt19937 generator((unsigned)1);
 
 	// Create random seed vector
 	std::vector<int> seeds_vector(iter*n_per_method+1,0);

@@ -740,7 +740,7 @@ lottery LotteryDesigner::perturb_objective(int iterations, bool print, unsigned 
 			sol.ID = bin;
 
 			// Go through all solutions in S to see if another solution has this ID
-			bool found = false;
+			/*bool found = false;
 			for (int i = 0; i < L.S.size(); i++) {
 				if (L.S[i].ID == bin) {
 					found = true;
@@ -748,7 +748,7 @@ lottery LotteryDesigner::perturb_objective(int iterations, bool print, unsigned 
 					// Increase the selection weight of this solution
 					i = L.S.size();
 				}
-			}
+			}*/
 		}
 
 		// Now add this solution to 'L', with a selection probability equal to 1/orders.size()
