@@ -4,8 +4,6 @@ using namespace std;
 
 int main()
 {
-	Method_simulations(10, 1000, "R", true);
-
 	KidneyExchange* KE = new KidneyExchange("40-instance-48", true);
 
 	inst I = KE->generate_instance(true, false);
